@@ -1,0 +1,15 @@
+# Table of Contents
+
+* [Python](python.md)
+  * [1. Introduction](python/Introduction.md)
+  * [2. Fundamentals](python/Fundamentals.md)
+  * [3. Control Flow](python/Control Flow.md)
+  * [4. Functions](python/Functions.md)
+  * [5. Data Structures](python/Data Structures.md)
+  * [6. Errors & Exceptions](python/Errors & Exceptions.md)
+  * [7. Functional Tools](python/Functional Tools.md)
+  * [8. Classes & OOP](python/Classes & OOP.md)
+  * [9. Modules & Packages](python/Modules & Packages.md)
+  * [10. File I/O](python/File IO and Context Managers.md)
+  * [11. Concurrency](python/Concurrency.md)
+  * [12. Metaprogramming](python/Metaprogramming.md)
