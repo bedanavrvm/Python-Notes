@@ -212,12 +212,9 @@ PEP 8 is the official document that defines how Python code should be formatted.
 | Constants | Use UPPER_SNAKE_CASE (e.g., MAX_RETRIES). |
 | Private Members | Prefix with underscore (e.g., _internal_method). |
 | Line Length | Limit all lines to a maximum of 79 characters. |
-| Blank Lines | Surround top-level function and class definitions with |
-
-  two blank lines. |
+| Blank Lines | Surround top-level function and class definitions with two blank lines.|
 | Imports | Place imports at the top of the file, one per line. |
-| Docstrings | Use triple quotes for module, class, and function
-  documentation. |
+| Docstrings | Use triple quotes for module, class, and function documentation. |
 | Spacing | Use spaces around operators and after commas. |
 
 ### Example of Non-Pythonic vs. Pythonic code
