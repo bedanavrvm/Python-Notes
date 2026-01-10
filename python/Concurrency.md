@@ -90,6 +90,9 @@ thread pooling.
 An **executor** manages a pool of worker threads (or processes) and gives
 you a higher-level API than manually creating `Thread`/`Process` objects.
 
+<details>
+<summary>Show ThreadPoolExecutor example</summary>
+
 ```python
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
@@ -108,6 +111,8 @@ if __name__ == "__main__":
     main()
 ```
 
+</details>
+
 ### Shared state and race conditions
 
 When multiple threads read/write shared data without coordination, you can get
@@ -119,6 +124,9 @@ Use synchronization primitives such as:
 - `threading.RLock` (re-entrant lock)
 - `threading.Semaphore` (limit concurrency)
 - `queue.Queue` (thread-safe message passing)
+
+<details>
+<summary>Show race condition / locking example</summary>
 
 ```python
 import threading
@@ -141,6 +149,8 @@ for t in threads:
 print(counter)
 ```
 
+</details>
+
 A **deadlock** happens when two (or more) threads wait on locks in a cycle.
 To reduce deadlocks:
 
@@ -152,6 +162,9 @@ To reduce deadlocks:
 
 Prefer `concurrent.futures.ProcessPoolExecutor` for simple CPU-bound
 parallelism.
+
+<details>
+<summary>Show ProcessPoolExecutor example</summary>
 
 ```python
 from concurrent.futures import ProcessPoolExecutor
@@ -172,6 +185,8 @@ if __name__ == "__main__":
     main()
 ```
 
+</details>
+
 ### Serialization (pickling) and IPC
 
 Processes do not share memory by default. Communication often uses:
@@ -189,6 +204,9 @@ In `asyncio`, an `async def` function defines a **coroutine**.
 
 - You use `await` to pause until an awaitable completes.
 - The event loop switches to other ready tasks at `await` points.
+
+<details>
+<summary>Show asyncio gather example</summary>
 
 ```python
 import asyncio
@@ -208,9 +226,14 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
+</details>
+
 ### Tasks, cancellation, and timeouts
 
 A **task** is a scheduled coroutine.
+
+<details>
+<summary>Show tasks / cancellation / timeouts example</summary>
 
 ```python
 import asyncio
@@ -227,6 +250,8 @@ async def main() -> None:
 
 asyncio.run(main())
 ```
+
+</details>
 
 ### Async synchronization
 

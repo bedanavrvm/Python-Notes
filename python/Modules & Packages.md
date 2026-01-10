@@ -10,19 +10,36 @@ A Module is simply a file containing Python definitions and statements. The file
 
 When you import a module, Python executes the code in that file and creates a module object in the current scope.
 
+{% tabs %}
+
+{% tab title="calculator.py" %}
+
 ```python
-# calculator.py
 def add(a, b):
     return a + b
+```
 
-# main.py
+{% endtab %}
+
+{% tab title="main.py (import module)" %}
+
+```python
 import calculator
 print(calculator.add(5, 3))
+```
 
-# Alternative: importing specific functions
+{% endtab %}
+
+{% tab title="main.py (from ... import ...)" %}
+
+```python
 from calculator import add
 print(add(5, 3))
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### Module Search Path (`sys.path`)
 
@@ -127,17 +144,18 @@ When working within a package, you have two ways to reference other modules.
 
 Specifies the full path from the project's root folder. This is the preferred method (PEP 8) because it is clear and unambiguous.
 
+{% tabs %}
+
+{% tab title="Absolute" %}
+
 ```python
 # Inside effects.py
 from graphics.primitives import draw_line
 ```
 
-### 2. Relative Imports
+{% endtab %}
 
-Uses leading dots to indicate the current and parent packages.
-
-- `.` refers to the current package
-- `..` refers to the parent package
+{% tab title="Relative" %}
 
 ```python
 # Inside effects.py
@@ -147,6 +165,17 @@ from .primitives import draw_line
 # If you try to run effects.py as a standalone script, 
 # relative import will fail.
 ```
+
+{% endtab %}
+
+{% endtabs %}
+
+### 2. Relative Imports
+
+Uses leading dots to indicate the current and parent packages.
+
+- `.` refers to the current package
+- `..` refers to the parent package
 
 ### Import Best Practices
 
@@ -332,6 +361,9 @@ def heavy_operation():
 
 Creating distributable packages:
 
+<details>
+<summary>Show setup.py example</summary>
+
 ```python
 # setup.py
 from setuptools import setup
@@ -347,6 +379,8 @@ setup(
 )
 ```
 
+</details>
+
 #### Package Metadata
 
 **Package metadata** includes name, version, author, and dependencies, stored in
@@ -361,13 +395,16 @@ be invoked via command-line tools (e.g., `console_scripts` in `setup.cfg`).
 
 Isolating package dependencies:
 
+{% tabs %}
+
+{% tab title="Linux/macOS" %}
+
 ```bash
 # Create virtual environment
 python -m venv my_env
 
 # Activate
-source my_env/bin/activate  # Linux/Mac
-my_env\Scripts\activate   # Windows
+source my_env/bin/activate
 
 # Install packages
 pip install requests numpy pandas
@@ -375,6 +412,28 @@ pip install requests numpy pandas
 # Freeze dependencies
 pip freeze > requirements.txt
 ```
+
+{% endtab %}
+
+{% tab title="Windows" %}
+
+```bash
+# Create virtual environment
+python -m venv my_env
+
+# Activate
+my_env\Scripts\activate
+
+# Install packages
+pip install requests numpy pandas
+
+# Freeze dependencies
+pip freeze > requirements.txt
+```
+
+{% endtab %}
+
+{% endtabs %}
 
 #### Version Management
 
@@ -412,6 +471,9 @@ for name, obj in inspect.getmembers(calculator):
 
 Accessing data files within packages:
 
+<details>
+<summary>Show package resources example</summary>
+
 ```python
 # my_package/
 # ├── data/
@@ -426,6 +488,8 @@ def load_config():
     with pkg_resources.resource_stream("my_package", "data/config.json") as f:
         return json.load(f)
 ```
+
+</details>
 
 ### Import Hooks
 

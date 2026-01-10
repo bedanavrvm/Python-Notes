@@ -74,10 +74,20 @@ print(next(counter))  # 2
 
 Concise syntax for creating generators:
 
+{% tabs %}
+
+{% tab title="List (eager)" %}
+
 ```python
 # List comprehension (creates full list in memory)
 squares_list = [x**2 for x in range(1000000)]
+```
 
+{% endtab %}
+
+{% tab title="Generator (lazy)" %}
+
+```python
 # Generator expression (creates generator object)
 squares_gen = (x**2 for x in range(1000000))
 
@@ -86,7 +96,14 @@ print(next(squares_gen))  # 0
 print(next(squares_gen))  # 1
 ```
 
+{% endtab %}
+
+{% endtabs %}
+
 ### Advanced Generator Patterns
+
+<details>
+<summary>Show advanced generator patterns</summary>
 
 ```python
 # Infinite generator
@@ -119,6 +136,8 @@ print(next(fib))  # 1
 data = range(10)
 result = list(process_data(data))  # [0, 4, 16, 36, 64]
 ```
+
+</details>
 
 ## Decorators
 
@@ -164,6 +183,9 @@ print(add(5, 10))
 ### Advanced Decorator Patterns
 
 #### Decorators with Arguments
+
+<details>
+<summary>Show decorator patterns</summary>
 
 ```python
 def repeat(times):
@@ -230,6 +252,8 @@ print(my_function.__name__)  # my_function (preserved)
 print(my_function.__doc__)   # Original function docstring (preserved)
 ```
 
+</details>
+
 ## Higher-Order Functions
 
 Functions that take other functions as arguments or return functions.
@@ -238,12 +262,23 @@ Functions that take other functions as arguments or return functions.
 
 Apply a function to all items in an iterable:
 
+{% tabs %}
+
+{% tab title="lambda" %}
+
 ```python
 numbers = [1, 2, 3, 4, 5]
 squared = list(map(lambda x: x**2, numbers))
 print(squared)  # [1, 4, 9, 16, 25]
+```
 
-# With regular function
+{% endtab %}
+
+{% tab title="named function" %}
+
+```python
+numbers = [1, 2, 3, 4, 5]
+
 def double(x):
     return x * 2
 
@@ -251,16 +286,31 @@ doubled = list(map(double, numbers))
 print(doubled)  # [2, 4, 6, 8, 10]
 ```
 
+{% endtab %}
+
+{% endtabs %}
+
 ### filter()
 
 Select items from an iterable based on a condition:
+
+{% tabs %}
+
+{% tab title="lambda" %}
 
 ```python
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 evens = list(filter(lambda x: x % 2 == 0, numbers))
 print(evens)  # [2, 4, 6, 8, 10]
+```
 
-# With regular function
+{% endtab %}
+
+{% tab title="named function" %}
+
+```python
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
 def is_prime(n):
     if n < 2:
         return False
@@ -272,6 +322,10 @@ def is_prime(n):
 primes = list(filter(is_prime, numbers))
 print(primes)  # [2, 3, 5, 7]
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### reduce()
 
@@ -379,6 +433,9 @@ print(multiply_then_add(5))   # add_one(multiply_by_two(5)) = 11
 
 ### Currying
 
+<details>
+<summary>Show currying example</summary>
+
 ```python
 def curry(func):
     def curried(*args, **kwargs):
@@ -395,7 +452,12 @@ add_5 = add_three(2, 3)  # Partially applied
 result = add_5(10)  # 15
 ```
 
+</details>
+
 ### Memoization
+
+<details>
+<summary>Show memoization examples</summary>
 
 ```python
 from functools import lru_cache
@@ -424,9 +486,14 @@ print(expensive_calculation(5))  # Calculates
 print(expensive_calculation(5))  # Returns cached result
 ```
 
+</details>
+
 ## Practical Applications
 
 ### Data Processing Pipeline
+
+<details>
+<summary>Show data processing pipeline example</summary>
 
 ```python
 def process_data(data):
@@ -447,6 +514,8 @@ def process_data(data):
 numbers = [1, 2, 3, 4, 5]
 result = process_data(numbers)  # [4, 16, 36]
 ```
+
+</details>
 
 ### Configuration Management
 

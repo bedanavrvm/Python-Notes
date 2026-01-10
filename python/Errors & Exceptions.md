@@ -223,19 +223,31 @@ except ZeroDivisionError as e:
 
 Context managers provide a clean way to handle resources that need setup and cleanup.
 
+{% tabs %}
+
+{% tab title="Traditional" %}
+
 ```python
-# Traditional approach
 try:
     file = open("data.txt", "w")
     file.write("Hello, World!")
 finally:
     file.close()
+```
 
-# Context manager approach
+{% endtab %}
+
+{% tab title="Context manager" %}
+
+```python
 with open("data.txt", "w") as file:
     file.write("Hello, World!")
     # File automatically closed here
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### Creating Custom Context Managers
 
@@ -267,6 +279,9 @@ with DatabaseConnection("postgresql://localhost") as db:
 
 ### Exception Logging
 
+<details>
+<summary>Show exception logging example</summary>
+
 ```python
 import logging
 
@@ -286,7 +301,12 @@ except Exception as e:
     logging.warning(f"Specific error: {type(e).__name__}: {e}")
 ```
 
+</details>
+
 ### Retry Mechanisms
+
+<details>
+<summary>Show retry mechanism example</summary>
 
 ```python
 import time
@@ -322,7 +342,12 @@ except Exception as e:
     print(f"Failed after retries: {e}")
 ```
 
+</details>
+
 ### Graceful Degradation
+
+<details>
+<summary>Show graceful degradation example</summary>
 
 ```python
 class ServiceDegradationError(Exception):
@@ -344,18 +369,28 @@ def get_data_with_fallback(primary_source, fallback_source):
             )
 ```
 
+</details>
+
 ## Exception Handling Best Practices
 
 ### 1. Be Specific
 
+{% tabs %}
+
+{% tab title="Bad" %}
+
 ```python
-# Bad: Too broad
 try:
     operation()
 except:
     pass  # Catches everything, including system exit
+```
 
-# Good: Specific
+{% endtab %}
+
+{% tab title="Good" %}
+
+```python
 try:
     operation()
 except (ValueError, TypeError) as e:
@@ -364,31 +399,55 @@ except Exception as e:
     handle_unexpected_error(e)
 ```
 
+{% endtab %}
+
+{% endtabs %}
+
 ### 2. Fail Fast
 
+{% tabs %}
+
+{% tab title="Bad" %}
+
 ```python
-# Bad: Continuing with invalid state
 def process_data(data):
     if not isinstance(data, list):
         return []  # Silent failure
     # Continue processing with empty list...
+```
 
-# Good: Fail immediately
+{% endtab %}
+
+{% tab title="Good" %}
+
+```python
 def process_data(data):
     if not isinstance(data, list):
         raise TypeError(f"Expected list, got {type(data).__name__}")
 ```
 
+{% endtab %}
+
+{% endtabs %}
+
 ### 3. Don't Suppress Important Errors
 
+{% tabs %}
+
+{% tab title="Bad" %}
+
 ```python
-# Bad: Hiding initialization errors
 try:
     config = load_config()
 except:
     config = {}  # Use default config, but problem might persist
+```
 
-# Good: Let critical errors propagate
+{% endtab %}
+
+{% tab title="Good" %}
+
+```python
 try:
     config = load_config()
 except FileNotFoundError:
@@ -396,18 +455,34 @@ except FileNotFoundError:
     raise  # Re-raise for caller to handle
 ```
 
+{% endtab %}
+
+{% endtabs %}
+
 ### 4. Provide Context
 
-```python
-# Bad: Vague error message
-raise ValueError("Error in processing")
+{% tabs %}
 
-# Good: Detailed error with context
+{% tab title="Bad" %}
+
+```python
+raise ValueError("Error in processing")
+```
+
+{% endtab %}
+
+{% tab title="Good" %}
+
+```python
 raise ValueError(
     f"Cannot process user {user_id}: "
     f"Invalid age {age}. Age must be between 0 and 120."
 )
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### 5. Use Type Hints
 
@@ -439,6 +514,9 @@ def process_user_data(
 
 ### Exception Tracing
 
+<details>
+<summary>Show exception tracing helper</summary>
+
 ```python
 import traceback
 import sys
@@ -459,7 +537,12 @@ def buggy_function():
     return 1 / 0
 ```
 
+</details>
+
 ### Post-Mortem Analysis
+
+<details>
+<summary>Show post-mortem analysis hook</summary>
 
 ```python
 import traceback
@@ -484,6 +567,8 @@ def handle_unhandled_exception(exc_type, value, tb):
 
 sys.excepthook = handle_unhandled_exception
 ```
+
+</details>
 
 ## Summary
 

@@ -64,11 +64,19 @@ If you need evaluated type hints (resolving forward references), use
 
 ## Introspection and Reflection
 
+{% tabs %}
+
+{% tab title="Introspection" %}
 **Introspection** is examining objects at runtime (what is this object?
 what attributes does it have?).
+{% endtab %}
 
+{% tab title="Reflection" %}
 **Reflection** is changing behavior at runtime (setting attributes,
 dynamically calling functions, loading modules).
+{% endtab %}
+
+{% endtabs %}
 
 Frameworks use these ideas for routing, dependency injection, ORMs, and
 serialization.
@@ -118,6 +126,9 @@ An **Abstract Base Class** defines a contract that subclasses must follow.
 If a subclass fails to implement an `@abstractmethod`, Python raises an
 error when you try to instantiate it.
 
+<details>
+<summary>Show ABC example</summary>
+
 ```python
 from abc import ABC, abstractmethod
 
@@ -137,6 +148,8 @@ sq = Square(5)
 print(sq.area())
 ```
 
+</details>
+
 ABCs are often used with the standard library's collection interfaces
 (`collections.abc.Iterable`, `Mapping`, etc.).
 
@@ -152,6 +165,9 @@ Descriptors are the mechanism behind `@property`, methods, and many ORM
 field systems.
 
 ### `@property` is a descriptor
+
+<details>
+<summary>Show @property descriptor example</summary>
 
 ```python
 class Temperature:
@@ -169,7 +185,12 @@ class Temperature:
         self._celsius = value
 ```
 
+</details>
+
 ### Custom descriptor example
+
+<details>
+<summary>Show custom descriptor example</summary>
 
 ```python
 class PositiveNumber:
@@ -196,10 +217,15 @@ p = Product(10)
 # p.price = -1  # ValueError
 ```
 
+</details>
+
 ## Class Creation Hooks: `__init_subclass__`
 
 `__init_subclass__` runs automatically when a class is subclassed. This is a
 lightweight alternative to metaclasses for many use cases.
+
+<details>
+<summary>Show **init_subclass** registry example</summary>
 
 ```python
 class PluginBase:
@@ -215,6 +241,8 @@ class MyPlugin(PluginBase):
 print(PluginBase.registry)  # {'MyPlugin': <class '__main__.MyPlugin'>}
 ```
 
+</details>
+
 ## Metaclasses (Class Creation Control)
 
 In Python, classes are objects too. The default metaclass is `type`.
@@ -226,6 +254,9 @@ A **metaclass** can customize:
 - instance creation (`__call__`)
 
 ### Singleton via metaclass
+
+<details>
+<summary>Show metaclass singleton example</summary>
 
 ```python
 class Singleton(type):
@@ -243,6 +274,8 @@ db1 = Database()
 db2 = Database()
 print(db1 is db2)
 ```
+
+</details>
 
 ### When to avoid metaclasses
 

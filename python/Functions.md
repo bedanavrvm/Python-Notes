@@ -86,12 +86,24 @@ def greet(name, greeting="Hello"):
 
 print(greet("Alice"))  # Hello, Alice!
 print(greet("Bob", "Hi"))  # Hi, Bob!
+```
 
+{% tabs %}
+
+{% tab title="Bad: mutable default" %}
+
+```python
 # Common pitfall: mutable default arguments
 def add_item(item, items=[]):  # BAD: list is shared across calls
     items.append(item)
     return items
+```
 
+{% endtab %}
+
+{% tab title="Better: default None" %}
+
+```python
 # Better approach
 def add_item(item, items=None):
     if items is None:
@@ -99,6 +111,10 @@ def add_item(item, items=None):
     items.append(item)
     return items
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### 2. Arbitrary Arguments: *args and **kwargs
 
@@ -359,20 +375,36 @@ print(fibonacci(10))  # 55
 
 ### Recursive vs Iterative
 
+{% tabs %}
+
+{% tab title="Recursive" %}
+
 ```python
 # Recursive approach (elegant but may hit recursion limit)
 def sum_recursive(lst):
     if not lst:
         return 0
     return lst[0] + sum_recursive(lst[1:])
+```
 
+{% endtab %}
+
+{% tab title="Iterative" %}
+
+```python
 # Iterative approach (more efficient for large lists)
 def sum_iterative(lst):
     total = 0
     for item in lst:
         total += item
     return total
+```
 
+{% endtab %}
+
+{% tab title="Tail recursion" %}
+
+```python
 # Tail recursion optimization (Python doesn't optimize automatically)
 def sum_tail_recursive(lst, acc=0):
     if not lst:
@@ -380,7 +412,14 @@ def sum_tail_recursive(lst, acc=0):
     return sum_tail_recursive(lst[1:], acc + lst[0])
 ```
 
+{% endtab %}
+
+{% endtabs %}
+
 ### Practical Recursion Examples
+
+<details>
+<summary>Show practical recursion examples</summary>
 
 ```python
 # Directory traversal
@@ -412,6 +451,8 @@ nested = [1, [2, [3, [4, 5]], 6]
 print(tree_depth(nested))  # 3
 ```
 
+</details>
+
 ### Recursion Best Practices
 
 ```python
@@ -432,6 +473,9 @@ def safe_recursive(data, depth=0):
 ## Decorators
 
 Decorators are functions that modify other functions. They are a powerful way to extend function behavior.
+
+<details>
+<summary>Show decorator examples</summary>
 
 ```python
 def timing_decorator(func):
@@ -468,6 +512,8 @@ def greet(name):
 
 print(greet("Alice"))
 ```
+
+</details>
 
 ## Lambda Functions (Anonymous Functions)
 
@@ -586,6 +632,10 @@ def find_user(
 
 Functions should have a single, clear responsibility:
 
+{% tabs %}
+
+{% tab title="Bad" %}
+
 ```python
 # Bad: Does too many things
 def process_user_input(input_data):
@@ -595,7 +645,13 @@ def process_user_input(input_data):
     # Send email
     # Log activity
     pass
+```
 
+{% endtab %}
+
+{% tab title="Good" %}
+
+```python
 # Good: Single responsibility
 def validate_input(input_data):
     pass
@@ -613,21 +669,39 @@ def log_activity(activity):
     pass
 ```
 
+{% endtab %}
+
+{% endtabs %}
+
 ### Pure Functions
 
 Pure functions have no side effects and always return the same output for the same input:
+
+{% tabs %}
+
+{% tab title="Pure" %}
 
 ```python
 # Pure function (predictable, testable)
 def add(a, b):
     return a + b
+```
 
+{% endtab %}
+
+{% tab title="Impure" %}
+
+```python
 # Impure function (side effects)
 def add_and_print(a, b):
     result = a + b
     print(f"Result: {result}")  # Side effect
     return result
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### Error Handling
 

@@ -19,6 +19,10 @@ The basic function for interacting with files is `open()`. It requires a file pa
 
 Before context managers, you had to manually close files. If an error occurred between open and close, the file might remain locked in memory, leading to resource leaks.
 
+{% tabs %}
+
+{% tab title="Manual close" %}
+
 ```python
 f = open("data.txt", "w")
 f.write("Hello World")
@@ -27,13 +31,9 @@ f.write("Hello World")
 f.close()
 ```
 
-### The `with` Statement (Context Managers)
+{% endtab %}
 
-Python introduced the `with` statement to automate the setup and teardown of resources. This is the standard "Pythonic" way to handle files.
-
-#### How it works
-
-When a `with` block is entered, Python sets up a resource. When the block is exited (even if an error occurs), Python automatically calls a "cleanup" method (internally known as `__exit__`) to close the file.
+{% tab title="with statement" %}
 
 ```python
 with open("data.txt", "r") as file:
@@ -42,6 +42,18 @@ with open("data.txt", "r") as file:
 
 ## File is automatically closed here
 ```
+
+{% endtab %}
+
+{% endtabs %}
+
+### The `with` Statement (Context Managers)
+
+Python introduced the `with` statement to automate the setup and teardown of resources. This is the standard "Pythonic" way to handle files.
+
+#### How it works
+
+When a `with` block is entered, Python sets up a resource. When the block is exited (even if an error occurs), Python automatically calls a "cleanup" method (internally known as `__exit__`) to close the file.
 
 ### Modern Path Handling: `pathlib`
 
@@ -116,6 +128,10 @@ You can create your own context managers to handle any resource that requires a 
 
 ### 1. Class-based (`__enter__` and `__exit__`)
 
+{% tabs %}
+
+{% tab title="Class-based" %}
+
 ```python
 class DatabaseConnection:
     def __enter__(self):
@@ -133,9 +149,9 @@ with DatabaseConnection() as db:
     print("Executing queries...")
 ```
 
-### 2. Generator-based (`contextlib`)
+{% endtab %}
 
-A more concise way to create context managers is using the `@contextmanager` decorator.
+{% tab title="Generator-based (contextlib)" %}
 
 ```python
 from contextlib import contextmanager
@@ -149,6 +165,14 @@ def temp_header():
 with temp_header():
     print("I am the middle of a sandwich.")
 ```
+
+{% endtab %}
+
+{% endtabs %}
+
+### 2. Generator-based (`contextlib`)
+
+A more concise way to create context managers is using the `@contextmanager` decorator.
 
 ### 3. Multiple Resource Context Manager
 
@@ -187,6 +211,9 @@ with FileProcessor("input.txt", "output.txt") as processor:
 
 For concurrent access to files:
 
+<details>
+<summary>Show file locking example</summary>
+
 ```python
 import fcntl
 import os
@@ -219,7 +246,12 @@ with with_file_lock("shared_data.txt") as file:
     print(f"Read: {data}")
 ```
 
+</details>
+
 ### Temporary Files
+
+<details>
+<summary>Show temporary files example</summary>
 
 ```python
 import tempfile
@@ -243,7 +275,12 @@ with tempfile.TemporaryDirectory() as temp_dir:
 # Directory automatically cleaned up
 ```
 
+</details>
+
 ### File System Monitoring
+
+<details>
+<summary>Show file system monitoring example</summary>
 
 ```python
 import os
@@ -272,7 +309,12 @@ def file_changed_callback(file_path, event):
 watch_directory("./data", file_changed_callback)
 ```
 
+</details>
+
 ### Binary File Operations
+
+<details>
+<summary>Show binary file operations example</summary>
 
 ```python
 import struct
@@ -303,7 +345,12 @@ def load_object(filename):
         return pickle.load(file)
 ```
 
+</details>
+
 ### Memory-Mapped Files
+
+<details>
+<summary>Show memory-mapped files example</summary>
 
 ```python
 import mmap
@@ -323,9 +370,14 @@ with memory_mapped_file("large_data.bin") as mmapped:
     mmapped.write(b"Hello")  # Write at position 50
 ```
 
+</details>
+
 ## Context Manager Best Practices
 
 ### Exception Handling
+
+<details>
+<summary>Show context manager exception-handling example</summary>
 
 ```python
 class SafeFileWriter:
@@ -361,7 +413,12 @@ except IOError as e:
     print(f"File operation failed: {e}")
 ```
 
+</details>
+
 ### Resource Cleanup
+
+<details>
+<summary>Show cleanup-on-exit example</summary>
 
 ```python
 import atexit
@@ -382,7 +439,12 @@ atexit.register(cleanup_on_exit)
 # Your program will cleanup automatically on exit
 ```
 
+</details>
+
 ### Performance Considerations
+
+<details>
+<summary>Show performance considerations example</summary>
 
 ```python
 # Buffering for better performance
@@ -403,6 +465,8 @@ with open(filename, "r") as file:
     for line in lines:
         process_line(line)
 ```
+
+</details>
 
 ## Summary
 

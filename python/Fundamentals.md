@@ -32,6 +32,9 @@ print(id(item))    # 14070... (memory address)
 
 Python uses reference counting for memory management. When an object's reference count drops to zero, it becomes eligible for garbage collection. This is why you don't need to manually allocate or deallocate memory in Python.
 
+<details>
+<summary>Show reference counting example</summary>
+
 ```python
 import sys
 
@@ -41,6 +44,8 @@ print(sys.getrefcount(a))  # Shows reference count
 b = a  # Increases reference count
 del b   # Decreases reference count
 ```
+
+</details>
 
 ## Data Types
 
@@ -83,15 +88,29 @@ negative_float = -0.001
 
 #### Floating Point Precision
 
+{% tabs %}
+
+{% tab title="float" %}
+
 ```python
 # Be careful with floating point arithmetic
 result = 0.1 + 0.2  # 0.30000000000000004 (not exactly 0.3)
 print(round(result, 2))  # 0.3 (rounded)
+```
 
+{% endtab %}
+
+{% tab title="Decimal" %}
+
+```python
 # For precise decimal arithmetic, use Decimal
 from decimal import Decimal
 precise = Decimal('0.1') + Decimal('0.2')  # 0.3 exactly
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### 3. Booleans (bool)
 
@@ -142,14 +161,43 @@ raw_string = r"C:\path\to\file"  # Raw string (no escape sequences)
 first = "Hello"
 second = "World"
 greeting = first + " " + second  # "Hello World"
+```
 
-# String formatting
+{% tabs %}
+
+{% tab title="f-string" %}
+
+```python
 name = "Alice"
 age = 25
 formatted = f"{name} is {age} years old"  # f-string (Python 3.6+)
-old_style = "%s is %d years old" % (name, age)
-format_method = "{} is {} years old".format(name, age)
+```
 
+{% endtab %}
+
+{% tab title="% formatting" %}
+
+```python
+name = "Alice"
+age = 25
+old_style = "%s is %d years old" % (name, age)
+```
+
+{% endtab %}
+
+{% tab title=".format()" %}
+
+```python
+name = "Alice"
+age = 25
+format_method = "{} is {} years old".format(name, age)
+```
+
+{% endtab %}
+
+{% endtabs %}
+
+```python
 # String methods
 text = "  Python Programming  "
 print(text.strip())        # "Python Programming"

@@ -355,12 +355,22 @@ Comprehensions provide a concise way to create new collections based on existing
 
 **Syntax**: `[expression for item in iterable if condition]`
 
+{% tabs %}
+
+{% tab title="Instead of this" %}
+
 ```python
 # Instead of this
 squares = []
 for x in range(5):
     squares.append(x**2)
+```
 
+{% endtab %}
+
+{% tab title="Do this" %}
+
+```python
 # Do this
 squares = [x**2 for x in range(5)]  # [0, 1, 4, 9, 16]
 
@@ -375,6 +385,10 @@ matrix = [[i*j for j in range(3)] for i in range(3)]
 nested = [[1, 2], [3, [4, 5]], 6]
 flat = [item for sublist in nested for item in sublist]
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ### Dictionary & Set Comprehensions
 
@@ -416,6 +430,9 @@ my_string = "hello"
 
 ### Memory and Performance
 
+<details>
+<summary>Show memory and performance snippet</summary>
+
 ```python
 import sys
 
@@ -443,7 +460,12 @@ print(timeit.timeit(list_lookup, number=1000))
 print(timeit.timeit(set_lookup, number=1000))
 ```
 
+</details>
+
 ### Choosing the Right Data Structure
+
+<details>
+<summary>Show choosing-the-right-structure checklist</summary>
 
 ```python
 # Use Lists when:
@@ -468,6 +490,8 @@ print(timeit.timeit(set_lookup, number=1000))
 # - Membership testing is frequent
 # - Order doesn't matter
 ```
+
+</details>
 
 ## Summary
 

@@ -66,11 +66,25 @@ Instead, we use "sandboxes" for each project.
 
 First, ensure you have Python installed. You can check this in your terminal:
 
+{% tabs %}
+
+{% tab title="python" %}
+
 ```bash
 python --version
-## or
+```
+
+{% endtab %}
+
+{% tab title="python3" %}
+
+```bash
 python3 --version
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 #### 2. Virtual Environments (venv)
 
@@ -87,20 +101,34 @@ of additional packages.
 ```bash
 ## 1. Create the environment (named 'venv')
 python -m venv venv
+```
 
 ## 2. Activate it
 
-## On Windows
-.\venv\Scripts\activate
+{% tabs %}
 
-## On macOS/Linux
+{% tab title="Windows" %}
+
+```bash
+.\venv\Scripts\activate
+```
+
+{% endtab %}
+
+{% tab title="macOS/Linux" %}
+
+```bash
 source venv/bin/activate
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 Once activated, your terminal prompt will usually show (venv),
 indicating that any Python commands now stay within this bubble.
 
-#### 3. PIP (Package Installer for Python)
+### 3. PIP (Package Installer for Python)
 
 PIP is the standard package manager. It allows you to install,
 upgrade, and remove packages from the Python Package Index (PyPI).
@@ -219,17 +247,31 @@ PEP 8 is the official document that defines how Python code should be formatted.
 
 ### Example of Non-Pythonic vs. Pythonic code
 
+{% tabs %}
+
+{% tab title="Non-Pythonic" %}
+
 ```python
 ## ❌ Non-Pythonic (Messy, confusing names)
 def check_val(X):
  if X > 10:return True
  else:return False
+```
 
+{% endtab %}
+
+{% tab title="Pythonic" %}
+
+```python
 ## ✅ Pythonic (Readable, follows PEP 8)
 def is_threshold_reached(value):
     """Checks if the value exceeds the standard threshold."""
     return value > 10
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ## Python Versions and Compatibility
 

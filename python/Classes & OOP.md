@@ -259,6 +259,24 @@ print(f"Area: {rect.area}, Perimeter: {rect.perimeter}")
 - `@classmethod`: Receives the class (`cls`) as first argument. Used for "factory methods" that create instances in different ways.
 - `@staticmethod`: Receives neither `self` nor `cls`. It's just a regular function that lives inside the class namespace because it's logically related.
 
+{% tabs %}
+
+{% tab title="@staticmethod" %}
+
+```python
+class DateConverter:
+    @staticmethod
+    def is_valid_year(year):
+        return 1900 <= year <= 2100
+
+# Static method usage
+print(DateConverter.is_valid_year(2024))  # True
+```
+
+{% endtab %}
+
+{% tab title="@classmethod" %}
+
 ```python
 class DateConverter:
     @staticmethod
@@ -273,13 +291,14 @@ class DateConverter:
             return cls(day, month, year)
         raise ValueError("Invalid year")
 
-# Static method usage
-print(DateConverter.is_valid_year(2024))  # True
-
 # Class method usage
 date_obj = DateConverter.from_string("25/12/2024")
 print(date_obj)  # DateConverter instance
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ## Advanced OOP Concepts
 
@@ -409,6 +428,9 @@ car.drive()
 
 ### Singleton Pattern
 
+<details>
+<summary>Show singleton pattern example</summary>
+
 ```python
 class Singleton:
     _instance = None
@@ -427,7 +449,12 @@ s2 = Singleton()
 print(s1 is s2)  # True (same instance)
 ```
 
+</details>
+
 ### Observer Pattern
+
+<details>
+<summary>Show observer pattern example</summary>
 
 ```python
 class Subject:
@@ -458,7 +485,12 @@ subject.attach(observer2)
 subject.notify("Hello Observers!")
 ```
 
+</details>
+
 ### Data Classes
+
+<details>
+<summary>Show dataclasses example</summary>
 
 ```python
 from dataclasses import dataclass
@@ -478,6 +510,8 @@ class Person:
 person = Person("Alice", 25, ["alice@email.com"])
 print(person)  # Person(name='Alice', age=25, emails=['alice@email.com'])
 ```
+
+</details>
 
 ## Summary
 
