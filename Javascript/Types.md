@@ -1,37 +1,202 @@
-# Types & the Type System (JavaScript vs TypeScript)
+# Types (JavaScript & TypeScript)
 
-JavaScript has *runtime* types.
-TypeScript adds a *compile-time* type system.
+A value in JavaScript is always of a certain type (for example, a number or a
+string).
 
-## Runtime types in JavaScript
+JavaScript and TypeScript both work with the same runtime, but they talk about
+types in different ways.
 
-In JS, the engine decides types at runtime.
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+- Types exist at runtime.
+- Variables can hold any kind of value.
+- Mistakes show up when the code runs.
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+- The runtime is still JavaScript.
+- TypeScript adds compile-time checks, then emits JavaScript.
+- Many mistakes are caught before running.
+
+{% endtab %}
+
+{% endtabs %}
+
+## Values, variables, and dynamic typing
+
+JavaScript is dynamically typed: the same variable can hold different types at
+different times.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
 
 ```js
-typeof 123;        // "number"
-typeof "hello";    // "string"
-typeof true;       // "boolean"
-typeof undefined;  // "undefined"
-typeof null;       // "object" (legacy quirk)
+let message = "hello";
+message = 123456;
+```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+```ts
+let message = "hello";
+// message = 123456; // compile-time error
+```
+
+{% endtab %}
+
+{% endtabs %}
+
+## The 8 basic JavaScript types
+
+There are 8 basic types in JavaScript.
+
+- **Primitive types**: `number`, `bigint`, `string`, `boolean`, `null`,
+  `undefined`, `symbol`
+- **Non-primitive type**: `object`
+
+TypeScript uses many of the same names as annotations (for example `string` and
+`number`), but those annotations do not exist at runtime.
+
+## Checking runtime types: `typeof` and `Array.isArray`
+
+`typeof` is a JavaScript operator that returns a string describing the runtime
+type.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+```js
+typeof undefined; // "undefined"
+typeof 0; // "number"
+typeof 10n; // "bigint"
+typeof true; // "boolean"
+typeof "foo"; // "string"
+typeof Symbol("id"); // "symbol"
+typeof Math; // "object"
+typeof null; // "object" (language quirk)
+typeof alert; // "function"
+
 Array.isArray([]); // true
 ```
 
-## Static types in TypeScript
+{% endtab %}
 
-In TS, you describe allowed values.
+{% tab title="TypeScript" %}
+
+At runtime, TypeScript runs as JavaScript, so `typeof` works the same.
 
 ```ts
-let id: number = 123;
-// id = "abc"; // compile-time error
+const value: unknown = "foo";
+
+if (typeof value === "string") {
+  console.log(value.toUpperCase());
+}
 ```
 
-## Core TS types (and how they map to JS)
+{% endtab %}
 
-- `string`, `number`, `boolean`: match JS primitives
-- `null`, `undefined`: exist at runtime; TS can force you to handle them
-- `any`: opt-out (dangerous)
-- `unknown`: safer “I don’t know yet”
-- `never`: impossible code paths
+{% endtabs %}
+
+## Type conversions (runtime)
+
+Most of the time, operators convert values automatically. You can also convert
+explicitly.
+
+### String conversion
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+```js
+String(false); // "false"
+String(null); // "null"
+```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+Same runtime behavior. TypeScript can help you keep track of the result
+type.
+
+```ts
+const x = String(false);
+// x is string
+```
+
+{% endtab %}
+
+{% endtabs %}
+
+### Numeric conversion
+
+`Number(value)` converts to a number. Unary `+value` is a shorter form.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+```js
+Number("123"); // 123
+Number("123z"); // NaN
+
++"2" + +"3"; // 5
+"2" + "3"; // "23" (string concatenation)
+```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+Same runtime behavior. TypeScript helps you avoid mixing string/number by
+accident.
+
+```ts
+const a = "2";
+const b = "3";
+const sum = Number(a) + Number(b);
+```
+
+{% endtab %}
+
+{% endtabs %}
+
+### Boolean conversion
+
+`Boolean(value)` converts to true/false.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+```js
+Boolean(0); // false
+Boolean("0"); // true (non-empty string)
+Boolean(""); // false
+```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+Same runtime behavior. TypeScript helps you make boolean intent explicit.
+
+```ts
+const enabled = Boolean("0");
+```
+
+{% endtab %}
+
+{% endtabs %}
 
 ## any vs unknown
 
@@ -70,6 +235,31 @@ function parse(value: unknown): string {
 
 A union expresses “one of these types”.
 
+In JavaScript, you model this with runtime checks.
+In TypeScript, you can also describe it at compile time.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+```js
+function normalizeId(id) {
+  if (typeof id === "number") {
+    return String(id);
+  }
+
+  if (typeof id === "string") {
+    return id;
+  }
+
+  throw new Error("Expected id to be a string or number");
+}
+```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
 ```ts
 type Id = string | number;
 
@@ -80,6 +270,10 @@ function normalizeId(id: Id): string {
   return id;
 }
 ```
+
+{% endtab %}
+
+{% endtabs %}
 
 ## Optionality: undefined vs optional properties
 
@@ -114,55 +308,14 @@ if (user.email) {
 
 {% endtabs %}
 
-## Structural typing (why TS feels “JS-like”)
+## `null` and `undefined`
 
-TypeScript is structurally typed: if it *looks like* the right shape, it’s allowed.
+In JavaScript:
 
-```ts
-type Point = { x: number; y: number };
+- `undefined` usually means “missing”.
+- `null` often means “explicitly empty”.
 
-function printPoint(p: Point) {
-  console.log(p.x, p.y);
-}
-
-printPoint({ x: 1, y: 2, z: 3 }); // ok (extra props allowed in variables)
-```
-
-<details>
-<summary>Show excess property checks gotcha</summary>
-
-```ts
-type Point = { x: number; y: number };
-
-printPoint({ x: 1, y: 2, z: 3 });
-// In many setups this is an error because object literals are checked more strictly.
-```
-
-</details>
-
-## Generics (type parameters)
-
-Generics let you write reusable typed code.
-
-```ts
-function first<T>(items: T[]): T | undefined {
-  return items[0];
-}
-
-const n = first([1, 2, 3]);
-const s = first(["a", "b"]);
-```
-
-## Important: TS does not validate runtime data
-
-If you read JSON from a server, TypeScript does not magically validate it.
-You still need runtime validation (manual checks or schema validation).
-
-## `null` and `undefined` (and why TS cares)
-
-In JavaScript, `undefined` usually means “missing” and `null` often means “explicitly empty”.
-
-In TypeScript (especially with `strictNullChecks`), `null` and `undefined` force you to handle absence.
+TypeScript can force you to handle these cases at compile time.
 
 {% tabs %}
 
@@ -170,7 +323,6 @@ In TypeScript (especially with `strictNullChecks`), `null` and `undefined` force
 
 ```js
 function getEmail(user) {
-  // If user.email is missing, this becomes undefined and calling toLowerCase crashes.
   return user.email.toLowerCase();
 }
 ```
@@ -194,43 +346,73 @@ function getEmail(user: User): string {
 
 {% endtabs %}
 
-## `never` (useful for exhaustiveness)
+## Objects and arrays
 
-`never` describes code paths that should be impossible. It is most useful for exhaustive checks.
+Objects are the “container” type in JavaScript. Arrays are also objects.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+```js
+typeof {}; // "object"
+typeof []; // "object"
+
+Array.isArray([]); // true
+Array.isArray({}); // false
+```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+Same runtime behavior. TypeScript can also describe the shapes.
 
 ```ts
-type State =
-  | { status: "idle" }
-  | { status: "loading" }
-  | { status: "error"; message: string };
+const xs: number[] = [1, 2, 3];
+const obj: { id: string } = { id: "1" };
 
-function render(s: State): string {
-  switch (s.status) {
-    case "idle":
-      return "Idle";
-    case "loading":
-      return "Loading";
-    case "error":
-      return s.message;
-    default: {
-      const _exhaustive: never = s;
-      return _exhaustive;
-    }
+console.log(Array.isArray(xs));
+console.log(typeof obj);
+```
+
+{% endtab %}
+
+{% endtabs %}
+
+## Narrowing values with checks
+
+When you have “one of many possible types”, you narrow it using checks like
+`typeof`, `Array.isArray`, `instanceof`, and `"prop" in obj`.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
+```js
+function printValue(value) {
+  if (typeof value === "string") {
+    console.log(value.toUpperCase());
+    return;
   }
+
+  if (typeof value === "number") {
+    console.log(value.toFixed(2));
+    return;
+  }
+
+  if (value instanceof Date) {
+    console.log(value.toISOString());
+    return;
+  }
+
+  console.log("Unknown value");
 }
 ```
 
-## Narrowing patterns (how TS refines unions)
+{% endtab %}
 
-Common ways to narrow in TypeScript:
-
-- `typeof x === "string"` (primitives)
-- `x instanceof Date` (classes)
-- `"prop" in obj` (property existence)
-- discriminated unions (tag field like `kind`)
-
-<details>
-<summary>Show narrowing patterns</summary>
+{% tab title="TypeScript" %}
 
 ```ts
 function printValue(value: string | number | Date) {
@@ -244,185 +426,8 @@ function printValue(value: string | number | Date) {
     return;
   }
 
-  // value is Date here
   console.log(value.toISOString());
 }
-```
-
-</details>
-
-## Literal types, `as const`, and `satisfies`
-
-These tools help you create precise types from values.
-
-{% tabs %}
-
-{% tab title="JavaScript" %}
-
-```js
-const status = "idle";
-// JS knows it's a string at runtime, but there's no compile-time literal typing.
-```
-
-{% endtab %}
-
-{% tab title="TypeScript" %}
-
-```ts
-const status = "idle" as const;
-// type of status is "idle", not string
-
-const config = {
-  retries: 3,
-  mode: "safe",
-} satisfies { retries: number; mode: "safe" | "fast" };
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-## Objects, arrays, tuples
-
-Tuples are useful when you want fixed-length, position-based data.
-
-```ts
-const point: [number, number] = [10, 20];
-const headers: ReadonlyArray<string> = ["Accept", "Content-Type"];
-```
-
-<details>
-<summary>Show why tuples help</summary>
-
-```ts
-function move([x, y]: [number, number]): [number, number] {
-  return [x + 1, y + 1];
-}
-
-// move(["x", "y"]); // compile-time error
-```
-
-</details>
-
-## Intersection types (`&`)
-
-Intersections combine multiple object shapes.
-
-```ts
-type Timestamped = { createdAt: Date };
-type Identified = { id: string };
-
-type Entity = Timestamped & Identified;
-
-const e: Entity = { id: "1", createdAt: new Date() };
-```
-
-## `keyof` and indexed access types
-
-These power a lot of “type-safe object utilities”.
-
-```ts
-type User2 = { id: string; name: string; age: number };
-
-type UserKey = keyof User2; // "id" | "name" | "age"
-
-function pluck<T, K extends keyof T>(obj: T, key: K): T[K] {
-  return obj[key];
-}
-
-const u: User2 = { id: "1", name: "Alice", age: 25 };
-const name = pluck(u, "name");
-```
-
-## Utility types (standard library)
-
-TypeScript ships with many reusable helpers.
-
-<details>
-<summary>Show common utility types</summary>
-
-```ts
-type User3 = { id: string; name: string; age: number };
-
-type UserPreview = Pick<User3, "id" | "name">;
-type UserWithoutAge = Omit<User3, "age">;
-type PartialUser = Partial<User3>;
-type RequiredUser = Required<User3>;
-type UserMap = Record<string, User3>;
-
-type Fn = (x: number) => string;
-type FnReturn = ReturnType<Fn>; // string
-type FnParams = Parameters<Fn>; // [number]
-```
-
-</details>
-
-## Type guards and assertions
-
-Type guards validate at runtime and narrow at compile time.
-
-{% tabs %}
-
-{% tab title="JavaScript" %}
-
-```js
-function isUser(value) {
-  return value && typeof value.name === "string";
-}
-```
-
-{% endtab %}
-
-{% tab title="TypeScript" %}
-
-```ts
-type User = { name: string };
-
-function isUser(value: unknown): value is User {
-  return !!value && typeof (value as any).name === "string";
-}
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-### Type assertions (`as`)
-
-An assertion tells the compiler “trust me” without adding runtime checks.
-
-```ts
-const raw: unknown = JSON.parse('{"name":"Alice"}');
-const user = raw as { name: string }; // unsafe if raw is not correct
-```
-
-## Enums vs unions
-
-Enums exist at runtime in a way that union types do not.
-In modern TS codebases, unions are often preferred unless you need the runtime object.
-
-{% tabs %}
-
-{% tab title="Union type" %}
-
-```ts
-type Status = "idle" | "loading" | "error";
-
-function setStatus(s: Status) {}
-```
-
-{% endtab %}
-
-{% tab title="Enum" %}
-
-```ts
-enum Status {
-  Idle = "idle",
-  Loading = "loading",
-  Error = "error",
-}
-
-function setStatus(s: Status) {}
 ```
 
 {% endtab %}
@@ -431,73 +436,101 @@ function setStatus(s: Status) {}
 
 ## Practical approach: validate at the boundary
 
-- Parse unknown input (`unknown`)
-- Validate required fields
-- Convert into safe internal types
+TypeScript does not validate runtime data for you. If you read JSON from a
+server, you must validate it at runtime.
 
-<details>
-<summary>Show a minimal runtime validation pattern (no external libraries)</summary>
+{% tabs %}
 
-```ts
-type User4 = { id: string; name: string };
+{% tab title="JavaScript" %}
 
-function parseUser(value: unknown): User4 {
+```js
+function parseUser(value) {
   if (!value || typeof value !== "object") {
     throw new Error("Expected object");
   }
 
-  const v = value as any;
-  if (typeof v.id !== "string") throw new Error("Expected id: string");
-  if (typeof v.name !== "string") throw new Error("Expected name: string");
+  if (typeof value.id !== "string") {
+    throw new Error("Expected id: string");
+  }
 
-  return { id: v.id, name: v.name };
+  if (typeof value.name !== "string") {
+    throw new Error("Expected name: string");
+  }
+
+  return { id: value.id, name: value.name };
 }
 ```
 
-</details>
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+```ts
+type User = { id: string; name: string };
+
+type AnyRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is AnyRecord {
+  return typeof value === "object" && value !== null;
+}
+
+function parseUser(value: unknown): User {
+  if (!isRecord(value)) {
+    throw new Error("Expected object");
+  }
+
+  const id = value["id"];
+  const name = value["name"];
+
+  if (typeof id !== "string") {
+    throw new Error("Expected id: string");
+  }
+
+  if (typeof name !== "string") {
+    throw new Error("Expected name: string");
+  }
+
+  return { id, name };
+}
+```
+
+{% endtab %}
+
+{% endtabs %}
 
 ## Summary
 
-- JavaScript has runtime types; TypeScript adds compile-time types.
-- `unknown` + narrowing is safer than `any`.
-- Unions + narrowing model real-world branching logic.
-- Utility types (`Pick`, `Omit`, `Partial`, `Record`, etc.) reduce repetitive typing.
-- TypeScript cannot validate runtime data: validate at boundaries.
+- JavaScript types are real runtime values.
+- TypeScript adds compile-time checks and then emits JavaScript.
+- Use runtime checks (`typeof`, `Array.isArray`, `instanceof`) to narrow.
+- Validate untrusted input (like JSON) at runtime.
 
-## Important Keywords
+## Tasks
 
-### **Static typing**
+{% tabs %}
 
-Type checking performed at compile time (TypeScript) rather than runtime.
+{% tab title="JavaScript" %}
 
-### **Runtime type**
+- Predict the results:
+  - `typeof null`
+  - `typeof []`
+  - `Boolean("0")`
+  - `"" + 1 + 0`
+- Fix this so it prints `5` (not `"23"`):
 
-The actual type/value a JS engine sees while executing.
+```js
+console.log("2" + "3");
+```
 
-### **Union type**
+{% endtab %}
 
-Type that can be one of several options (`string | number`).
+{% tab title="TypeScript" %}
 
-### **Narrowing**
+- Take the JavaScript `parseUser` and rewrite it in TypeScript using
+  `unknown`.
+- Create a `type User = { id: string; name: string }` and ensure your
+  `parseUser` returns `User`.
 
-Refining a union type using checks (`typeof`, `in`, `instanceof`).
+{% endtab %}
 
-### **Type guard**
-
-Function that validates at runtime and narrows at compile time (`value is User`).
-
-### **Type assertion**
-
-Telling TS to trust a type without runtime validation (`value as User`).
-
-### **Literal type**
-
-A specific value as a type (`"idle"` instead of `string`).
-
-### **`keyof`**
-
-Operator that produces the union of object keys.
-
-### **Utility types**
-
-Built-in helper types like `Pick`, `Omit`, `Partial`, and `Record`.
+{% endtabs %}
