@@ -75,6 +75,11 @@ import calculator
 importlib.reload(calculator)
 ```
 
+### Module Cache
+
+Python caches compiled bytecode in `__pycache__` directories to speed up
+subsequent imports. This **module cache** avoids recompiling unchanged modules.
+
 ## Packages: The Directory Structure
 
 A Package is a way of structuring Python's module namespace by using "dotted module names." A package is essentially a folder containing multiple module files.
@@ -312,6 +317,17 @@ spec = importlib.util.spec_from_file_location("custom_module.py", "/path/to/modu
 custom_module = importlib.util.module_from_spec(spec)
 ```
 
+### Lazy Import
+
+A **lazy import** defers loading until the module is actually used, improving
+startup performance:
+
+```python
+def heavy_operation():
+    import pandas  # Imported only when function is called
+    return pd.DataFrame()
+```
+
 ### Package Distribution
 
 Creating distributable packages:
@@ -331,6 +347,16 @@ setup(
 )
 ```
 
+#### Package Metadata
+
+**Package metadata** includes name, version, author, and dependencies, stored in
+`setup.py` or `pyproject.toml`. Tools like `pip` read this metadata.
+
+#### Entry Point
+
+An **entry point** is a script or function defined in package metadata that can
+be invoked via command-line tools (e.g., `console_scripts` in `setup.cfg`).
+
 ### Virtual Environments
 
 Isolating package dependencies:
@@ -349,6 +375,19 @@ pip install requests numpy pandas
 # Freeze dependencies
 pip freeze > requirements.txt
 ```
+
+#### Version Management
+
+**Version management** involves handling package versions and ensuring
+compatibility. Use `pip-tools` or `poetry` to lock dependency versions.
+
+#### Semantic Versioning
+
+**Semantic versioning** (MAJOR.MINOR.PATCH) conveys API compatibility:
+
+- MAJOR: incompatible changes
+- MINOR: new features, backward compatible
+- PATCH: bug fixes
 
 ## Module Discovery and Inspection
 
@@ -387,6 +426,38 @@ def load_config():
     with pkg_resources.resource_stream("my_package", "data/config.json") as f:
         return json.load(f)
 ```
+
+### Import Hooks
+
+An **import hook** allows customizing the import process by registering finders
+and loaders. This enables loading modules from databases, zip files, or remote
+sources.
+
+### Plugin Systems
+
+A **plugin system** loads additional functionality dynamically at runtime.
+Plugins are modules that implement a defined interface and are discovered via
+entry points or directory scanning.
+
+### Library vs Framework
+
+- **Library**: Code you call (e.g., `requests`, `numpy`). You control the flow.
+- **Framework**: Code that calls you (e.g., Django, Flask). The framework
+  controls the flow via inversion of control.
+
+### API Design
+
+Good **API design** for modules means:
+
+- Clear function signatures and docstrings
+- Consistent naming conventions
+- Minimal, stable public interfaces
+- Use of `__all__` to control what gets imported with `*`
+
+### Package Index
+
+A **package index** like PyPI hosts Python packages. `pip install` fetches
+packages from the configured index (default: <https://pypi.org/simple>).
 
 ## Summary
 
