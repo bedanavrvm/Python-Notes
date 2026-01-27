@@ -1,8 +1,8 @@
-# Chapter 11: Loops and Branches
+# Chapter 9: Loops and Branches
 
 Control flow statements direct the execution path through your script. This chapter covers case/esac for branching, pattern matching, and the select construct for building menus.
 
-## 11.1. The `case/esac` Construct
+## 9.1. The `case/esac` Construct
 
 The `case` construct is Bash's analog to `switch` in C/C++. It permits branching to one of several code blocks depending on condition tests and serves as a shorthand for multiple `if/then/else` statements.
 
@@ -70,7 +70,7 @@ exit 0
 
 ---
 
-## 11.2. Case with Multiple Patterns
+## 9.2. Case with Multiple Patterns
 
 Multiple patterns can match the same code block using the pipe `|` operator.
 
@@ -170,7 +170,7 @@ exit 0
 
 ---
 
-## 11.3. Command-Line Parameter Handling with Case
+## 9.3. Command-Line Parameter Handling with Case
 
 Case is useful for parsing command-line arguments.
 
@@ -237,7 +237,7 @@ echo "Config file: $CONFFILE"
 
 ---
 
-## 11.4. Case with Command Substitution
+## 9.4. Case with Command Substitution
 
 The case variable can be generated dynamically using command substitution.
 
@@ -273,7 +273,7 @@ exit 0
 
 ---
 
-## 11.5. String Validation Functions
+## 9.5. String Validation Functions
 
 ### Example 11-27: Simple String Matching
 
@@ -395,7 +395,7 @@ exit 0
 
 ---
 
-## 11.6. The `select` Construct
+## 9.6. The `select` Construct
 
 The `select` construct creates an interactive menu for user selection. It prompts the user to choose from a numbered list.
 
@@ -517,7 +517,7 @@ exit 0
 
 ---
 
-## 11.7. Combining Case and Loops
+## 9.7. Combining Case and Loops
 
 ### Example: Loop with Case Input Validation
 

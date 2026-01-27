@@ -1,8 +1,8 @@
-# Chapter 12: Internal Commands and Builtins
+# Chapter 10: Internal Commands and Builtins
 
 Bash provides numerous internal commands (builtins) that are executed directly by the shell rather than spawning external processes. Understanding these commands is essential for writing efficient and robust scripts.
 
-## 12.1. Script Control Commands
+## 10.1. Script Control Commands
 
 ### `exit [n]`
 
@@ -38,7 +38,7 @@ Replaces the current process with a specified command. Unlike normal commands wh
 - Code after `exec` **never executes**
 - Can reassign file descriptors (e.g., `exec < file` redirects stdin)
 
-### Example 12-1: Effects of `exec`
+### Example 10-1: Effects of `exec`
 
 ```bash
 #!/bin/bash
@@ -65,7 +65,7 @@ Executed with exec
 
 Exit status will not be 99 because `exec` replaced the script process.
 
-### Example 12-2: Self-Referencing Script
+### Example 10-2: Self-Referencing Script
 
 ```bash
 #!/bin/bash
@@ -109,7 +109,7 @@ echo "Back to terminal"
 
 ---
 
-## 12.2. Shell Option and Debugging Commands
+## 10.2. Shell Option and Debugging Commands
 
 ### `shopt`
 
@@ -171,7 +171,7 @@ function_b
 
 ---
 
-## 12.3. Utility Commands
+## 10.3. Utility Commands
 
 ### `true` and `false`
 
@@ -254,7 +254,7 @@ help for
 
 ---
 
-## 12.4. Job Control Commands
+## 10.4. Job Control Commands
 
 Job control allows you to manage foreground and background processes.
 
@@ -278,7 +278,7 @@ Job control allows you to manage foreground and background processes.
 | `%-` | Previous job |
 | `$!` | PID of last background process |
 
-### Example 12-3: Job Management
+### Example 10-3: Job Management
 
 ```bash
 #!/bin/bash
@@ -304,7 +304,7 @@ echo "All jobs completed"
 exit 0
 ```
 
-### Example 12-4: Preventing Orphan Processes
+### Example 10-4: Preventing Orphan Processes
 
 ```bash
 #!/bin/bash
@@ -359,7 +359,7 @@ echo "Done."
 
 ---
 
-## 12.5. Process Management Commands
+## 10.5. Process Management Commands
 
 ### `kill [signal] PID|job`
 
@@ -379,7 +379,7 @@ kill -l
 kill %1  # Kill job 1
 ```
 
-### Example 12-5: Self-Terminating Script
+### Example 10-5: Self-Terminating Script
 
 ```bash
 #!/bin/bash
@@ -422,7 +422,7 @@ killall -l
 
 ---
 
-## 12.6. Command Directives
+## 10.6. Command Directives
 
 ### `command`
 
@@ -470,7 +470,7 @@ enable -f ./builtin.so mybuiltin
 
 ---
 
-## 12.7. Process Introspection
+## 10.7. Process Introspection
 
 ### `times`
 
@@ -488,7 +488,7 @@ Limited usefulness for shell scripts; more useful for profiling in general progr
 
 ---
 
-## 12.8. Script Recursion and Sourcing
+## 10.8. Script Recursion and Sourcing
 
 ### Self-Sourcing vs. Self-Calling
 

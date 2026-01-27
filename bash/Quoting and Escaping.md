@@ -1,8 +1,8 @@
-# Chapter 5: Quoting and Escaping
+# Chapter 4: Quoting and Escaping
 
 Quoting and escaping are fundamental techniques for controlling how the shell interprets special characters and spaces in your scripts. Proper use of quotes and escapes prevents word splitting, variable expansion, and command interpretation in unintended ways.
 
-## 5.1. Double Quotes (Partial Quoting / Weak Quoting)
+## 4.1. Double Quotes (Partial Quoting / Weak Quoting)
 
 Double quotes allow variable and command substitution, but prevent globbing (wildcard expansion) and most special character interpretation.
 
@@ -54,7 +54,7 @@ echo "\$5"                   # $5
 echo "\\"                    # \
 ```
 
-### Example 5-1: Complex Quoting Scenarios
+### Example 4-1: Complex Quoting Scenarios
 
 ```bash
 #!/bin/bash
@@ -82,7 +82,7 @@ fi
 
 ---
 
-## 5.2. Single Quotes (Full Quoting / Strong Quoting)
+## 4.2. Single Quotes (Full Quoting / Strong Quoting)
 
 Single quotes operate strictly: they prevent **all** variable expansion, command substitution, and escape processing. Every character within single quotes is treated literally except the single quote itself.
 
@@ -145,7 +145,7 @@ echo 'Today: $(date +%Y)'    # Today: $(date +%Y)
 
 ---
 
-## 5.3. Escaping
+## 4.3. Escaping
 
 Escaping is a method of quoting a **single character**. The backslash `\` preceding a character tells the shell to interpret that character literally.
 
@@ -193,7 +193,7 @@ ABC=$'\101\102\103'         # Octal 101, 102, 103 = A, B, C
 echo $ABC                   # ABC
 ```
 
-### Example 5-2: Escaped Characters
+### Example 4-2: Escaped Characters
 
 ```bash
 #!/bin/bash
@@ -224,7 +224,7 @@ escape=$'\033'              # Escape character
 echo "Invisible escape: $escape (no visible output)"
 ```
 
-### Example 5-3: Detecting Key Presses
+### Example 4-3: Detecting Key Presses
 
 ```bash
 #!/bin/bash
@@ -277,7 +277,7 @@ done
 
 ---
 
-## 5.4. Practical Escaping Scenarios
+## 4.4. Practical Escaping Scenarios
 
 ### Escaping Special Characters
 
@@ -348,7 +348,7 @@ EOF
 
 ---
 
-## 5.5. Assignment and Escaping
+## 4.5. Assignment and Escaping
 
 ### Assigning Escaped Values
 
@@ -383,7 +383,7 @@ echo "$variable"            # \ (escaped backslash is valid)
 
 ---
 
-## 5.6. Quoting Behavior Summary
+## 4.6. Quoting Behavior Summary
 
 | Feature | Double Quotes | Single Quotes | Escape (`\`) |
 |---------|---------------|---------------|--------------|

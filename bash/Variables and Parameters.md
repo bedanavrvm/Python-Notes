@@ -1,8 +1,8 @@
-# Chapter 4: Introduction to Variables and Parameters
+# Chapter 3: Introduction to Variables and Parameters
 
 Variables are how programming and scripting languages represent data. A variable is nothing more than a label—a name assigned to a location or set of locations in computer memory holding an item of data. Variables appear in arithmetic operations, manipulation of quantities, and in string parsing.
 
-## 4.1. Variable Substitution
+## 3.1. Variable Substitution
 
 The name of a variable is a placeholder for its value, the data it holds. Referencing (retrieving) its value is called **variable substitution**.
 
@@ -48,7 +48,7 @@ echo '$hello'    # $hello (literal string, not substituted)
 {% endtab %}
 {% endtabs %}
 
-### Example 4-1: Variable Assignment and Substitution
+### Example 3-1: Variable Assignment and Substitution
 
 ```bash
 #!/bin/bash
@@ -119,7 +119,7 @@ echo "$uninitialized"      # 5
 
 ---
 
-## 4.2. Variable Assignment
+## 3.2. Variable Assignment
 
 The **`=`** operator assigns a value to a variable. No space is permitted before or after the `=` sign.
 
@@ -146,7 +146,7 @@ Do not confuse `=` (assignment) with `-eq` (equality test):
 {% endtab %}
 {% endtabs %}
 
-### Example 4-2: Plain Variable Assignment
+### Example 3-2: Plain Variable Assignment
 
 ```bash
 #!/bin/bash
@@ -177,7 +177,7 @@ echo "The value of \"a\" is now $a."
 exit 0
 ```
 
-### Example 4-3: Variable Assignment with Command Substitution
+### Example 3-3: Variable Assignment with Command Substitution
 
 ```bash
 #!/bin/bash
@@ -205,11 +205,11 @@ exit 0
 
 ---
 
-## 4.3. Bash Variables Are Untyped
+## 3.3. Bash Variables Are Untyped
 
 Unlike many other programming languages, **Bash does not segregate its variables by "type."** Essentially, Bash variables are character strings, but depending on context, Bash permits arithmetic operations and comparisons on variables. The determining factor is whether the value contains only digits.
 
-### Example 4-4: Integer or String?
+### Example 3-4: Integer or String?
 
 ```bash
 #!/bin/bash
@@ -260,7 +260,7 @@ exit $?
 
 ---
 
-## 4.4. Special Variable Types
+## 3.4. Special Variable Types
 
 ### Local Variables
 
@@ -302,7 +302,7 @@ Arguments passed to the script from the command line: `$0`, `$1`, `$2`, `$3`, et
 - **`$*` and `$@`:** Denote all positional parameters (with subtle differences in quoting)
 - **`$#`:** The number of positional parameters
 
-### Example 4-5: Positional Parameters
+### Example 3-5: Positional Parameters
 
 ```bash
 #!/bin/bash

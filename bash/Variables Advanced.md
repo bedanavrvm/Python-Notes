@@ -1,8 +1,8 @@
-# Chapter 9: Variables (Advanced)
+# Chapter 7: Variables (Advanced)
 
 Beyond basic variable assignment, Bash offers arrays, special variables, and techniques for generating random numbers. This chapter explores these advanced features.
 
-## 9.1. Arrays
+## 7.1. Arrays
 
 Arrays allow you to store multiple values in a single variable, indexed by position or key.
 
@@ -85,7 +85,7 @@ done
 {% endtab %}
 {% endtabs %}
 
-### Example 9-1: Working with Indexed Arrays
+### Example 7-1: Working with Indexed Arrays
 
 ```bash
 #!/bin/bash
@@ -115,7 +115,7 @@ fruits[1]="blueberry"
 echo "After modifying index 1: ${fruits[@]}"
 ```
 
-### Example 9-2: Slot Machine Simulation
+### Example 7-2: Slot Machine Simulation
 
 ```bash
 #!/bin/bash
@@ -221,7 +221,7 @@ exit 0
 
 ---
 
-## 9.2. Special Variables and $RANDOM
+## 7.2. Special Variables and $RANDOM
 
 Bash provides several special variables for system information and randomness.
 
@@ -277,7 +277,7 @@ echo $((RANDOM % 11 + 10))
 
 ---
 
-## 9.3. Generating Random Numbers in a Range
+## 7.3. Generating Random Numbers in a Range
 
 Several techniques exist for generating random numbers within specific ranges and constraints.
 
@@ -294,7 +294,7 @@ rnumber=$((RANDOM % N + 1))
 rnumber=$((RANDOM % (max - min + 1) + min))
 ```
 
-### Example 9-14: Random Between Values
+### Example 7-14: Random Between Values
 
 ```bash
 #!/bin/bash
@@ -395,11 +395,11 @@ rnumber=$(($(date +%s%N) % 100))
 
 ---
 
-## 9.4. Testing Random Distribution
+## 7.4. Testing Random Distribution
 
 To verify that `$RANDOM` produces a reasonable distribution, write a script that tracks the frequency of outcomes.
 
-### Example 9-15: Rolling a Die with $RANDOM
+### Example 7-15: Rolling a Die with $RANDOM
 
 ```bash
 #!/bin/bash
@@ -443,11 +443,11 @@ exit 0
 
 ---
 
-## 9.5. Reseeding $RANDOM
+## 7.5. Reseeding $RANDOM
 
 Setting `$RANDOM` to a specific value reseeds the pseudorandom generator, allowing reproducible sequences.
 
-### Example 9-16: Seeding $RANDOM
+### Example 7-16: Seeding $RANDOM
 
 ```bash
 #!/bin/bash
@@ -507,7 +507,7 @@ exit 0
 
 ---
 
-## 9.6. Alternative Methods for Random Numbers
+## 7.6. Alternative Methods for Random Numbers
 
 ### Using `awk`
 
@@ -548,7 +548,7 @@ rnumber=$((seed % 100))
 
 ---
 
-## 9.7. Array Best Practices
+## 7.7. Array Best Practices
 
 {% tabs %}
 {% tab title="Indexed Arrays" %}

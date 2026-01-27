@@ -1,8 +1,8 @@
-# Chapter 8: Operations and Operators
+# Chapter 6: Operations and Operators
 
 Bash provides a rich set of operators for arithmetic, logical, and bitwise operations. Understanding operator precedence and how to combine them correctly is essential for writing robust scripts.
 
-## 8.1. Arithmetic Operators
+## 6.1. Arithmetic Operators
 
 Arithmetic operations in Bash can be performed using `let`, `$(( ))`, or `$[ ]` constructs.
 
@@ -91,7 +91,7 @@ Pre- vs. post-decrement have different side effects in conditional contexts.
 
 ---
 
-## 8.2. Bitwise Operators
+## 6.2. Bitwise Operators
 
 Bitwise operators manipulate individual bits and are seldom used in shell scripts. Their chief use is in manipulating values read from ports or sockets. "Bit flipping" is more relevant to compiled languages like C and C++.
 
@@ -145,7 +145,7 @@ echo $a           # 20
 
 ---
 
-## 8.3. Logical Operators
+## 6.3. Logical Operators
 
 Logical operators combine conditions and control program flow.
 
@@ -165,7 +165,7 @@ Logical operators combine conditions and control program flow.
 {% endtab %}
 {% endtabs %}
 
-### Example 8-3: Compound Condition Tests
+### Example 6-3: Compound Condition Tests
 
 ```bash
 #!/bin/bash
@@ -249,7 +249,7 @@ if [[ "$a" -eq 24 && "$b" -eq 47 ]]
 
 ---
 
-## 8.4. Numerical Constants
+## 6.4. Numerical Constants
 
 Bash interprets numbers in different bases depending on their prefix or notation.
 
@@ -298,7 +298,7 @@ echo $((16#AF16))     # 44822 (hex)
 {% endtab %}
 {% endtabs %}
 
-### Example 8-4: Representation of Numerical Constants
+### Example 6-4: Representation of Numerical Constants
 
 ```bash
 #!/bin/bash
@@ -342,7 +342,7 @@ exit 0
 
 ---
 
-## 8.5. The Double-Parentheses Construct `(( ))`
+## 6.5. The Double-Parentheses Construct `(( ))`
 
 The `(( ... ))` construct permits arithmetic expansion and C-style variable manipulation.
 
@@ -364,7 +364,7 @@ The `(( ... ))` construct supports:
 {% endtab %}
 {% endtabs %}
 
-### Example 8-5: C-Style Variable Manipulation
+### Example 6-5: C-Style Variable Manipulation
 
 ```bash
 #!/bin/bash
@@ -423,7 +423,7 @@ exit 0
 
 ---
 
-## 8.6. Comma Operator
+## 6.6. Comma Operator
 
 The comma operator chains together two or more arithmetic operations. All operations are evaluated, but only the result of the **last** operation is returned.
 
@@ -441,7 +441,7 @@ The comma operator is mainly useful in `for` loops for managing multiple loop va
 
 ---
 
-## 8.7. Operator Precedence
+## 6.7. Operator Precedence
 
 Operator precedence determines the order in which operations are evaluated. Higher-precedence operators execute before lower-precedence ones.
 
@@ -477,7 +477,7 @@ Operator precedence determines the order in which operations are evaluated. High
 3. **Order of evaluation** for equal-precedence operators is usually **left-to-right**
 4. **Use parentheses** to disambiguate complex expressions
 
-### Example 8-6: Understanding Precedence
+### Example 6-6: Understanding Precedence
 
 ```bash
 #!/bin/bash
@@ -530,7 +530,7 @@ exit 0
 
 ---
 
-## 8.8. Best Practices for Complex Expressions
+## 6.8. Best Practices for Complex Expressions
 
 To avoid confusion or errors in complex sequences of operations:
 

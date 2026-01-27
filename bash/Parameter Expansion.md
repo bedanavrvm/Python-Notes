@@ -1,8 +1,8 @@
-# Chapter 10: Parameter Expansion and Substitution
+# Chapter 8: Parameter Expansion and Substitution
 
 Parameter expansion allows you to manipulate variables in powerful ways: providing defaults, testing for existence, extracting substrings, removing patterns, and replacing text. These operators are essential for robust script writing.
 
-## 10.1. Default Values and Parameter Testing
+## 8.1. Default Values and Parameter Testing
 
 {% tabs %}
 {% tab title="${parameter:-default}" %}
@@ -85,7 +85,7 @@ echo "All required variables are set."
 {% endtab %}
 {% endtabs %}
 
-### Example 10-7: Parameter Testing with Error Messages
+### Example 8-7: Parameter Testing with Error Messages
 
 ```bash
 #!/bin/bash
@@ -113,7 +113,7 @@ echo "This line will not print because ZZXy23AB is undefined."
 exit 0
 ```
 
-### Example 10-8: Usage Messages
+### Example 8-8: Usage Messages
 
 ```bash
 #!/bin/bash
@@ -130,7 +130,7 @@ exit 0
 
 ---
 
-## 10.2. String Length and Substring Removal
+## 8.2. String Length and Substring Removal
 
 {% tabs %}
 {% tab title="String Length ${#var}" %}
@@ -206,7 +206,7 @@ echo "${path%/*}"        # /home/user/docs (remove shortest /* from back)
 {% endtab %}
 {% endtabs %}
 
-### Example 10-9: Length of a Variable
+### Example 8-9: Length of a Variable
 
 ```bash
 #!/bin/bash
@@ -234,7 +234,7 @@ echo "007 with leading zero stripped: $(strip_leading_zero 007)"
 exit 0
 ```
 
-### Example 10-10: Pattern Matching in Substitution
+### Example 8-10: Pattern Matching in Substitution
 
 ```bash
 #!/bin/bash
@@ -277,7 +277,7 @@ exit 0
 
 ---
 
-## 10.3. Substring Extraction and Replacement
+## 8.3. Substring Extraction and Replacement
 
 {% tabs %}
 {% tab title="Substring Extraction: :pos:len" %}
@@ -355,7 +355,7 @@ echo "${url/#http/https}"    # https://example.com
 {% endtab %}
 {% endtabs %}
 
-### Example 10-12: Pattern Matching for String Parsing
+### Example 8-12: Pattern Matching for String Parsing
 
 ```bash
 #!/bin/bash
@@ -419,7 +419,7 @@ echo "Replace all 'o' with 'O': $t"     # /hOme/user/dOcs/file.txt
 exit 0
 ```
 
-### Example 10-13: Prefix and Suffix Matching
+### Example 8-13: Prefix and Suffix Matching
 
 ```bash
 #!/bin/bash
@@ -453,9 +453,9 @@ exit 0
 
 ---
 
-## 10.4. Renaming Files with Pattern Substitution
+## 8.4. Renaming Files with Pattern Substitution
 
-### Example 10-11: Batch File Extension Renaming
+### Example 8-11: Batch File Extension Renaming
 
 ```bash
 #!/bin/bash
@@ -499,7 +499,7 @@ exit 0
 
 ---
 
-## 10.5. Indirect References and Variable Name Expansion
+## 8.5. Indirect References and Variable Name Expansion
 
 {% tabs %}
 {% tab title="Indirect Reference: ${!varname}" %}
@@ -552,7 +552,7 @@ done
 
 ---
 
-## 10.6. Summary of Parameter Expansion Operators
+## 8.6. Summary of Parameter Expansion Operators
 
 | Operator | Purpose | Example |
 |----------|---------|---------|

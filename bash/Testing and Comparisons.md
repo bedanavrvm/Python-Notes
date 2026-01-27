@@ -1,8 +1,8 @@
-# Chapter 7: Testing and Comparisons
+# Chapter 5: Testing and Comparisons
 
 Testing is central to writing robust Bash scripts. The `test` command (also spelled `[ ]`) and its extended form `[[ ]]` allow you to evaluate conditions and make decisions based on file properties, variable values, and logical combinations.
 
-## 7.1. File Tests
+## 5.1. File Tests
 
 File tests check the properties and status of files and directories.
 
@@ -110,7 +110,7 @@ fi
 {% endtab %}
 {% endtabs %}
 
-### Example 7-1: Testing File Properties
+### Example 5-1: Testing File Properties
 
 ```bash
 #!/bin/bash
@@ -147,7 +147,7 @@ then
 fi
 ```
 
-### Example 7-2: Comparing File Timestamps
+### Example 5-2: Comparing File Timestamps
 
 ```bash
 #!/bin/bash
@@ -178,7 +178,7 @@ then
 fi
 ```
 
-### Example 7-4: Testing for Broken Links
+### Example 5-4: Testing for Broken Links
 
 ```bash
 #!/bin/bash
@@ -222,7 +222,7 @@ exit $?
 
 ---
 
-## 7.2. Integer Comparison Operators
+## 5.2. Integer Comparison Operators
 
 Integer comparisons work on variables containing numeric values. These operators are used within `[ ]` or `[[ ]]` constructs, or within `(( ))` arithmetic contexts.
 
@@ -259,7 +259,7 @@ Arithmetic context allows C-style operators: `<`, `<=`, `>`, `>=`, `==`, `!=`.
 {% endtab %}
 {% endtabs %}
 
-### Example 7-5: Arithmetic and String Comparisons
+### Example 5-5: Arithmetic and String Comparisons
 
 ```bash
 #!/bin/bash
@@ -309,7 +309,7 @@ exit 0
 
 ---
 
-## 7.3. String Comparison Operators
+## 5.3. String Comparison Operators
 
 String comparisons test the values of string variables. These use a different set of operators than integer comparisons.
 
@@ -384,7 +384,7 @@ fi
 {% endtab %}
 {% endtabs %}
 
-### Example 7-6: Testing for Null Strings
+### Example 5-6: Testing for Null Strings
 
 ```bash
 #!/bin/bash
@@ -446,7 +446,7 @@ exit 0
 
 **Key Insight:** Always quote variables in test brackets: `[ "$var" ]` rather than `[ $var ]`. An unquoted variable may undergo word splitting and cause unexpected results.
 
-### Example 7-7: A Practical Utility Script
+### Example 5-7: A Practical Utility Script
 
 ```bash
 #!/bin/bash
@@ -488,7 +488,7 @@ exit $?
 
 ---
 
-## 7.4. Compound Comparison Operators
+## 5.4. Compound Comparison Operators
 
 Combine multiple test conditions using logical operators.
 
@@ -556,7 +556,7 @@ fi
 {% endtab %}
 {% endtabs %}
 
-### Example 7-8: Compound Tests
+### Example 5-8: Compound Tests
 
 ```bash
 #!/bin/bash
@@ -603,7 +603,7 @@ exit 0
 
 ---
 
-## 7.5. Test Constructs Comparison
+## 5.5. Test Constructs Comparison
 
 | Test Form | Usage | Short-circuits | Pattern Matching |
 |-----------|-------|----------------|-----------------|
@@ -619,7 +619,7 @@ exit 0
 
 ---
 
-## 7.6. Real-World Example: xinitrc Configuration
+## 5.6. Real-World Example: xinitrc Configuration
 
 ```bash
 #!/bin/bash
