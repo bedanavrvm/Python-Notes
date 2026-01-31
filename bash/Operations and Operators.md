@@ -2,587 +2,777 @@
 
 Bash provides a rich set of operators for arithmetic, logical, and bitwise operations. Understanding operator precedence and how to combine them correctly is essential for writing robust scripts.
 
-## 6.1. Arithmetic Operators
-
-Arithmetic operations in Bash can be performed using `let`, `$(( ))`, or `$[ ]` constructs.
-
-{% tabs %}
-{% tab title="Basic Operators" %}
-
-| Operator | Meaning | Example |
-|----------|---------|---------|
-| `+` | Addition | `let "a = 5 + 3"` → 8 |
-| `-` | Subtraction | `let "a = 5 - 3"` → 2 |
-| `*` | Multiplication | `let "a = 5 * 3"` → 15 |
-| `/` | Division (integer) | `let "a = 15 / 3"` → 5 |
-| `%` | Modulo (remainder) | `let "a = 17 % 5"` → 2 |
-| `**` | Exponentiation | `let "a = 2 ** 3"` → 8 |
-
-**Syntaxes:**
-```bash
-# Using let
-let "result = 5 + 3"
-
-# Using double parentheses (preferred)
-result=$(( 5 + 3 ))
-
-# Using $[ ] (deprecated)
-result=$[ 5 + 3 ]
-
-# Arithmetic in conditions
-if (( a > b )); then
-  echo "a is greater"
-fi
-```
-
-{% endtab %}
-{% tab title="Assignment Operators" %}
-
-| Operator | Meaning | Example |
-|----------|---------|---------|
-| `+=` | Add and assign | `let "a += 5"` → `a = a + 5` |
-| `-=` | Subtract and assign | `let "a -= 3"` → `a = a - 3` |
-| `*=` | Multiply and assign | `let "a *= 2"` → `a = a * 2` |
-| `/=` | Divide and assign | `let "a /= 2"` → `a = a / 2` |
-| `%=` | Modulo and assign | `let "a %= 3"` → `a = a % 3` |
-
-**Example:**
-```bash
-a=10
-let "a += 5"
-echo $a           # 15
-
-result=20
-(( result *= 2 ))
-echo $result      # 40
-```
-
-{% endtab %}
-{% tab title="Increment/Decrement" %}
-
-| Operator | Meaning | Effect |
-|----------|---------|--------|
-| `++var` | Pre-increment | Increments, then uses new value |
-| `var++` | Post-increment | Uses old value, then increments |
-| `--var` | Pre-decrement | Decrements, then uses new value |
-| `var--` | Post-decrement | Uses old value, then decrements |
-
-**Example:**
-```bash
-a=5
-
-(( ++a ))        # Pre-increment: a becomes 6, then used
-echo $a          # 6
-
-(( a++ ))        # Post-increment: old value used, then a becomes 7
-echo $a          # 7
-
-(( --a ))        # Pre-decrement: a becomes 6, then used
-echo $a          # 6
-
-(( a-- ))        # Post-decrement: old value used, then a becomes 5
-echo $a          # 5
-```
-
-Pre- vs. post-decrement have different side effects in conditional contexts.
-
-{% endtab %}
-{% endtabs %}
+In programming, **operations** are actions performed on data (adding numbers, comparing values), and **operators** are the symbols that represent these operations. Mastering operators enables you to write concise, expressive code that manipulates data effectively.
 
 ---
 
-## 6.2. Bitwise Operators
+## 6.1. Arithmetic Operators and Contexts
 
-Bitwise operators manipulate individual bits and are seldom used in shell scripts. Their chief use is in manipulating values read from ports or sockets. "Bit flipping" is more relevant to compiled languages like C and C++.
+Arithmetic operations in Bash can be performed using several constructs. It's important to understand when and why to use each.
 
-{% tabs %}
-{% tab title="Bitwise Operations" %}
+### Arithmetic Evaluation Constructs
 
-| Operator | Meaning | Example |
-|----------|---------|---------|
-| `<<` | Left shift (multiply by 2 per shift) | `let "a = 5 << 2"` → 20 |
-| `>>` | Right shift (divide by 2 per shift) | `let "a = 20 >> 2"` → 5 |
-| `&` | Bitwise AND | `let "a = 12 & 10"` → 8 |
-| `\|` | Bitwise OR | `let "a = 12 \| 10"` → 14 |
-| `^` | Bitwise XOR | `let "a = 12 ^ 10"` → 6 |
-| `~` | Bitwise NOT | `let "a = ~5"` → -6 |
+Bash provides three main ways to perform arithmetic:
 
-**Example:**
-```bash
-# Left shift: multiply by 4 (2^2)
-let "result = 5 << 2"
-echo $result      # 20
+| Construct | Syntax | Usage | Notes |
+|-----------|--------|-------|-------|
+| `let` | `let "expr"` | Variable assignment | Older, explicit syntax |
+| `(( ))` | `(( expr ))` | Arithmetic or condition | **Preferred**, most readable |
+| `$[ ]` | `$[ expr ]` | Command substitution | **Deprecated**, avoid |
+| `$(( ))` | `result=$(( expr ))` | Command substitution | Same as `$[ ]`, preferred syntax |
 
-# Bitwise AND
-let "result = 12 & 10"  # 1100 & 1010 = 1000 (8 in decimal)
-echo $result      # 8
+**Why `(( ))` is preferred:**
+- More readable than `let`
+- Can be used in conditions without `[ ]`
+- Allows spaces around operators
+- More familiar to C/Java developers
 
-# Bitwise OR
-let "result = 12 | 10"  # 1100 | 1010 = 1110 (14 in decimal)
-echo $result      # 14
-```
+### Basic Arithmetic Operators
 
-{% endtab %}
-{% tab title="Bitwise Assignment" %}
+| Operator | Meaning | Example | Result |
+|----------|---------|---------|--------|
+| `+` | Addition | `(( 5 + 3 ))` | 8 |
+| `-` | Subtraction | `(( 5 - 3 ))` | 2 |
+| `*` | Multiplication | `(( 5 * 3 ))` | 15 |
+| `/` | Division (integer) | `(( 15 / 3 ))` | 5 |
+| `%` | Modulo (remainder) | `(( 17 % 5 ))` | 2 |
+| `**` | Exponentiation | `(( 2 ** 3 ))` | 8 |
+| `-` | Unary minus | `(( -5 ))` | -5 |
+| `+` | Unary plus | `(( +5 ))` | 5 |
 
-| Operator | Meaning |
-|----------|---------|
-| `<<=` | Left-shift-equal |
-| `>>=` | Right-shift-equal |
-| `&=` | AND-equal |
-| `\|=` | OR-equal |
-| `^=` | XOR-equal |
+### Important Distinction: Integer Division
 
-**Example:**
-```bash
-a=5
-let "a <<= 2"     # a = a << 2
-echo $a           # 20
-```
-
-{% endtab %}
-{% endtabs %}
-
----
-
-## 6.3. Logical Operators
-
-Logical operators combine conditions and control program flow.
-
-{% tabs %}
-{% tab title="Logical NOT, AND, OR" %}
-
-| Operator | Meaning | Usage |
-|----------|---------|-------|
-| `!` | Logical NOT | `if [ ! -f "$file" ]` |
-| `&&` | Logical AND (short-circuit) | `[ cond1 ] && [ cond2 ]` or `[[ cond1 && cond2 ]]` |
-| `\|\|` | Logical OR (short-circuit) | `[ cond1 ] \|\| [ cond2 ]` or `[[ cond1 \|\| cond2 ]]` |
-| `-a` | AND (no short-circuit) | `[ cond1 -a cond2 ]` |
-| `-o` | OR (no short-circuit) | `[ cond1 -o cond2 ]` |
-
-**Key Difference:** `&&` and `||` short-circuit (stop evaluating once result is known), while `-a` and `-o` do not.
-
-{% endtab %}
-{% endtabs %}
-
-### Example 6-3: Compound Condition Tests
+Bash performs **integer division** — it truncates decimal results:
 
 ```bash
 #!/bin/bash
-# Compound conditions using && and ||
+
+# Integer division (decimal truncated)
+echo "15 / 4 = $(( 15 / 4 ))"      # Output: 3 (not 3.75)
+echo "17 / 5 = $(( 17 / 5 ))"      # Output: 3 (not 3.4)
+
+# For decimal results, use bc command
+echo "15 / 4 = $(echo "scale=2; 15/4" | bc)"  # Output: 3.75
+```
+
+### Using Arithmetic in Different Contexts
+
+```bash
+#!/bin/bash
+
+# Context 1: Variable assignment
+result=$(( 5 + 3 ))
+echo "Result: $result"              # Output: 8
+
+# Context 2: In conditions
+if (( 5 > 3 )); then
+  echo "5 is greater than 3"
+fi
+
+# Context 3: Arithmetic substitution
+echo "10 + 20 = $(( 10 + 20 ))"
+
+# Context 4: With variables
+count=5
+(( count = count + 1 ))
+echo "New count: $count"            # Output: 6
+```
+
+---
+
+## 6.2. Assignment and Compound Assignment Operators
+
+Assignment operators modify a variable based on its current value.
+
+### Assignment Operators
+
+| Operator | Meaning | Example | Equivalent |
+|----------|---------|---------|------------|
+| `=` | Assign | `a=5` | Direct assignment |
+| `+=` | Add and assign | `a += 5` | `a = a + 5` |
+| `-=` | Subtract and assign | `a -= 3` | `a = a - 3` |
+| `*=` | Multiply and assign | `a *= 2` | `a = a * 2` |
+| `/=` | Divide and assign | `a /= 2` | `a = a / 2` |
+| `%=` | Modulo and assign | `a %= 3` | `a = a % 3` |
+
+### Practical Examples
+
+```bash
+#!/bin/bash
+
+# Using +=
+count=10
+(( count += 5 ))
+echo "Count after += 5: $count"     # 15
+
+# Using -=
+score=100
+(( score -= 20 ))
+echo "Score after -= 20: $score"    # 80
+
+# Using *= (scaling)
+price=29
+(( price *= 2 ))
+echo "Price doubled: $price"        # 58
+
+# Chaining operations
+total=0
+(( total += 50 ))                   # 50
+(( total += 30 ))                   # 80
+(( total -= 10 ))                   # 70
+echo "Final total: $total"          # 70
+```
+
+**Why compound assignment matters:**
+- **Readability**: `count += 1` is clearer than `count=$(( count + 1 ))`
+- **Brevity**: Fewer characters to type
+- **Correctness**: Less chance of typos like `count = count + 1` (which shadows the variable)
+
+---
+
+## 6.3. Increment and Decrement Operators
+
+These operators change a variable by 1. The prefix and postfix forms have **different** behaviors in certain contexts.
+
+### Increment/Decrement Operators
+
+| Operator | Meaning | Behavior |
+|----------|---------|----------|
+| `++var` | Pre-increment | Increment **first**, then use value |
+| `var++` | Post-increment | Use value **first**, then increment |
+| `--var` | Pre-decrement | Decrement **first**, then use value |
+| `var--` | Post-decrement | Use value **first**, then decrement |
+
+### Understanding Pre vs. Post
+
+**Pre-increment/decrement:** The value changes **before** being used in the expression
+
+```bash
+a=5
+b=$(( ++a ))
+echo "a=$a, b=$b"      # a=6, b=6 (a incremented first, then assigned to b)
+```
+
+**Post-increment/decrement:** The value changes **after** being used in the expression
+
+```bash
+a=5
+b=$(( a++ ))
+echo "a=$a, b=$b"      # a=6, b=5 (value assigned to b first, then a incremented)
+```
+
+### Practical Use Cases
+
+```bash
+#!/bin/bash
+
+# Loop counter (most common use)
+count=0
+while (( count < 5 )); do
+  echo "Count: $count"
+  (( count++ ))
+done
+
+# Decrement (countdown)
+countdown=3
+while (( countdown > 0 )); do
+  echo "T minus $countdown"
+  (( countdown-- ))
+done
+echo "Blastoff!"
+
+# Pre vs. post matters in assignments
+a=10
+b=$(( ++a ))
+echo "Pre-increment: a=$a, b=$b"    # a=11, b=11
+
+a=10
+b=$(( a++ ))
+echo "Post-increment: a=$a, b=$b"   # a=11, b=10
+```
+
+---
+
+## 6.4. Bitwise Operators
+
+Bitwise operators manipulate individual bits and are rarely used in shell scripts. They're primarily useful for:
+- Manipulating hardware registers
+- Processing binary flags
+- Bit-level data manipulation
+
+### Bitwise Operators
+
+| Operator | Meaning | Example | Binary Example |
+|----------|---------|---------|-----------------|
+| `<<` | Left shift (multiply by 2 per shift) | `(( 5 << 2 ))` | `0101` << 2 = `10100` (20) |
+| `>>` | Right shift (divide by 2 per shift) | `(( 20 >> 2 ))` | `10100` >> 2 = `0101` (5) |
+| `&` | Bitwise AND | `(( 12 & 10 ))` | `1100` & `1010` = `1000` (8) |
+| `\|` | Bitwise OR | `(( 12 \| 10 ))` | `1100` \| `1010` = `1110` (14) |
+| `^` | Bitwise XOR | `(( 12 ^ 10 ))` | `1100` ^ `1010` = `0110` (6) |
+| `~` | Bitwise NOT | `(( ~5 ))` | ~`0101` = `...1010` (-6) |
+
+### Understanding Bitwise Operations
+
+**Bitwise AND (`&`)**: Result has 1 where **both** inputs have 1
+
+```bash
+12 = 1100
+10 = 1010
+---------
+ 8 = 1000  (only position 3 has 1 in both)
+```
+
+**Bitwise OR (`|`)**: Result has 1 where **at least one** input has 1
+
+```bash
+12 = 1100
+10 = 1010
+---------
+14 = 1110  (positions 1,2,3 have at least one 1)
+```
+
+**Bitwise XOR (`^`)**: Result has 1 where inputs **differ**
+
+```bash
+12 = 1100
+10 = 1010
+---------
+ 6 = 0110  (positions 1,2 differ between inputs)
+```
+
+**Left Shift (`<<`)**: Shift bits left, fill with zeros (multiplies by 2^n)
+
+```bash
+5 << 2:
+0101 << 2 = 10100 = 20  (5 * 4 = 20)
+```
+
+### Bitwise Assignment Operators
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| `<<=` | Left-shift and assign | `(( a <<= 2 ))` |
+| `>>=` | Right-shift and assign | `(( a >>= 2 ))` |
+| `&=` | AND and assign | `(( a &= 0xFF ))` |
+| `\|=` | OR and assign | `(( a \|= 0x01 ))` |
+| `^=` | XOR and assign | `(( a ^= mask ))` |
+
+### Example 6-1: Bitwise Operations
+
+```bash
+#!/bin/bash
+
+# Left shift (multiply by powers of 2)
+echo "5 << 1 = $(( 5 << 1 ))"       # 10 (5 * 2)
+echo "5 << 2 = $(( 5 << 2 ))"       # 20 (5 * 4)
+echo "5 << 3 = $(( 5 << 3 ))"       # 40 (5 * 8)
+
+# Right shift (divide by powers of 2)
+echo "20 >> 1 = $(( 20 >> 1 ))"     # 10 (20 / 2)
+echo "20 >> 2 = $(( 20 >> 2 ))"     # 5  (20 / 4)
+
+# Bitwise AND (mask operation)
+echo "12 & 10 = $(( 12 & 10 ))"     # 8
+
+# Bitwise OR (set bits)
+echo "12 | 10 = $(( 12 | 10 ))"     # 14
+
+# Bitwise XOR (toggle bits)
+echo "12 ^ 10 = $(( 12 ^ 10 ))"     # 6
+```
+
+---
+
+## 6.5. Logical Operators
+
+Logical operators combine conditions and are essential for decision-making in scripts.
+
+### Logical Operators
+
+| Operator | Meaning | Short-circuits | Example |
+|----------|---------|---|---------|
+| `!` | NOT (negation) | N/A | `if [[ ! -f "$file" ]]` |
+| `&&` | AND (both must be true) | **Yes** | `[[ cond1 && cond2 ]]` |
+| `\|\|` | OR (at least one true) | **Yes** | `[[ cond1 \|\| cond2 ]]` |
+| `-a` | AND (within `[ ]`) | No | `[ cond1 -a cond2 ]` |
+| `-o` | OR (within `[ ]`) | No | `[ cond1 -o cond2 ]` |
+
+### Understanding Short-Circuit Evaluation
+
+**Short-circuit AND (`&&`):** If first condition is **false**, second is never evaluated
+
+```bash
+# Second condition not checked (file doesn't exist)
+if [ -f "$file" ] && grep "pattern" "$file"; then
+  echo "Pattern found"
+fi
+# grep never runs if file doesn't exist
+```
+
+**Short-circuit OR (`||`):** If first condition is **true**, second is never evaluated
+
+```bash
+# Second command not run (file exists)
+[ -f "$file" ] || cp "$template" "$file"
+# Copy only happens if file doesn't exist
+```
+
+### Logical NOT (`!`)
+
+Reverses the truth value of a condition:
+
+```bash
+# NOT operator
+if [ ! -f "$filename" ]; then
+  echo "$filename does not exist"
+fi
+
+# Equivalent long form
+if [ -f "$filename" ]; then
+  # do nothing
+else
+  echo "$filename does not exist"
+fi
+```
+
+### Example 6-2: Compound Conditions
+
+```bash
+#!/bin/bash
 
 a=24
 b=47
 
-# Test 1: Using && (AND)
-if [ "$a" -eq 24 ] && [ "$b" -eq 47 ]
-then
-  echo "Test #1 succeeds (both conditions true)"
-else
-  echo "Test #1 fails"
+# Test 1: AND (both must be true)
+if [ "$a" -eq 24 ] && [ "$b" -eq 47 ]; then
+  echo "✓ Both conditions are true (AND)"
 fi
 
-echo
-
-# Test 2: Using || (OR)
-if [ "$a" -eq 98 ] || [ "$b" -eq 47 ]
-then
-  echo "Test #2 succeeds (at least one condition true)"
-else
-  echo "Test #2 fails"
+# Test 2: OR (at least one must be true)
+if [ "$a" -eq 99 ] || [ "$b" -eq 47 ]; then
+  echo "✓ At least one condition is true (OR)"
 fi
 
-echo
-
-# Test 3: Using -a (AND, no short-circuit)
-if [ "$a" -eq 24 -a "$b" -eq 47 ]
-then
-  echo "Test #3 succeeds"
-else
-  echo "Test #3 fails"
+# Test 3: NOT
+if [ ! -z "$a" ]; then
+  echo "✓ a is not empty (NOT)"
 fi
 
-echo
-
-# Test 4: Using -o (OR, no short-circuit)
-if [ "$a" -eq 98 -o "$b" -eq 47 ]
-then
-  echo "Test #4 succeeds"
-else
-  echo "Test #4 fails"
+# Test 4: Complex logic
+if [ "$a" -gt 20 ] && ([ "$b" -lt 50 ] || [ "$b" -eq 47 ]); then
+  echo "✓ Complex: a > 20 AND (b < 50 OR b == 47)"
 fi
 
-echo
-
-# Test 5: String comparison with &&
-a=rhino
-b=crocodile
-if [ "$a" = rhino ] && [ "$b" = crocodile ]
-then
-  echo "Test #5 succeeds"
-else
-  echo "Test #5 fails"
+# Test 5: Guard pattern (fail fast)
+if [ -f "$file" ] && [ -r "$file" ] && grep -q "pattern" "$file"; then
+  echo "✓ File exists, is readable, and contains pattern"
 fi
-
-# && and || in arithmetic context
-echo
-echo "Arithmetic context:"
-echo "1 && 2 = $(( 1 && 2 ))"        # 1 (both true)
-echo "3 && 0 = $(( 3 && 0 ))"        # 0 (one false)
-echo "4 || 0 = $(( 4 || 0 ))"        # 1 (at least one true)
-echo "0 || 0 = $(( 0 || 0 ))"        # 0 (both false)
-
-exit 0
 ```
 
-**Important:** In single brackets `[ ]`, use `&&` and `||` **outside** the brackets, not inside:
+**Critical Rule with Single Brackets:**
+In `[ ]`, use `&&` and `||` **outside** the brackets, not inside:
+
 ```bash
 # Correct:
-if [ "$a" -eq 24 ] && [ "$b" -eq 47 ]
+if [ "$a" -eq 24 ] && [ "$b" -eq 47 ]; then
 
-# Wrong:
-if [ "$a" -eq 24 && "$b" -eq 47 ]  # Syntax error!
+# Wrong (syntax error):
+if [ "$a" -eq 24 && "$b" -eq 47 ]; then
 
 # In double brackets, && and || work inside:
-if [[ "$a" -eq 24 && "$b" -eq 47 ]]
+if [[ "$a" -eq 24 && "$b" -eq 47 ]]; then
 ```
 
 ---
 
-## 6.4. Numerical Constants
+## 6.6. Numerical Constants and Bases
 
 Bash interprets numbers in different bases depending on their prefix or notation.
 
-{% tabs %}
-{% tab title="Number Bases" %}
+### Number Bases
 
-| Prefix | Base | Example | Result |
-|--------|------|---------|--------|
-| (none) | Decimal (base 10) | `32` | 32 |
-| `0` | Octal (base 8) | `032` | 26 (3×8 + 2) |
-| `0x` or `0X` | Hexadecimal (base 16) | `0x32` | 50 (3×16 + 2) |
-| `BASE#` | Custom base (2-64) | `2#11101` | 29 |
+| Notation | Base | Example | Decimal Value |
+|----------|------|---------|---|
+| Decimal | 10 | `32` | 32 |
+| Octal | 8 | `032` | 26 (3×8 + 2) |
+| Hexadecimal | 16 | `0x32` | 50 (3×16 + 2) |
+| Binary | 2 | `2#11101` | 29 |
+| Custom | 2-64 | `BASE#number` | Varies |
 
-**Examples:**
-```bash
-# Decimal
-let "dec = 32"
-echo $dec             # 32
-
-# Octal (base 8)
-let "oct = 032"
-echo $oct             # 26
-
-# Hexadecimal (base 16)
-let "hex = 0x32"
-echo $hex             # 50
-
-# Binary (base 2)
-let "bin = 2#111100111001101"
-echo $bin             # 31181
-
-# Base 32
-let "b32 = 32#77"
-echo $b32             # 231
-
-# Base 64
-let "b64 = 64#@_"
-echo $b64             # 4031
-
-# Mixed bases
-echo $((36#zz))       # 1295 (base 36)
-echo $((2#10101010))  # 170 (binary)
-echo $((16#AF16))     # 44822 (hex)
-```
-
-{% endtab %}
-{% endtabs %}
-
-### Example 6-4: Representation of Numerical Constants
+### Using Different Bases
 
 ```bash
 #!/bin/bash
-# numbers.sh: Numbers in different bases
 
-# Decimal (default)
-let "dec = 32"
-echo "Decimal: $dec"
+# Decimal (default, no prefix)
+echo "Decimal 32 = $((32))"
 
-# Octal (prefix 0)
-let "oct = 032"
-echo "Octal 032 = $oct in decimal"
+# Octal (prefix 0, digits 0-7)
+echo "Octal 032 = $((8#32))"        # 26 (easier to read with base prefix)
 
-# Hexadecimal (prefix 0x)
-let "hex = 0x32"
-echo "Hex 0x32 = $hex in decimal"
+# Hexadecimal (prefix 0x, digits 0-9, a-f)
+echo "Hex 0x20 = $((0x20))"         # 32
+echo "Hex 0xFF = $((0xFF))"         # 255
 
-# More hex examples
-echo "Hex 0x9abc = $((0x9abc))"
+# Binary (2#, digits 0-1)
+echo "Binary 2#11101 = $((2#11101))"  # 29
 
-# Custom bases (BASE#NUMBER, where BASE is 2-64)
-let "bin = 2#111100111001101"
-echo "Binary = $bin"
+# Base 16 (same as hex)
+echo "Base16 $(( 16#1F ))"          # 31
 
-let "b32 = 32#77"
-echo "Base-32 = $b32"
+# Base 8 (same as octal)
+echo "Base8 $(( 8#37 ))"            # 31
 
-let "b64 = 64#@_"
-echo "Base-64 = $b64"
+# Base 32
+echo "Base32 $(( 32#10 ))"          # 32
+```
 
-# Multiple custom bases in one command
-echo "Various bases: $((36#zz)) $((2#10101010)) $((16#AF16)) $((53#1aA))"
-# Output: 1295 170 44822 3375
+### Why Different Bases Matter
 
-# Note: Digits must be in range for the specified base
-# let "bad_oct = 081"  # Error: 8 is not valid in octal
-# Octal uses only 0-7
+```bash
+#!/bin/bash
 
-exit 0
+# Common use: file permissions in octal
+chmod 755 script.sh              # Octal: read+write+execute, read+execute, read+execute
+
+# Color values in hexadecimal
+color=0xFF0000                   # Red in RGB
+
+# Network masks
+mask=$((0xFF000000))             # Common network mask
+
+# Bit flags
+flag=$((2#1010))                 # Set specific bits
 ```
 
 ---
 
-## 6.5. The Double-Parentheses Construct `(( ))`
+## 6.7. The Double-Parentheses Construct `(( ))`
 
-The `(( ... ))` construct permits arithmetic expansion and C-style variable manipulation.
+The `(( ... ))` construct is Bash's primary arithmetic mechanism, providing:
+- Arithmetic evaluation and assignment
+- C-style variable manipulation
+- Conditional testing without `[ ]`
+- The ternary operator
 
-{% tabs %}
-{% tab title="Features" %}
-
-The `(( ... ))` construct supports:
-- **Arithmetic evaluation:** `(( a = 5 + 3 ))`
-- **C-style increment/decrement:** `(( a++ ))`, `(( ++a ))`
-- **C-style operators:** `<`, `<=`, `>`, `>=`, `==`, `!=`
-- **Conditional evaluation:** Returns 0 (success) if result is non-zero
-- **Ternary operator:** `(( result = a > b ? a : b ))`
-
-**Advantages over `let`:**
-- More readable C-like syntax
-- Spaces around operators are permitted
-- Can be used in conditions without needing `[ ]`
-
-{% endtab %}
-{% endtabs %}
-
-### Example 6-5: C-Style Variable Manipulation
+### Features of `(( ))`
 
 ```bash
 #!/bin/bash
-# c-vars.sh: C-style variable manipulation
+
+# Feature 1: Arithmetic assignment (with spaces, no need for quotes)
+(( result = 5 + 3 ))
+echo "Result: $result"
+
+# Feature 2: C-style operators (not just -gt, -eq)
+(( count = 0 ))
+if (( count < 5 )); then          # Using < instead of -lt
+  echo "Count is less than 5"
+fi
+
+# Feature 3: Pre/post increment and decrement
+(( count++ ))
+(( ++count ))
+(( --count ))
+
+# Feature 4: Ternary operator (inline if-then-else)
+(( grade = (score >= 90) ? 1 : 0 ))
+
+# Feature 5: Complex expressions with readable syntax
+(( result = (a + b) * c / d - e ** 2 ))
+```
+
+### Ternary Operator: Inline Conditionals
+
+The ternary operator provides compact if-then-else logic:
+
+```bash
+# Syntax: (( result = condition ? value_if_true : value_if_false ))
+
+score=85
+(( grade = (score >= 90) ? 'A' : (score >= 80) ? 'B' : 'C' ))
+echo "Grade: $grade"
+
+# More complex example
+(( age = 25 ))
+(( status = (age < 18) ? 0 : (age < 65) ? 1 : 2 ))
+# status = 1 (adult, working age)
+```
+
+### Example 6-3: C-Style Variable Manipulation
+
+```bash
+#!/bin/bash
 
 echo "Initial assignment:"
 (( a = 23 ))
 echo "a = $a"
 
 echo
-echo "Post-increment (use value, then increment):"
+echo "Post-increment:"
 (( a++ ))
-echo "a after a++ = $a"  # 24
+echo "a after a++ = $a"            # 24
 
 echo
-echo "Post-decrement (use value, then decrement):"
-(( a-- ))
-echo "a after a-- = $a"  # 23
-
-echo
-echo "Pre-increment (increment, then use value):"
+echo "Pre-increment:"
 (( ++a ))
-echo "a after ++a = $a"  # 24
+echo "a after ++a = $a"            # 25
 
 echo
-echo "Pre-decrement (decrement, then use value):"
-(( --a ))
-echo "a after --a = $a"  # 23
-
-echo
-echo "Compound assignment operators:"
+echo "Compound assignment:"
 (( a += 10 ))
-echo "a after += 10 = $a"  # 33
+echo "a after += 10 = $a"          # 35
 
 echo
-echo "C-style ternary operator:"
-(( t = a < 45 ? 7 : 11 ))
-echo "a < 45 ? 7 : 11 = $t"  # 7 (since a=33)
-
-echo
-echo "Arithmetic in conditions:"
-if (( a > 30 ))
-then
-  echo "a is greater than 30"
-fi
-
-echo
-echo "Pre- vs. post-decrement in conditions:"
-n=1
-let --n && echo "Pre-decrement: True" || echo "Pre-decrement: False"
-n=1
-let n-- && echo "Post-decrement: True" || echo "Post-decrement: False"
-
-exit 0
+echo "Ternary operator:"
+(( result = (a > 30) ? 100 : 50 ))
+echo "a > 30 ? 100 : 50 = $result"  # 100
 ```
 
 ---
 
-## 6.6. Comma Operator
+## 6.8. Operator Precedence
 
-The comma operator chains together two or more arithmetic operations. All operations are evaluated, but only the result of the **last** operation is returned.
+Operator precedence determines the order in which operations are evaluated. **Higher-precedence** operators execute before **lower-precedence** ones.
 
-```bash
-# Set t1 to result of last operation (15 - 4 = 11)
-let "t1 = ((5 + 3, 7 - 1, 15 - 4))"
-echo "t1 = $t1"                    # t1 = 11
+### Precedence Hierarchy (Highest to Lowest)
 
-# Set a and calculate t2
-let "t2 = ((a = 9, 15 / 3))"
-echo "t2 = $t2, a = $a"            # t2 = 5, a = 9
-```
-
-The comma operator is mainly useful in `for` loops for managing multiple loop variables.
-
----
-
-## 6.7. Operator Precedence
-
-Operator precedence determines the order in which operations are evaluated. Higher-precedence operators execute before lower-precedence ones.
-
-### Precedence Table (Highest to Lowest)
-
-| Precedence | Operators | Meaning |
+| Precedence | Operators | Example |
 |-----------|-----------|---------|
-| **HIGHEST** | `var++`, `var--` | Post-increment, post-decrement |
-| | `++var`, `--var` | Pre-increment, pre-decrement |
-| | `!`, `~` | Logical/bitwise NOT |
-| | `**` | Exponentiation |
-| | `*`, `/`, `%` | Multiply, divide, modulo |
-| | `+`, `-` | Add, subtract |
-| | `<<`, `>>` | Bitwise shifts |
-| | `-z`, `-n` | String null tests |
-| | `-e`, `-f`, `-t`, `-x`, etc. | File tests |
-| | `<`, `-lt`, `>`, `-gt`, `<=`, `-le`, `>=`, `-ge` | Comparison |
-| | `-nt`, `-ot`, `-ef` | File comparison |
-| | `==`, `-eq`, `!=`, `-ne` | Equality/inequality |
-| | `&` | Bitwise AND |
-| | `^` | Bitwise XOR |
-| | `\|` | Bitwise OR |
-| | `&&`, `-a` | Logical AND |
-| | `\|\|`, `-o` | Logical OR |
-| | `?:` | Ternary operator |
-| | `=`, `+=`, `-=`, `*=`, `/=`, `%=`, etc. | Assignment |
-| **LOWEST** | `,` | Comma operator |
+| **HIGHEST** | Post-increment/decrement (`var++`, `var--`) | First evaluated |
+| | Pre-increment/decrement (`++var`, `--var`) | |
+| | Unary (`!`, `~`, `+`, `-`) | |
+| | Exponentiation (`**`) | `2 ** 3 ** 2` = `2 ** (3 ** 2)` |
+| | Multiplication, division, modulo (`*`, `/`, `%`) | `6 / 2 * 3` = `(6 / 2) * 3` = 9 |
+| | Addition, subtraction (`+`, `-`) | `2 + 3 * 4` = `2 + (3 * 4)` = 14 |
+| | Bitwise shifts (`<<`, `>>`) | |
+| | Bitwise AND (`&`) | |
+| | Bitwise XOR (`^`) | |
+| | Bitwise OR (`\|`) | |
+| | Relational (`<`, `>`, `<=`, `>=`) | |
+| | Equality (`==`, `!=`, `-eq`, `-ne`) | |
+| | Logical AND (`&&`, `-a`) | Short-circuits |
+| | Logical OR (`\|\|`, `-o`) | Short-circuits |
+| | Ternary (`condition ? true : false`) | Right-associative |
+| | Assignment (`=`, `+=`, `-=`, etc.) | Right-associative |
+| **LOWEST** | Comma (`,`) | Last evaluated |
 
 ### Key Precedence Rules
 
-1. **"My Dear Aunt Sally"** — Multiply, Divide, Add, Subtract for arithmetic operations
-2. **Compound logical operators** (`&&`, `||`, `-a`, `-o`) have **low precedence**
-3. **Order of evaluation** for equal-precedence operators is usually **left-to-right**
-4. **Use parentheses** to disambiguate complex expressions
+**Rule 1: Multiplication and Division Before Addition and Subtraction**
 
-### Example 6-6: Understanding Precedence
+```bash
+echo $(( 2 + 3 * 4 ))    # 14, not 20
+# Evaluates as: 2 + (3 * 4)
+```
+
+**Rule 2: Use Parentheses for Clarity**
+
+```bash
+# Ambiguous
+if (( a || b && c )); then
+
+# Clear
+if (( a || (b && c) )); then
+# Logical AND has higher precedence than OR
+```
+
+**Rule 3: Left-to-Right for Equal Precedence**
+
+```bash
+echo $(( 10 - 5 + 2 ))   # 7, not 3
+# Evaluates as: (10 - 5) + 2, not 10 - (5 + 2)
+```
+
+**Rule 4: Exponentiation is Right-Associative**
+
+```bash
+echo $(( 2 ** 3 ** 2 ))  # 512 (2^9)
+# Evaluates as: 2 ** (3 ** 2), not (2 ** 3) ** 2
+```
+
+### Example 6-4: Understanding Precedence
 
 ```bash
 #!/bin/bash
-# Understanding operator precedence
 
-# Clear precedence example
+echo "Arithmetic precedence:"
 echo "5 + 3 * 2 = $(( 5 + 3 * 2 ))"       # 11 (multiply first)
-echo "5 * 3 + 2 = $(( 5 * 3 + 2 ))"       # 17 (multiply first)
 echo "(5 + 3) * 2 = $(( (5 + 3) * 2 ))"   # 16 (explicit grouping)
 
 echo
+echo "Logical operator precedence:"
+a=1
+b=0
+c=1
 
-# Logical operator precedence
-a=5
-b=3
-
-# This is ambiguous: -o has lower precedence than -gt
-if [ -z "$a" -o "$a" -gt "$b" -a -n "$b" ]
-then
-  echo "Hard to read!"
+# AND has higher precedence than OR
+if (( a || b && c )); then
+  echo "true (parsed as: a || (b && c))"
 fi
 
-# Better: explicit grouping
-if [[ -z "$a" ]] || ( [[ "$a" -gt "$b" ]] && [[ -n "$b" ]] )
-then
-  echo "Much clearer!"
+# With explicit grouping
+if (( (a || b) && c )); then
+  echo "true"
 fi
 
 echo
+echo "Exponentiation (right-associative):"
+echo "2 ** 3 ** 2 = $(( 2 ** 3 ** 2 ))"   # 512 (2^9)
+echo "(2 ** 3) ** 2 = $(( (2 ** 3) ** 2 ))"  # 64 (8^2)
+```
 
-# Real example from /etc/init.d/functions
-# while [ -n "$remaining" -a "$retry" -gt 0 ]
-# This evaluates as:
-# while [ (-n "$remaining") -a ("$retry" -gt 0) ]
-# The -n and -gt operators execute first (higher precedence)
-# Then -a combines the results (lower precedence)
+---
 
-remaining="something"
-retry=5
+## 6.9. The Comma Operator
 
-while [ -n "$remaining" -a "$retry" -gt 0 ]
-do
-  echo "Loop iteration (remaining=$remaining, retry=$retry)"
-  (( retry-- ))
-  [ "$retry" -eq 3 ] && remaining=""  # Exit after a few iterations
+The comma operator chains multiple operations together. All operations execute, but only the **last result** is returned.
+
+```bash
+# Returns 11 (result of last operation)
+(( result = (5 + 3, 7 - 1, 15 - 4) ))
+echo "$result"                     # 11
+
+# Useful in for loops with multiple variables
+for (( i = 0, j = 100; i < 10; i++, j-- )); do
+  echo "i=$i, j=$j"
 done
-
-exit 0
 ```
 
 ---
 
-## 6.8. Best Practices for Complex Expressions
+## Programming Keywords and Concepts
 
-To avoid confusion or errors in complex sequences of operations:
+### Essential Operators and Keywords
 
-1. **Use parentheses** to group conditions explicitly
-2. **Break long expressions** into readable sections
-3. **Prefer `[[ ]]` over `[ ]`** for modern Bash scripts
-4. **Use `&&` and `||` outside brackets** with single brackets
-5. **Document complex logic** with comments
+| Operator | Type | Purpose |
+|---|---|---|
+| `(( ))` | Arithmetic | Evaluate expressions and conditions |
+| `$(( ))` | Substitution | Embed arithmetic in strings/assignments |
+| `+`, `-`, `*`, `/`, `%`, `**` | Arithmetic | Basic math operations |
+| `++`, `--` | Increment/decrement | Add or subtract 1 |
+| `+=`, `-=`, `*=`, `/=`, `%=` | Compound assignment | Modify and assign in one operation |
+| `<<`, `>>`, `&`, `\|`, `^`, `~` | Bitwise | Bit-level manipulation |
+| `&&`, `\|\|`, `!` | Logical | Combine and negate conditions |
+| `?:` | Ternary | Inline if-then-else |
 
-**Bad (unclear):**
-```bash
-if [ "$v1" -gt "$v2" -o "$v1" -lt "$v2" -a -e "$filename" ]
-then
-  # What's the intended logic here?
-  echo "Hard to read"
-fi
-```
+### Core Programming Concepts
 
-**Good (explicit grouping):**
-```bash
-if [[ "$v1" -gt "$v2" ]] || [[ "$v1" -lt "$v2" ]] && [[ -e "$filename" ]]
-then
-  echo "Conditions are clearly grouped"
-fi
-```
+**1. Operator Precedence**
+- Determines order of evaluation in complex expressions
+- Multiplication/division before addition/subtraction
+- Use parentheses for clarity and correctness
+- Prevents subtle bugs from unexpected evaluation order
+
+**2. Arithmetic Contexts**
+- `(( ))` — Preferred for all arithmetic in Bash
+- `let` — Older syntax, less readable
+- `$[ ]` — Deprecated, avoid
+- Each context returns a value suitable for different uses
+
+**3. Pre vs. Post Increment/Decrement**
+- **Pre** (`++var`): Increment first, use new value
+- **Post** (`var++`): Use old value, then increment
+- Usually equivalent in simple statements
+- Difference matters in complex expressions
+
+**4. Short-Circuit Evaluation**
+- `&&` and `||` stop evaluating once result is known
+- Allows "guard" patterns: `[ -f "$file" ] && grep pattern "$file"`
+- Prevents errors from invalid operations
+- More efficient (skips unnecessary evaluation)
+
+**5. Ternary Operator for Inline Logic**
+- `condition ? true_value : false_value`
+- Compact alternative to if-then-else
+- Can be nested for complex decisions
+- Improves readability vs. multiple if statements
+
+**6. Bitwise Operations for Bit Manipulation**
+- Left/right shift for multiplying/dividing by powers of 2
+- AND for masking (keeping only certain bits)
+- OR for setting bits
+- XOR for toggling bits
+- Rarely used in scripts but essential in systems programming
+
+**7. Logical Operators for Decision Combining**
+- AND (&&) — all conditions must be true
+- OR (||) — at least one condition must be true
+- NOT (!) — reverses truth value
+- Enables expressing complex business logic
+
+**8. Number Base Conversions**
+- Octal (base 8): Used for permissions
+- Hexadecimal (base 16): Used for colors, addresses
+- Binary (base 2): Used for bit flags
+- Custom bases: Sometimes used for data encoding
+
+**9. Assignment Operators for Brevity**
+- Compound operators (`+=`, `-=`, etc.) more readable than `a = a + b`
+- Reduces variable references and typos
+- Essential idiom in Bash programming
+- Combined with loops for counters
+
+**10. Expression Evaluation Strategy**
+- Use `(( ))` for all arithmetic in modern Bash
+- Parenthesize subexpressions for clarity
+- Break complex expressions into intermediate variables
+- Always test edge cases and boundaries
 
 ---
 
-## Exercises
+## Best Practices for Safe Arithmetic
 
-1. **Write a script** using the double-parentheses construct to perform basic arithmetic (add, multiply, divide) and demonstrate both pre- and post-increment operations.
+### Pattern 1: Explicit Grouping
 
-2. **Create a script** that converts numbers between different bases (decimal, binary, octal, hexadecimal) using the custom base notation `BASE#NUMBER`.
+```bash
+# Bad: unclear what condition is being tested
+if (( a > 5 || b < 10 && c == 1 )); then
 
-3. **Demonstrate bitwise operations** by writing a script that performs left-shift, right-shift, AND, and OR operations on user-provided integers.
+# Good: explicit grouping
+if (( a > 5 || (b < 10 && c == 1) )); then
+```
 
-4. **Write a script** that uses the ternary operator `?:` to classify numbers as positive, negative, or zero.
+### Pattern 2: Intermediate Variables
 
-5. **Create a complex condition test** that combines multiple file tests, integer comparisons, and logical operators, then rewrite it with explicit parentheses for clarity.
+```bash
+# For clarity in complex calculations
+(( width = 100 ))
+(( height = 50 ))
+(( area = width * height ))
+(( doubled = area * 2 ))
+echo "Doubled area: $doubled"
+```
 
-6. **Implement a loop** using `(( ))` construct with C-style variable manipulation (pre/post increment) and demonstrate the difference in a conditional context.
+### Pattern 3: Guard Patterns
+
+```bash
+# Fail fast if precondition not met
+[ "$count" -gt 0 ] || { echo "Invalid count"; exit 1; }
+# Only continue if count is positive
+```
+
+### Pattern 4: Ternary for Simple Choices
+
+```bash
+# Better than if-then-else for single choice
+(( status = (age >= 18) ? 1 : 0 ))
+```
 
 ---
 
 ## Summary
 
-- **Arithmetic operators:** `+`, `-`, `*`, `/`, `%`, `**` (exponentiation)
-- **Assignment operators:** `+=`, `-=`, `*=`, `/=`, `%=`
-- **Increment/decrement:** `++var` (pre), `var++` (post), `--var` (pre), `var--` (post)
-- **Bitwise operators:** `<<` (left shift), `>>` (right shift), `&` (AND), `|` (OR), `^` (XOR), `~` (NOT)
-- **Logical operators:** `!` (NOT), `&&` (AND with short-circuit), `||` (OR with short-circuit), `-a` (AND), `-o` (OR)
-- **Numerical bases:** Decimal (no prefix), Octal (`0` prefix), Hexadecimal (`0x` prefix), Custom (`BASE#` notation)
-- **Double parentheses `(( ))`:** C-style arithmetic and variable manipulation
-- **Operator precedence:** High (post-increment) to low (comma) — use parentheses for clarity
-- **Ternary operator:** `(( result = condition ? true_value : false_value ))`
+Operators are the building blocks of expressions:
+
+- **Arithmetic operators** (`+`, `-`, `*`, `/`, `%`, `**`) perform calculations
+- **Assignment operators** (`=`, `+=`, `-=`, etc.) modify variables
+- **Increment/decrement** (`++`, `--`) change values by 1, with pre/post variants
+- **Bitwise operators** (`<<`, `>>`, `&`, `|`, `^`, `~`) manipulate individual bits
+- **Logical operators** (`&&`, `||`, `!`) combine and negate conditions
+- **`(( ))`** is the preferred arithmetic construct in Bash for readability and flexibility
+- **Operator precedence** determines evaluation order; use parentheses for clarity
+- **Short-circuit evaluation** in `&&` and `||` prevents errors and improves efficiency
+- **Ternary operator** (`condition ? true : false`) provides inline conditionals
+
+Master operators, and you'll write more expressive, efficient, and maintainable Bash scripts.

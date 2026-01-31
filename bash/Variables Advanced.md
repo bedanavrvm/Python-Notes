@@ -1,601 +1,764 @@
 # Chapter 7: Variables (Advanced)
 
-Beyond basic variable assignment, Bash offers arrays, special variables, and techniques for generating random numbers. This chapter explores these advanced features.
+Beyond basic variable assignment, Bash offers arrays, special variables, and techniques for generating random numbers. This chapter explores advanced variable concepts that enable sophisticated scripting patterns.
 
-## 7.1. Arrays
+**Arrays** are the primary data structure for managing collections of values. **Special variables** give access to system information and randomness. Together, these features enable real-world script functionality.
 
-Arrays allow you to store multiple values in a single variable, indexed by position or key.
+---
 
-{% tabs %}
-{% tab title="Indexed Arrays" %}
+## 7.1. Understanding Arrays
 
-Indexed (numeric) arrays use integer indices starting at 0.
+An **array** is a data structure that stores multiple values under a single name, each accessed by an index. Bash supports two types: **indexed arrays** (integer-based) and **associative arrays** (string-based).
 
-**Creating and populating:**
+### Why Arrays Matter
+
 ```bash
-# Method 1: Individual assignment
+# Without arrays (poor approach)
+fruit1="apple"
+fruit2="banana"
+fruit3="cherry"
+echo "$fruit1"
+echo "$fruit2"
+echo "$fruit3"
+
+# With arrays (scalable approach)
+fruits=("apple" "banana" "cherry")
+for fruit in "${fruits[@]}"; do
+  echo "$fruit"
+done
+```
+
+The array version scales easily to 100 or 1000 items without code duplication.
+
+---
+
+## 7.2. Indexed Arrays
+
+Indexed arrays use integer indices (0, 1, 2, ...) to access elements. This is the most common array type in Bash.
+
+### Creating Indexed Arrays
+
+**Method 1: Individual element assignment**
+
+```bash
 array[0]="first"
 array[1]="second"
 array[2]="third"
+```
 
-# Method 2: Initializer list
+**Method 2: Array literal (initializer list)**
+
+```bash
 array=("apple" "banana" "cherry")
+```
 
-# Method 3: Using declare
+**Method 3: Using `declare`**
+
+```bash
 declare -a myarray
 myarray[0]="element0"
 myarray[1]="element1"
 ```
 
-**Accessing elements:**
+### Accessing Array Elements
+
+| Syntax | Meaning |
+|--------|---------|
+| `${array[0]}` | First element |
+| `${array[1]}` | Second element |
+| `${array[@]}` | All elements (preferred) |
+| `${array[*]}` | All elements (same as above with proper quoting) |
+| `${#array[@]}` | Number of elements |
+| `${!array[@]}` | Array indices/keys |
+
+**Examples:**
+
 ```bash
-echo "${array[0]}"        # first
-echo "${array[1]}"        # second
-echo "${array[@]}"        # all elements
-echo "${array[*]}"        # all elements (different quoting)
-echo "${#array[@]}"       # number of elements
-echo "${!array[@]}"       # indices
+#!/bin/bash
+
+fruits=("apple" "banana" "cherry" "date" "elderberry")
+
+# Access single element
+echo "First fruit: ${fruits[0]}"     # apple
+echo "Third fruit: ${fruits[2]}"     # cherry
+
+# Get array length
+echo "Total fruits: ${#fruits[@]}"   # 5
+
+# Get all elements
+echo "All fruits: ${fruits[@]}"
+
+# Get indices
+echo "Indices: ${!fruits[@]}"        # 0 1 2 3 4
 ```
 
-**Looping over arrays:**
-```bash
-for element in "${array[@]}"
-do
-  echo "$element"
-done
+### Looping Over Indexed Arrays
 
-for i in "${!array[@]}"
-do
-  echo "Index $i: ${array[$i]}"
+**Method 1: Loop over values**
+
+```bash
+for fruit in "${fruits[@]}"; do
+  echo "$fruit"
 done
 ```
 
-{% endtab %}
-{% tab title="Associative Arrays" %}
+**Method 2: Loop over indices**
 
-Associative arrays (hash maps) use string keys instead of integer indices. Requires `declare -A`.
-
-**Creating and populating:**
 ```bash
+for i in "${!fruits[@]}"; do
+  echo "Index $i: ${fruits[$i]}"
+done
+```
+
+**Method 3: C-style for loop**
+
+```bash
+for ((i = 0; i < ${#fruits[@]}; i++)); do
+  echo "[$i] = ${fruits[$i]}"
+done
+```
+
+### Modifying Arrays
+
+```bash
+#!/bin/bash
+
+fruits=("apple" "banana")
+
+# Add element (appends at next index)
+fruits[2]="cherry"
+echo "${fruits[@]}"                 # apple banana cherry
+
+# Modify existing element
+fruits[1]="blueberry"
+echo "${fruits[@]}"                 # apple blueberry cherry
+
+# Append using += (Bash 3.1+)
+fruits+=("date")
+echo "${fruits[@]}"                 # apple blueberry cherry date
+
+# Get number of elements
+echo "Count: ${#fruits[@]}"          # 4
+```
+
+### Example 7-1: Managing a List with Indexed Arrays
+
+```bash
+#!/bin/bash
+# task-list.sh - Simple task management with arrays
+
+tasks=()
+
+add_task() {
+  local task="$1"
+  tasks+=("$task")
+  echo "Added: $task"
+}
+
+list_tasks() {
+  echo "Tasks:"
+  for i in "${!tasks[@]}"; do
+    echo "  $((i + 1)). ${tasks[$i]}"
+  done
+}
+
+remove_task() {
+  local index=$1
+  if [ $index -ge 1 ] && [ $index -le ${#tasks[@]} ]; then
+    echo "Removed: ${tasks[$((index - 1))]}"
+    unset 'tasks[$((index - 1))]'
+    # Reindex array
+    tasks=("${tasks[@]}")
+  fi
+}
+
+# Main
+add_task "Buy groceries"
+add_task "Fix the leak"
+add_task "Call dentist"
+
+list_tasks
+
+remove_task 2
+echo "After removing task 2:"
+list_tasks
+```
+
+---
+
+## 7.3. Associative Arrays
+
+Associative arrays (also called **hash maps** or **dictionaries**) use string keys instead of integer indices. Requires Bash 4.0+ and explicit declaration.
+
+### Declaring Associative Arrays
+
+```bash
+# Declaration with declare -A
 declare -A person
 person["name"]="Alice"
 person["age"]="30"
 person["city"]="New York"
 
 # Or initialize all at once
-declare -A colors=(["red"]="#FF0000" ["green"]="#00FF00" ["blue"]="#0000FF")
+declare -A colors=(
+  ["red"]="#FF0000"
+  ["green"]="#00FF00"
+  ["blue"]="#0000FF"
+)
 ```
 
-**Accessing elements:**
+**Important:** You must declare associative arrays before use with `declare -A`. Indexed arrays don't require this.
+
+### Accessing Associative Array Elements
+
+| Syntax | Meaning |
+|--------|---------|
+| `${array["key"]}` | Value for specific key |
+| `${array[@]}` | All values |
+| `${!array[@]}` | All keys |
+| `${#array[@]}` | Number of key-value pairs |
+
+**Examples:**
+
 ```bash
-echo "${person["name"]}"     # Alice
-echo "${person["age"]}"      # 30
-echo "${person[@]}"          # all values
-echo "${!person[@]}"         # all keys
+#!/bin/bash
+
+declare -A person=(
+  ["name"]="Alice"
+  ["age"]="30"
+  ["city"]="New York"
+)
+
+# Access specific value
+echo "Name: ${person["name"]}"       # Alice
+echo "Age: ${person["age"]}"         # 30
+
+# Get all values
+echo "Values: ${person[@]}"
+
+# Get all keys
+echo "Keys: ${!person[@]}"
+
+# Get count
+echo "Count: ${#person[@]}"          # 3
 ```
 
-**Looping over associative arrays:**
+### Looping Over Associative Arrays
+
 ```bash
-for key in "${!person[@]}"
-do
-  echo "$key => ${person[$key]}"
+#!/bin/bash
+
+declare -A settings=(
+  ["theme"]="dark"
+  ["font_size"]="12"
+  ["language"]="en"
+)
+
+# Loop over key-value pairs
+echo "Settings:"
+for key in "${!settings[@]}"; do
+  echo "  $key = ${settings[$key]}"
 done
 ```
 
-{% endtab %}
-{% endtabs %}
+### When to Use Associative Arrays
 
-### Example 7-1: Working with Indexed Arrays
+```bash
+# Good use case: representing an object/record
+declare -A user=(
+  ["id"]="12345"
+  ["username"]="alice"
+  ["email"]="alice@example.com"
+  ["created"]="2026-01-28"
+)
+
+# Good use case: configuration/settings
+declare -A config=(
+  ["db_host"]="localhost"
+  ["db_port"]="5432"
+  ["db_user"]="admin"
+)
+
+# Avoid: when order matters
+# (Associative arrays don't maintain insertion order)
+```
+
+### Example 7-2: Storing Configuration Data
 
 ```bash
 #!/bin/bash
-# array-demo.sh: Demonstrating indexed arrays
+# config.sh - Configuration management with associative arrays
 
-fruits=("apple" "banana" "cherry" "date" "elderberry")
+# Define configuration
+declare -A db=(
+  ["host"]="localhost"
+  ["port"]="5432"
+  ["user"]="dbadmin"
+  ["password"]="secret123"
+  ["name"]="myapp"
+)
 
-echo "Fruits array:"
-echo "Total fruits: ${#fruits[@]}"
-echo
-
-for i in "${!fruits[@]}"
-do
-  printf "  %d: %s\n" "$i" "${fruits[$i]}"
-done
-
-echo
-echo "All fruits: ${fruits[@]}"
-echo
-
-# Add an element
-fruits[5]="fig"
-echo "After adding fig: ${fruits[@]}"
-
-# Modify an element
-fruits[1]="blueberry"
-echo "After modifying index 1: ${fruits[@]}"
-```
-
-### Example 7-2: Slot Machine Simulation
-
-```bash
-#!/bin/bash
-# slots.sh: Simulating a slot machine with array distribution
-
-ROWS=23
-COLS=21
-RANGE=3        # Values 0, 1, 2 for left, stay, right
-PASSES=500     # Number of marbles to drop
-
-declare -a Slots
-POS=0
-
-Initialize_Slots() {
-  for ((i=0; i<COLS; i++))
-  do
-    Slots[$i]=0
-  done
+get_connection_string() {
+  echo "postgresql://${db["user"]}@${db["host"]}:${db["port"]}/${db["name"]}"
 }
 
-Show_Slots() {
-  # Display histogram
-  echo
-  echo "Slot Machine Results:"
-  echo
-  printf "    "
-  for ((i=0; i<COLS; i++))
-  do
-    printf "%3d" $i
-  done
-  echo
-  
-  for ((i=0; i<ROWS; i++))
-  do
-    printf "%3d |" $((ROWS-i))
-    for ((j=0; j<COLS; j++))
-    do
-      if [ ${Slots[$j]} -ge $((ROWS-i)) ]
-      then
-        printf " o "
-      else
-        printf "   "
-      fi
-    done
-    echo "|"
-  done
-  
-  echo "    |"
-  for ((i=0; i<COLS; i++))
-  do
-    printf "___"
-  done
-  echo "__|"
-  
-  echo
-  printf "    "
-  for ((i=0; i<COLS; i++))
-  do
-    printf "%3d" ${Slots[$i]}
-  done
-  echo
+test_connection() {
+  local conn=$(get_connection_string)
+  echo "Testing connection: $conn"
+  # In real script, would actually test connection
 }
 
-Move() {
-  # Random movement: left (-1), stay (0), right (+1)
-  Move=$RANDOM
-  let "Move %= RANGE"
-  case "$Move" in
-    0) ;;            # Stay put
-    1) ((POS--));;   # Move left
-    2) ((POS++));;   # Move right
-  esac
-}
-
-Play() {
-  # One pass (drop one marble)
-  for ((i=0; i<ROWS; i++))
-  do
-    Move
-  done
-  
-  SHIFT=11
-  let "POS += $SHIFT"
-  (( Slots[$POS]++ ))
-}
-
-Run() {
-  # Main loop: drop multiple marbles
-  for ((p=0; p<PASSES; p++))
-  do
-    Play
-    POS=0
-  done
-}
-
-# Main execution
-Initialize_Slots
-Run
-Show_Slots
-
-exit 0
-```
-
----
-
-## 7.2. Special Variables and $RANDOM
-
-Bash provides several special variables for system information and randomness.
-
-{% tabs %}
-{% tab title="Special Variables" %}
-
-| Variable | Meaning |
-|----------|---------|
-| `$0` | Script name |
-| `$1, $2, ...` | Positional parameters |
-| `$#` | Number of positional parameters |
-| `$*` | All positional parameters (as one word) |
-| `$@` | All positional parameters (as separate words) |
-| `$?` | Exit status of last command |
-| `$$` | Process ID (PID) of script |
-| `$!` | Process ID of last background job |
-| `$RANDOM` | Random integer between 0 and 32767 |
-| `$HOSTNAME` | System hostname |
-| `$USER` | Current user |
-| `$HOME` | Home directory |
-| `$PWD` | Current working directory |
-| `$IFS` | Internal Field Separator |
-
-{% endtab %}
-{% tab title="The $RANDOM Variable" %}
-
-`$RANDOM` is a built-in Bash variable that generates a random integer between 0 and 32767 (inclusive).
-
-**Basic usage:**
-```bash
-# Simple random number
-echo $RANDOM           # e.g., 27486
-
-# Random number in range 0-9
-echo $((RANDOM % 10))  # e.g., 7
-
-# Random number in range 1-6 (like a die)
-echo $((RANDOM % 6 + 1))  # e.g., 4
-
-# Random number in range 10-20
-echo $((RANDOM % 11 + 10))
-```
-
-**Key facts:**
-- `$RANDOM` generates a **pseudorandom** number (not truly random)
-- Returns values between 0 and 32767 (15-bit range)
-- Each invocation produces a different value
-- Can be seeded for reproducibility: `RANDOM=seed`
-- For better randomness, use `/dev/urandom`
-
-{% endtab %}
-{% endtabs %}
-
----
-
-## 7.3. Generating Random Numbers in a Range
-
-Several techniques exist for generating random numbers within specific ranges and constraints.
-
-### Basic Range Generation
-
-```bash
-# Random number between 0 and N-1
-rnumber=$((RANDOM % N))
-
-# Random number between 1 and N
-rnumber=$((RANDOM % N + 1))
-
-# Random number between min and max
-rnumber=$((RANDOM % (max - min + 1) + min))
-```
-
-### Example 7-14: Random Between Values
-
-```bash
-#!/bin/bash
-# random-between.sh: Generate random numbers in a range
-# with divisibility constraint
-
-randomBetween() {
-  # Generates a random number between $min and $max
-  # divisible by $divisibleBy
-  
-  local min=${1:-0}
-  local max=${2:-32767}
-  local divisibleBy=${3:-1}
-  
-  # Ensure divisibleBy is positive
-  [ ${divisibleBy} -lt 0 ] && divisibleBy=$((0 - divisibleBy))
-  
-  # Sanity checks
-  if [ $# -gt 3 ] || [ ${divisibleBy} -eq 0 ] || [ ${min} -eq ${max} ]
-  then
-    echo "Usage: randomBetween [min] [max] [divisibleBy]"
-    return 1
-  fi
-  
-  # Swap if min > max
-  if [ ${min} -gt ${max} ]
-  then
-    local x=${min}
-    min=${max}
-    max=${x}
-  fi
-  
-  # Adjust min if not divisible by $divisibleBy
-  if [ $((min / divisibleBy * divisibleBy)) -ne ${min} ]
-  then
-    if [ ${min} -lt 0 ]
-    then
-      min=$((min / divisibleBy * divisibleBy))
+print_settings() {
+  echo "Database Configuration:"
+  for key in "${!db[@]}"; do
+    if [ "$key" != "password" ]; then
+      echo "  $key: ${db[$key]}"
     else
-      min=$(((min / divisibleBy + 1) * divisibleBy))
+      echo "  $key: ****"
     fi
-  fi
-  
-  # Adjust max similarly
-  if [ $((max / divisibleBy * divisibleBy)) -ne ${max} ]
-  then
-    if [ ${max} -lt 0 ]
-    then
-      max=$((((max / divisibleBy) - 1) * divisibleBy))
-    else
-      max=$((max / divisibleBy * divisibleBy))
-    fi
-  fi
-  
-  # Generate random number
-  local spread=$((max - min + divisibleBy))
-  randomBetweenAnswer=$(((RANDOM % spread) / divisibleBy * divisibleBy + min))
-  
-  return 0
+  done
 }
 
-# Test the function
-randomBetween -14 20 3
-echo "Random number between -14 and 20, divisible by 3: $randomBetweenAnswer"
-
-randomBetween 1 100
-echo "Random number between 1 and 100: $randomBetweenAnswer"
-
-randomBetween 0 9
-echo "Random digit: $randomBetweenAnswer"
-```
-
-### Techniques for Better Randomness
-
-**Using `/dev/urandom`:**
-```bash
-# Generate a random byte and convert to decimal
-rnumber=$(od -An -td1 -N1 < /dev/urandom | tr -d ' ')
-
-# Or using hexdump
-rnumber=$(hexdump -n 1 -e '%d' /dev/urandom)
-```
-
-**Using `awk` for floating-point randomness:**
-```bash
-# Random number between 0 and 1 (with decimal places)
-awk 'BEGIN { srand(); print rand() }'
-
-# Random integer in range
-awk "BEGIN { srand(); print int(rand() * 100) }"
-```
-
-**Using `date` for sequence-based randomness:**
-```bash
-# Use current time as seed
-rnumber=$(($(date +%s%N) % 100))
+# Usage
+print_settings
+echo
+test_connection
 ```
 
 ---
 
-## 7.4. Testing Random Distribution
+## 7.4. Special Variables
 
-To verify that `$RANDOM` produces a reasonable distribution, write a script that tracks the frequency of outcomes.
+### Essential Special Variables
 
-### Example 7-15: Rolling a Die with $RANDOM
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `$0` | Script name | `./myscript.sh` |
+| `$1`, `$2`, ... | Positional parameters | Function/script arguments |
+| `$#` | Number of parameters | `for (( i = 1; i <= $#; i++ ))` |
+| `$$` | Process ID (PID) | `temp_${$}.txt` for unique files |
+| `$?` | Exit code of last command | `if [ $? -eq 0 ]` |
+| `$!` | PID of last background process | `kill $!` to terminate |
+| `$RANDOM` | Random integer (0-32767) | `$((RANDOM % 6 + 1))` for die roll |
+| `$HOSTNAME` | System hostname | For network operations |
+| `$USER` | Current username | For logging/permissions |
+| `$HOME` | Home directory path | For config file locations |
+| `$PWD` | Current working directory | `cd "$HOME"; echo "$PWD"` |
+| `$IFS` | Internal Field Separator | Controls word splitting |
+
+### Using Process ID for Uniqueness
 
 ```bash
 #!/bin/bash
-# dice-roll.sh: Testing randomness with die rolls
 
-RANDOM=$$           # Seed using script's process ID
-PIPS=6              # A die has 6 faces
-MAXTHROWS=600       # Number of throws
+# Create unique temporary files
+temp_file="/tmp/data_$$.txt"
+echo "Creating temp file: $temp_file"
 
-throw=0
-ones=0 twos=0 threes=0 fours=0 fives=0 sixes=0
+# Combine with timestamp for extra uniqueness
+timestamp=$(date +%s)
+unique_name="backup_$${timestamp}_$$.tar.gz"
+echo "Backup filename: $unique_name"
+```
 
-while [ "$throw" -lt "$MAXTHROWS" ]
-do
-  let "die = RANDOM % PIPS"
-  case "$die" in
-    0) ((ones++));;
-    1) ((twos++));;
-    2) ((threes++));;
-    3) ((fours++));;
-    4) ((fives++));;
-    5) ((sixes++));;
-  esac
-  let "throw += 1"
+### Using $? for Error Checking
+
+```bash
+#!/bin/bash
+
+# Check if command succeeded
+grep "pattern" file.txt
+if [ $? -eq 0 ]; then
+  echo "Pattern found"
+else
+  echo "Pattern not found"
+fi
+
+# More concise
+grep "pattern" file.txt && echo "Found" || echo "Not found"
+```
+
+---
+
+## 7.5. The $RANDOM Variable
+
+`$RANDOM` is a built-in Bash variable that generates a **pseudorandom** integer between 0 and 32767 (15-bit range, inclusive).
+
+### Understanding $RANDOM
+
+```bash
+#!/bin/bash
+
+# Basic usage
+echo "Random number: $RANDOM"
+
+# Each invocation is different
+echo "$RANDOM"
+echo "$RANDOM"
+echo "$RANDOM"
+# Output: three different values
+```
+
+### Generating Random Numbers in Ranges
+
+**Formula: Random between min and max (inclusive)**
+
+```bash
+# Random between 0 and 9
+(( random_digit = RANDOM % 10 ))
+
+# Random between 1 and 6 (die roll)
+(( die_roll = RANDOM % 6 + 1 ))
+
+# Random between min and max
+min=10
+max=20
+(( random_value = RANDOM % (max - min + 1) + min ))
+```
+
+**Breaking down the formula:**
+- `RANDOM % (max - min + 1)` — Get random value in range [0, max - min]
+- `+ min` — Shift range to [min, max]
+
+### Practical Examples
+
+```bash
+#!/bin/bash
+
+# Coin flip (0 or 1)
+(( coin = RANDOM % 2 ))
+[ "$coin" -eq 0 ] && echo "Heads" || echo "Tails"
+
+# Card from standard deck (1-52)
+(( card = RANDOM % 52 + 1 ))
+echo "Card number: $card"
+
+# Password character (ASCII 33-126, printable)
+(( ascii = RANDOM % 94 + 33 ))
+printf "Character: \\$(printf '%03o' $ascii)\n"
+```
+
+### Example 7-3: Rolling a Die with Distribution Testing
+
+```bash
+#!/bin/bash
+# dice-stats.sh - Roll a die N times and show distribution
+
+ROLLS=6000
+declare -a counts=(0 0 0 0 0 0)
+
+for ((i = 0; i < ROLLS; i++)); do
+  (( roll = RANDOM % 6 ))
+  (( counts[$roll]++ ))
 done
 
-echo "Results of $MAXTHROWS throws:"
-echo "ones   = $ones"
-echo "twos   = $twos"
-echo "threes = $threes"
-echo "fours  = $fours"
-echo "fives  = $fives"
-echo "sixes  = $sixes"
-echo
-echo "(Expected ~100 of each for even distribution)"
+echo "Die roll distribution ($ROLLS rolls):"
+for face in 0 1 2 3 4 5; do
+  percentage=$(( (counts[$face] * 100) / ROLLS ))
+  echo "  Face $((face + 1)): ${counts[$face]} times (~${percentage}%)"
+done
 
-exit 0
+echo
+echo "Expected: ~1000 of each for fair distribution"
 ```
 
-**Expected output:** With 600 throws, each face should appear approximately 100 times (±20 or so).
+### Important Facts About $RANDOM
 
----
+**Pseudorandom, not random:**
+- Uses a predictable algorithm (Linear Congruential Generator)
+- Suitable for games and simulations
+- **Not suitable** for cryptography or security
 
-## 7.5. Reseeding $RANDOM
-
-Setting `$RANDOM` to a specific value reseeds the pseudorandom generator, allowing reproducible sequences.
-
-### Example 7-16: Seeding $RANDOM
+**Seeding for reproducibility:**
 
 ```bash
-#!/bin/bash
-# seeding-random.sh: Demonstrating RANDOM reseeding
-
-MAXCOUNT=10
-
-echo "Seed = 1:"
+# Seed with a value for reproducible sequences
 RANDOM=1
-for ((i=0; i<MAXCOUNT; i++))
-do
-  echo -n "$RANDOM "
-done
-echo
+echo "$RANDOM"     # Always same first value with seed=1
+echo "$RANDOM"     # Always same second value
 
-echo
-echo "Seed = 1 again (should be identical):"
+# Reset seed
 RANDOM=1
-for ((i=0; i<MAXCOUNT; i++))
-do
-  echo -n "$RANDOM "
-done
-echo
-
-echo
-echo "Seed = 2 (different sequence):"
-RANDOM=2
-for ((i=0; i<MAXCOUNT; i++))
-do
-  echo -n "$RANDOM "
-done
-echo
-
-echo
-echo "Seed from process ID:"
-RANDOM=$$
-for ((i=0; i<MAXCOUNT; i++))
-do
-  echo -n "$RANDOM "
-done
-echo
-
-echo
-echo "Seed from /dev/urandom:"
-SEED=$(od -N 1 -tu1 /dev/urandom | awk '{print $2}')
-RANDOM=$SEED
-for ((i=0; i<MAXCOUNT; i++))
-do
-  echo -n "$RANDOM "
-done
-echo
-
-exit 0
+echo "$RANDOM"     # Same as before
 ```
 
-**Key insight:** Same seed always produces the same sequence, useful for reproducible testing.
-
----
-
-## 7.6. Alternative Methods for Random Numbers
-
-### Using `awk`
+**For better randomness:**
 
 ```bash
-#!/bin/bash
-# awk-random.sh: Generate random numbers with awk
+# Use /dev/urandom (hardware randomness)
+random_byte=$(od -An -td1 -N1 < /dev/urandom | tr -d ' ')
 
-echo "Random number between 0 and 1 (6 decimals):"
-echo | awk '{ srand(); print rand() }'
+# Use /dev/random (blocking, higher quality)
+random_byte=$(od -An -td1 -N1 < /dev/random | tr -d ' ')
 
-echo
-echo "10 random integers between 1 and 100:"
-awk 'BEGIN {
-  srand()
-  for (i=1; i<=10; i++)
-    print int(rand() * 100) + 1
-}'
-
-echo
-echo "Random float between 10 and 20:"
-awk 'BEGIN {
-  srand()
-  print 10 + rand() * 10
-}'
-```
-
-### Using Date for Seeding
-
-```bash
 # Use nanoseconds from date
-seed=$(date +%s%N)
-rnumber=$((seed % 100))
-
-# Or use just seconds
-seed=$(date +%s)
-rnumber=$((seed % 100))
+(( random_seed = $(date +%s%N) % 100 ))
 ```
 
 ---
 
-## 7.7. Array Best Practices
+## 7.6. Generating Random Numbers With Constraints
 
-{% tabs %}
-{% tab title="Indexed Arrays" %}
+### Divisibility Constraint
 
-- Always quote array subscripts: `"${array[$i]}"` not `${array[$i]}`
-- Use `[@]` to expand all elements: `"${array[@]}"`
-- Use `[*]` only when you want word-splitting
-- Initialize arrays explicitly: `array=()`
-- Check array length with `${#array[@]}`
+Sometimes you need a random number divisible by a specific value:
 
-{% endtab %}
-{% tab title="Associative Arrays" %}
+```bash
+#!/bin/bash
 
-- Declare with `declare -A` before use
-- Keys can contain any string (spaces, special characters)
-- Access with quoted keys: `"${array["key name"]}"`
-- Iterate over keys with `"${!array[@]}"`
-- No guaranteed order of iteration
+# Random multiple of 5, between 0 and 100
+divisor=5
+max=100
+(( random_num = (RANDOM % ((max / divisor) + 1)) * divisor ))
+echo "Random (multiple of 5): $random_num"
+```
 
-{% endtab %}
-{% endtabs %}
+### Example 7-4: Random Number With Multiple Constraints
+
+```bash
+#!/bin/bash
+# random-constrained.sh
+
+random_in_range() {
+  local min=$1
+  local max=$2
+  local divisor=${3:-1}
+  
+  # Validate inputs
+  [ $min -gt $max ] && { echo "Error: min > max"; return 1; }
+  [ $divisor -eq 0 ] && { echo "Error: divisor is 0"; return 1; }
+  
+  # Calculate range accounting for divisor
+  local count=$(( (max - min) / divisor + 1 ))
+  local random=$(( RANDOM % count ))
+  local result=$(( random * divisor + min ))
+  
+  echo $result
+}
+
+# Generate random numbers
+echo "Random 0-50: $(random_in_range 0 50)"
+echo "Random 1-100, multiple of 10: $(random_in_range 10 100 10)"
+echo "Random 5-25, multiple of 5: $(random_in_range 5 25 5)"
+```
 
 ---
 
-## Exercises
+## 7.7. Best Practices for Arrays
 
-1. **Create an indexed array** of your favorite programming languages and iterate over it, printing each language with its index.
+### For Indexed Arrays
 
-2. **Build an associative array** representing a student's grades (subjects as keys, grades as values) and calculate the average.
+```bash
+# ✓ Correct: Always quote array subscripts
+for i in "${!array[@]}"; do
+  echo "${array[$i]}"
+done
 
-3. **Write a script** that rolls two dice 1000 times and displays the frequency distribution of sums (2-12).
+# ✓ Correct: Use [@] for all elements
+for item in "${array[@]}"; do
+  echo "$item"
+done
 
-4. **Generate random numbers** in the range 50-100, divisible by 5, using the formula approach.
+# ✗ Avoid: Unquoted arrays (word-splitting)
+for item in $array; do   # WRONG!
+  echo "$item"
+done
 
-5. **Implement a simple lottery picker** that generates N random numbers from 1 to 50 without repetition (using an array to track picks).
+# ✓ Correct: Check length before accessing
+if [ ${#array[@]} -gt 0 ]; then
+  echo "First: ${array[0]}"
+fi
+```
 
-6. **Create a function** that accepts min, max, and divisor, then returns a random number meeting those constraints (like `randomBetween`).
+### For Associative Arrays
+
+```bash
+# ✓ Correct: Declare before use
+declare -A config
+config["key"]="value"
+
+# ✓ Correct: Quote keys with spaces
+declare -A person=(
+  ["first name"]="Alice"
+  ["last name"]="Bob"
+)
+echo "${person["first name"]}"
+
+# ✗ Wrong: Missing declare -A
+config["key"]="value"  # Creates indexed array, not associative!
+
+# ✓ Correct: Iterate over keys
+for key in "${!config[@]}"; do
+  echo "$key: ${config[$key]}"
+done
+```
+
+### Common Pitfalls
+
+```bash
+# ✗ Pitfall 1: Forgetting declare -A for associative arrays
+assoc["key"]="value"    # Actually creates indexed array!
+
+# ✗ Pitfall 2: Unquoted array expansion
+for item in ${array[@]}; do    # Word-splitting occurs!
+  echo "$item"
+done
+
+# ✓ Fix: Quote array expansion
+for item in "${array[@]}"; do
+  echo "$item"
+done
+
+# ✗ Pitfall 3: Assuming order in associative arrays
+# Associative arrays don't maintain insertion order!
+declare -A items=(["a"]=1 ["b"]=2 ["c"]=3)
+for key in "${!items[@]}"; do
+  echo "$key"
+done
+# Order is undefined!
+```
+
+---
+
+## Programming Keywords and Concepts
+
+### Essential Array Keywords
+
+| Keyword | Type | Purpose |
+|---|---|---|
+| `declare -a` | Declaration | Create indexed array |
+| `declare -A` | Declaration | Create associative array |
+| `${array[@]}` | Expansion | All elements |
+| `${#array[@]}` | Expansion | Array length |
+| `${!array[@]}` | Expansion | Keys/indices |
+| `+=` | Operator | Append to array |
+
+### Core Programming Concepts
+
+**1. Data Structures**
+- Arrays are collections of values under one name
+- Indexed arrays for ordered collections
+- Associative arrays for key-value pairs (objects/records)
+- Enables managing related data together
+
+**2. Array Indexing**
+- Indexed arrays: 0-based integer indices
+- Associative arrays: string-based keys
+- Access via bracket notation: `${array[key]}`
+- Important: Always quote indices to prevent word-splitting
+
+**3. Array Iteration Patterns**
+- Over values: `for item in "${array[@]}"`
+- Over indices: `for i in "${!array[@]}"`
+- C-style: `for ((i = 0; i < ${#array[@]}; i++))`
+- Choose based on what you need (values or positions)
+
+**4. Array Modification**
+- Individual element: `array[5]="value"`
+- Append: `array+=("new element")`
+- Unset: `unset 'array[index]'`
+- Reindex: `array=("${array[@]}")`
+
+**5. Special Variables Access**
+- Provide access to system state without external commands
+- `$$` for process-specific filenames
+- `$?` for error checking
+- `$RANDOM` for non-cryptographic randomness
+- Essential for defensive programming
+
+**6. Pseudorandom Number Generation**
+- `$RANDOM` generates 15-bit values (0-32767)
+- Predictable and reproducible with seeding
+- Suitable for games, simulations, sampling
+- Not suitable for security/cryptography
+
+**7. Randomness Formulas**
+- Range [0, N): `RANDOM % N`
+- Range [min, max]: `RANDOM % (max - min + 1) + min`
+- Multiples: `(RANDOM / step) * step`
+- Complex constraints require custom logic
+
+**8. Associative vs. Indexed Arrays**
+- Choose based on data structure needs
+- Associative when semantic meaning in keys
+- Indexed when order matters
+- Bash 4.0+ required for associative arrays
+
+**9. Quote Protection in Arrays**
+- Quoting prevents word-splitting: `"${array[@]}"`
+- Unquoted expands with IFS: `${array[@]}`
+- Critical when filenames have spaces
+- Habit: always quote array variables
+
+**10. Process ID Usage**
+- `$$` for unique filenames: `file_$$.tmp`
+- Combine with timestamp for extra uniqueness
+- Prevents conflicts in concurrent scripts
+- Essential for temporary file management
+
+---
+
+## Common Array Patterns
+
+### Pattern 1: Accumulating Values
+
+```bash
+results=()
+for file in *.txt; do
+  # Process file
+  status=$(process "$file")
+  results+=("$status")
+done
+
+# Display all results
+for result in "${results[@]}"; do
+  echo "$result"
+done
+```
+
+### Pattern 2: Lookup Table (Associative Array)
+
+```bash
+declare -A status_codes=(
+  ["success"]="0"
+  ["error"]="1"
+  ["not_found"]="2"
+  ["timeout"]="3"
+)
+
+handle_result() {
+  local code=$1
+  local msg="${status_codes[$code]}"
+  echo "Result: $msg"
+}
+```
+
+### Pattern 3: Counting Occurrences
+
+```bash
+declare -a frequencies
+for item in "${items[@]}"; do
+  (( frequencies[$item]++ ))
+done
+
+for value in "${!frequencies[@]}"; do
+  echo "$value: ${frequencies[$value]} times"
+done
+```
 
 ---
 
 ## Summary
 
-- **Indexed arrays:** Use integer indices; access with `${array[i]}`; iterate with `for i in "${!array[@]}"`
-- **Associative arrays:** Require `declare -A`; use string keys; access with `${array["key"]}`
-- **Special variables:** `$RANDOM`, `$$`, `$?`, `$!`, `$HOME`, `$PWD`, etc.
-- **`$RANDOM` range:** 0 to 32767 (15-bit pseudorandom)
-- **Generate random in range:** `$((RANDOM % (max - min + 1) + min))`
-- **Reseeding:** `RANDOM=seed` produces reproducible sequences
-- **Better randomness:** Use `/dev/urandom`, `awk`, or `date` for higher-quality randomness
-- **Always quote arrays:** `"${array[@]}"` and `"${array[$i]}"` to prevent word-splitting
+Advanced variables provide powerful data management:
+
+- **Indexed arrays** store ordered collections; access with `${array[i]}`
+- **Associative arrays** store key-value pairs; require `declare -A`
+- **Always quote** array expansions: `"${array[@]}"`
+- **Special variables** provide system information: `$$`, `$?`, `$HOME`, etc.
+- **`$RANDOM`** generates pseudorandom integers (0-32767)
+- **Randomness formulas** enable generating constrained random numbers
+- **Array best practices** prevent common mistakes with quoting and initialization
+- **Choose the right structure** — indexed for sequences, associative for objects
+
+Master arrays and special variables, and you'll write more sophisticated and maintainable Bash scripts.

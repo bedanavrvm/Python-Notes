@@ -104,6 +104,49 @@ $ ls -l myscript.sh
 #  ^       = owner now has execute permission
 ```
 
+### Understanding the Permission Groups
+
+Linux file permissions are divided into **3 groups**, each with exactly 3 slots:
+
+```
+-rwxr-xr-x
+ -  rwx   r-x   r-x
+ |  |     |     |
+ |  |     |     └── others (everyone else)
+ |  |     └──────────── group (users in the file's group)
+ |  └───────────────────── owner (the user who created the file)
+ └────────────────────────── file type (- = regular file, d = directory, l = link)
+```
+
+**Each group has exactly 3 positions:**
+- **r** (read) = can view file contents
+- **w** (write) = can modify/delete file
+- **x** (execute) = can run the file as a program
+
+**Critical rule**: Each group can have **at most one r, one w, and one x**. The extra r's and w's you see belong to the **next group**:
+
+```bash
+-rwxr-xr-x
+  └└└ owner (rwx)
+     └└└ group (r-x, meaning read and execute only)
+        └└└ others (r-x, meaning read and execute only)
+```
+
+**What r and x together mean:**
+- **r-x** (read + execute) = You can **read AND run the file**, but cannot **modify it**
+- **rwx** (read + write + execute) = You have **full control**: read, modify, and execute
+- **r--** (read only) = You can only **view** the contents; cannot modify or execute
+- **--x** (execute only) = You can **run** the program but cannot read its source code
+
+**Common permission examples:**
+
+| Permission | Meaning |
+|------------|----------|
+| `-rw-r--r--` | Owner can read/write; group and others can only read |
+| `-rwxr-xr-x` | Owner has full control; group and others can read and execute |
+| `-rwx------` | Only owner can do anything; group and others have no access |
+| `-r--r--r--` | Everyone can read; nobody can modify or execute |
+
 ### Running Your Script
 
 Once executable, run the script with:
@@ -212,6 +255,61 @@ echo "Year is $year"    # Output: Year is 2026
 - No spaces around `=` in variable assignment
 - Variable names are case-sensitive (`Name` and `name` are different)
 - Access variables with `$variablename`
+
+### Understanding Variable Persistence
+
+Shell variables have **limited lifetime** — they exist only in their shell environment:
+
+**Interactive shell example:**
+
+```bash
+$ name="Alice"
+$ echo $name
+Alice
+
+# Variables persist in the same shell session
+$ echo $name
+Alice
+
+# But exit the shell and start a new one:
+$ exit
+$ echo $name
+# (nothing — variable doesn't exist in new shell)
+```
+
+**Why variables don't persist across shells:**
+
+Variables live in the **current shell's memory** (RAM). When the shell exits, that memory is freed and all variables disappear. A new shell session gets its own separate memory space.
+
+**Making variables persist:**
+
+1. **Export to child processes** (they inherit, but don't persist after exit):
+   ```bash
+   export name="Alice"
+   bash                    # Start a subshell
+   echo $name              # Works! "Alice" is inherited
+   exit                    # Return to parent shell
+   ```
+   The variable is only available to child processes, not saved permanently.
+
+2. **Save to `~/.bashrc`** (persists across terminal sessions):
+   ```bash
+   # Add this line to ~/.bashrc
+   export MY_VAR="Alice"
+   ```
+   Now every time you open a terminal, `MY_VAR` will be available in that shell.
+
+3. **Save to `~/.bash_profile`** (persists for login shells on some systems):
+   ```bash
+   # Add to ~/.bash_profile for login shell persistence
+   export MY_VAR="Alice"
+   ```
+
+**In short:**
+- Variables created in a shell session **exist only in that session's memory**
+- **`export`** makes variables available to child processes, but they're still lost when all shells exit
+- **`~/.bashrc`** is the way to save variables permanently across different terminal sessions
+- Without saving to a config file or exporting, variables are **temporary** and disappear when you close the terminal
 
 ### Functions for Reusable Code
 

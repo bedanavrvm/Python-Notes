@@ -1,409 +1,825 @@
 # Chapter 12: System and Administrative Commands
 
-System and administrative commands manage user accounts, groups, terminal settings, and system monitoring. These commands are typically invoked by root for system maintenance, user management, and emergency operations.
+## Understanding System Administration through Shells
 
-## Users and Groups Management
+System and administrative commands manage the core functions of Unix/Linux systems: user accounts, file permissions, terminal behavior, and system monitoring. These commands typically require elevated privileges (root/sudo) and directly interact with system files and kernel interfaces.
 
-### users: List Logged-On Users
+**Key insight:** System administration is fundamentally about **identity** (users, groups) and **access control** (permissions, capabilities). Understanding these commands means understanding how systems enforce security and accountability.
 
-Display all currently logged-on users. Equivalent to `who -q`.
+### Why These Commands Matter
+
+Most scripting tasks eventually need:
+- User authentication (`su`, `sudo`)
+- Account creation/management (`useradd`, `usermod`)
+- Permission changes (`chown`, `chgrp`)
+- Terminal control (`stty`, `tty`)
+- Session tracking (`who`, `w`, `last`)
+
+These aren't just utilities—they're your interface to system security and administration.
+
+---
+
+## 12.1. Users and Groups Management
+
+### Understanding Unix Identity Model
+
+Unix security is built on a simple model:
+1. **Users**: Individual identity (UID, username, home directory, shell)
+2. **Groups**: Collections of users with shared permissions (GID, group members)
+3. **Ownership**: Files/processes belong to a user and group
+4. **Permissions**: Restrict access based on user/group/other
+
+### users: List Currently Logged-In Users
+
+Display all users currently logged into the system (no details—just names):
 
 ```bash
-bash$ users
-bozo bozo bozo bozo
+$ users
+bozo bozo bozo alice bob
+# bozo is logged in 3 times (3 terminal sessions)
 ```
 
-### groups: List User Group Membership
+**Comparison:**
+- `users`: Just names, duplicate entries for multiple sessions
+- `who`: More detail (terminal, login time)
+- `w`: Most detail (terminal, commands running)
 
-Lists the current user and the groups they belong to.
+### groups: List User Group Memberships
+
+Show current user's group membership:
 
 ```bash
-bash$ groups
-bozita cdrom cdwriter audio xgrp
+$ groups
+bozo sudo cdrom audio
 
-bash$ echo $GROUPS
-501
+$ groups alice
+alice : alice sudo docker
+# alice belongs to alice, sudo, and docker groups
 ```
 
-### chown, chgrp: Change File Ownership
+### chown and chgrp: Changing File Ownership
 
-**chown** changes file ownership. Only root can use this command to transfer ownership between users.
+The `chown` command changes file owner. Only the file owner or root can change ownership:
 
 ```bash
-root# chown bozo *.txt
-# Transfer ownership of all .txt files to user 'bozo'
+# Change owner
+chown alice file.txt          # alice becomes owner
+
+# Change owner and group
+chown alice:staff file.txt    # alice:staff
+
+# Recursive change (directories)
+chown -R alice:staff /home/alice/documents
+
+# Verify change
+ls -l file.txt
+# -rw-r--r-- 1 alice staff 1234 Jan 1 12:00 file.txt
 ```
 
-**chgrp** changes group ownership. You must be the owner and a member of the destination group (or root).
+The `chgrp` command changes group ownership:
 
 ```bash
-chgrp --recursive dunderheads *.data
-# Recursively change group ownership of all *.data files
+# Change group
+chgrp developers file.txt
+
+# Recursive
+chgrp -R developers /project
+
+# Verify
+ls -l file.txt
+# -rw-r--r-- 1 alice developers 1234 Jan 1 12:00 file.txt
 ```
 
-### useradd, userdel: User Account Management
+### useradd and userdel: User Account Management
 
-**useradd** adds a user account and creates a home directory:
+**Creating a user account:**
 
 ```bash
-root# useradd -m -s /bin/bash newuser
-# -m: Create home directory
-# -s: Set login shell
+# Basic user creation
+useradd username
+
+# Create with home directory and shell
+useradd -m -s /bin/bash -d /home/username username
+
+# Create with specific UID and GID
+useradd -u 1001 -g staff -m username
+
+# Options:**
+#   -m: Create home directory
+#   -s: Specify login shell
+#   -d: Specify home directory path
+#   -u: Specify UID
+#   -g: Specify primary group
+#   -G: Specify supplementary groups
 ```
 
-**userdel** removes a user account and associated files:
+**Removing a user account:**
 
 ```bash
-root# userdel -r username
-# -r: Remove home directory and mail spool
+# Remove user (keep home directory)
+userdel username
+
+# Remove user AND home directory
+userdel -r username
+
+# Verify deletion
+id username  # Returns error: no such user
 ```
 
-### usermod: Modify User Accounts
-
-Modify user attributes including password, group membership, expiration date, and account status.
+### Example 12-1 (Enhanced): New User Creation Script
 
 ```bash
-usermod -aG sudo username
-# Add user to sudo group
+#!/bin/bash
+# add-user.sh: Create new user with validation
 
+if [ "$EUID" -ne 0 ]; then
+  echo "✗ This script requires root privileges"
+  exit 1
+fi
+
+echo "=== New User Creation ==="
+echo
+
+read -p "Username: " username
+read -p "Full name: " fullname
+read -p "Shell [/bin/bash]: " shell
+shell="${shell:-/bin/bash}"
+
+# Validate shell exists
+if [ ! -x "$shell" ]; then
+  echo "✗ Shell not found or not executable: $shell"
+  exit 1
+fi
+
+# Check if user already exists
+if id "$username" &>/dev/null; then
+  echo "✗ User already exists: $username"
+  exit 1
+fi
+
+# Create user
+useradd -m -s "$shell" -c "$fullname" "$username"
+if [ $? -ne 0 ]; then
+  echo "✗ Failed to create user"
+  exit 1
+fi
+
+# Set password
+echo
+echo "Set password for $username"
+passwd "$username"
+
+# Verify creation
+echo
+echo "✓ User created successfully:"
+id "$username"
+
+exit 0
+```
+
+### usermod and groupmod: Modifying Accounts
+
+**Modifying user accounts:**
+
+```bash
+# Add user to supplementary group
+usermod -aG sudo alice
+
+# Change login shell
+usermod -s /bin/zsh bob
+
+# Change home directory
+usermod -d /mnt/newhome charlie
+
+# Change username
+usermod -l newname oldname
+
+# Lock account (disable login)
 usermod -L username
-# Lock user account (disable login)
 
+# Unlock account
 usermod -U username
-# Unlock user account
+
+# Set account expiration date
+usermod -e 2025-12-31 username
 ```
 
-### groupmod: Modify Groups
-
-Change group name and/or ID number:
+**Modifying groups:**
 
 ```bash
-groupmod -n newname oldname
 # Rename group
+groupmod -n newname oldname
+
+# Change group GID
+groupmod -g 1001 groupname
 ```
 
 ### id: Show User and Group IDs
 
-List real and effective user IDs, and group IDs of the current process.
+Display current user's UIDs, GIDs, and groups:
 
 ```bash
-bash$ id
-uid=501(bozo) gid=501(bozo) groups=501(bozo),22(cdrom),80(cdwriter),81(audio)
+$ id
+uid=501(alice) gid=501(alice) groups=501(alice),4(adm),24(cdrom),27(sudo)
+
+# Show specific user
+$ id bob
+uid=502(bob) gid=502(bob) groups=502(bob)
+
+# Show only effective UID
+$ id -u
+501
+
+# Show only effective GID
+$ id -g
+501
 ```
 
-### lid: List Group Membership
+---
 
-Show group(s) for a user or users in a group. Only root can use this command.
+## 12.2. User Session Information
+
+### who: Logged-In Users with Details
+
+Show detailed information about logged-in users:
 
 ```bash
-root# lid bozo
-bozo(gid=500)
+$ who
+alice    tty1        2025-01-28 09:30
+bob      pts/0       2025-01-28 10:15
+charlie  pts/1       2025-01-28 10:20
 
-root# lid daemon
-bin(gid=1)
-daemon(gid=2)
+# With detailed output
+$ who -l
+alice    tty1        2025-01-28 09:30 (00:45)
+bob      pts/0       2025-01-28 10:15 (00:20)
+
+# Show current terminal
+$ who -m
+alice    pts/5       2025-01-28 10:45
 ```
 
-## User Session Information
+**Output columns:**
+- Username
+- Terminal (tty# or pts/#)
+- Login date and time
+- Idle time (with `-l`)
 
-### who: List Logged-On Users with Details
+### whoami: Current Username
 
-Show all users logged into the system with terminal and login time.
-
-```bash
-bash$ who
-bozo tty1 Apr 27 17:45
-bozo pts/0 Apr 27 17:46
-bozo pts/1 Apr 27 17:47
-
-bash$ who -m
-localhost.localdomain!bozo pts/2 Apr 27 17:49
-```
-
-### whoami: Current User Name
-
-Show the current user name.
+Simple command to show current user:
 
 ```bash
-bash$ whoami
-bozo
+$ whoami
+alice
+
+# Useful in scripts
+if [ "$(whoami)" != "root" ]; then
+  echo "This script requires root"
+  exit 1
+fi
 ```
 
 ### w: Extended User and Process List
 
-Show logged-on users and processes belonging to them.
+Show logged-in users and what they're doing:
 
 ```bash
-bash$ w | grep startx
-bozo tty1 - 4:22pm 6:41 4.47s 0.45s startx
+$ w
+ 10:45:30 up 2:30, 3 users, load average: 0.12, 0.15, 0.18
+USER    TTYP    FROM          LOGIN@  IDLE   JCPU   PCPU  WHAT
+alice   tty1    -             09:30   15m    1:20   0.45s bash
+bob     pts/0   192.168.1.100 10:15   5m     0.30s  0.02s sshd
+charlie pts/1   remote.com    10:20   2m     0.15s  0.01s man
+
+# Show only specific user
+$ w alice
 ```
 
-### logname: Login Name
+### last: Login History
 
-Show current user's login name as found in `/var/run/utmp`.
+Show login and logout history:
 
 ```bash
-bash$ logname
-bozo
+$ last
+alice    pts/0                        Tue Jan 28 10:45 - 10:50 (00:05)
+bob      pts/1                        Tue Jan 28 10:30 - 10:40 (00:10)
+charlie  tty1                         Tue Jan 28 09:00 - 09:45 (00:45)
+reboot   system boot                  Tue Jan 28 08:00 - 10:50 (02:50)
+
+# Show specific user's history
+$ last alice
+
+# Show last 10 entries
+$ last -n 10
+
+# Show failed login attempts
+$ lastb
 ```
 
-### su: Substitute User
-
-Run a program or shell as a different user.
-
-```bash
-su rjones
-# Start shell as user 'rjones'
-
-su - username
-# Login shell (loads user's environment)
-```
-
-### sudo: Execute as Root or Another User
-
-Run commands with elevated privileges. Controlled by `/etc/sudoers` file.
-
-```bash
-sudo cp /root/secretfile /home/bozo/secret
-# Run copy command as root
-
-sudo -u username command
-# Run command as specific user
-```
-
-## Password Management
-
-### passwd: Set or Change Passwords
-
-```bash
-passwd
-# Change current user's password
-
-passwd username
-# Root changes another user's password
-
-passwd -l username
-# Lock user account
-
-passwd -u username
-# Unlock user account
-```
-
-### Example: Setting a New Password (Root Only)
+### Example 12-2 (Enhanced): User Activity Monitor
 
 ```bash
 #!/bin/bash
-ROOT_UID=0
-E_WRONG_USER=65
-E_NOSUCHUSER=70
+# user-activity.sh: Monitor and report user sessions
 
-if [ "$UID" -ne "$ROOT_UID" ]; then
-    echo "Only root can run this script."
-    exit $E_WRONG_USER
-fi
+echo "=== User Activity Report ==="
+echo "Generated: $(date)"
+echo
 
-username=bozo
-NEWPASSWORD=security_violation
+echo "--- Currently Logged In Users ---"
+w -h | awk '{print $1}' | sort | uniq -c
 
-grep -q "$username" /etc/passwd
-if [ $? -ne 0 ]; then
-    echo "User $username does not exist."
-    exit $E_NOSUCHUSER
-fi
+echo
+echo "--- Last 5 Logins ---"
+last -n 5 | grep -v "^$"
 
-echo "$NEWPASSWORD" | passwd --stdin "$username"
-echo "User $username's password changed!"
+echo
+echo "--- User Login Time Summary ---"
+ac -p | tail -10
+
 exit 0
 ```
 
-## User Activity Logging
+---
 
-### ac: User Login Time
+## 12.3. Password Management
 
-Show users' logged-in time as read from `/var/log/wtmp`.
+### passwd: User Password Control
 
-```bash
-bash$ ac
-total 68.08
-```
-
-### last: List Last Logins
-
-Show last logged-in users, including remote logins and system reboots.
+Change password for current user or another user (if root):
 
 ```bash
-bash$ last reboot
-reboot system boot 2.6.9-1.667 Fri Feb 4 18:18 (00:02)
-reboot system boot 2.6.9-1.667 Fri Feb 4 15:20 (01:27)
+# Change own password
+passwd
+# Prompts for current password, then new password
+
+# Root change another user's password
+passwd alice
+
+# Options:
+#   -l: Lock account (disable login)
+#   -u: Unlock account
+#   -d: Delete password (no login required)
+#   -e: Force password change on next login
+#   -i: Disable after days of inactivity
 ```
 
-### newgrp: Switch Group Membership
-
-Change user's group ID without logging out.
+### Example 12-3 (Enhanced): Secure Password Setting Script
 
 ```bash
-newgrp groupname
-# Switch to different group for file permissions
+#!/bin/bash
+# set-password.sh: Set password with validation (root only)
+
+if [ "$EUID" -ne 0 ]; then
+  echo "✗ This script requires root privileges"
+  exit 1
+fi
+
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 username password"
+  exit 1
+fi
+
+username="$1"
+newpassword="$2"
+
+# Verify user exists
+if ! id "$username" &>/dev/null; then
+  echo "✗ User not found: $username"
+  exit 1
+fi
+
+# Validate password strength
+if [ ${#newpassword} -lt 8 ]; then
+  echo "✗ Password too short (minimum 8 characters)"
+  exit 1
+fi
+
+# Set password via stdin
+echo "$newpassword" | passwd --stdin "$username" 2>/dev/null
+
+if [ $? -eq 0 ]; then
+  echo "✓ Password changed for $username"
+else
+  echo "✗ Failed to change password"
+  exit 1
+fi
+
+# Force password change on next login
+passwd -e "$username"
+echo "✓ User must change password on next login"
+
+exit 0
 ```
 
-## Terminal Management
+---
+
+## 12.4. Terminal Management and Control
 
 ### tty: Show Terminal Device
 
-Echo the filename of the current user's terminal.
+Display the terminal device associated with current session:
 
 ```bash
-bash$ tty
+$ tty
 /dev/pts/1
+
+# In a non-interactive context (e.g., cron)
+$ tty
+not a tty
+
+# Use in scripts to detect if interactive
+if [ -t 0 ]; then
+  echo "Running interactively"
+else
+  echo "Running non-interactively"
+fi
 ```
 
-### stty: Terminal Settings
+### stty: Terminal Settings Control
 
-Show and modify terminal settings.
-
-```bash
-stty -a            # Show all settings
-stty -echo         # Disable terminal echo
-stty echo          # Enable terminal echo
-stty -icanon       # Disable canonical mode
-stty erase '#'     # Set erase character
-stty -g            # Save all settings
-```
-
-### Example: Secret Password Input
+View and modify terminal behavior—critical for scripts that read sensitive input or control terminal behavior:
 
 ```bash
-#!/bin/bash
-echo
-echo -n "Enter password "
-read passwd
-echo "password is $passwd"
+# View all current settings
+stty -a
 
+# Save current settings
+saved_settings=$(stty -g)
+
+# Restore settings
+stty "$saved_settings"
+
+# Disable echo (for password input)
 stty -echo
-# Turn off terminal echo
-
-echo -n "Enter password again "
-read passwd
-echo
-echo "password is $passwd"
-echo
-
+read -p "Password: " password
 stty echo
-# Restore terminal echo
+
+# Disable canonical mode (read keystrokes immediately)
+stty -icanon
+read -n1 key
+stty icanon
+
+# Set erase character
+stty erase '#'
+
+# Reset to defaults
+stty sane
+```
+
+### Example 12-4 (Enhanced): Safe Password Input Function
+
+```bash
+#!/bin/bash
+# read-password.sh: Read password without echoing
+
+read_password() {
+  local prompt="${1:-Password: }"
+  local password
+  
+  # Save terminal settings
+  local saved_settings=$(stty -g)
+  
+  # Disable echo
+  stty -echo -echonl
+  
+  read -p "$prompt" password
+  
+  # Restore settings
+  stty "$saved_settings"
+  
+  echo "$password"
+}
+
+echo "Enter credentials:"
+username=$(read -p "Username: " username; echo "$username")
+password=$(read_password "Password: ")
+
+echo
+echo "Username: $username"
+echo "Password length: ${#password}"
 
 exit 0
 ```
 
-### Example: Keypress Detection
+### Example 12-5 (Enhanced): Interactive Key Reading
 
 ```bash
 #!/bin/bash
-old_tty_settings=$(stty -g)
-stty -icanon
+# keypress-menu.sh: Read single keypress for menu selection
 
-Keypress=$(head -c1)
+show_menu() {
+  echo "=== Menu ==="
+  echo "1. Option One"
+  echo "2. Option Two"
+  echo "3. Option Three"
+  echo "q. Quit"
+}
 
-echo
-echo "Key pressed was \"$Keypress\"."
-echo
+read_single_key() {
+  local saved_settings=$(stty -g)
+  stty -icanon -echo  # Raw mode: read immediately, no echo
+  
+  local key=$(head -c1)
+  
+  stty "$saved_settings"
+  
+  echo "$key"
+}
 
-stty "$old_tty_settings"
-exit 0
+while true; do
+  show_menu
+  
+  echo -n "Your choice: "
+  choice=$(read_single_key)
+  
+  echo  # Newline after single character
+  
+  case "$choice" in
+    1) echo "You chose: Option One" ;;
+    2) echo "You chose: Option Two" ;;
+    3) echo "You chose: Option Three" ;;
+    q) echo "Goodbye"; exit 0 ;;
+    *) echo "Invalid choice" ;;
+  esac
+  
+  echo
+done
 ```
 
 ### Terminal Modes
 
-**Canonical Mode (default):**
-- Characters buffered until ENTER is pressed
-- Terminal has built-in line editor
-- Supports backspace, line-kill (^U), etc.
+**Canonical mode (default):**
+- Characters buffered until Enter pressed
+- Backspace, Ctrl-U (kill line) work automatically
+- Line discipline handles editing
 
-**Raw Mode (-icanon):**
+**Raw mode (-icanon):**
 - Every keypress sent immediately to program
-- No terminal line editing
-- Special keys sent as characters
-
-### setterm: Terminal Attributes
-
-Set terminal attributes, controlling appearance and behavior.
+- No automatic line editing
+- Program responsible for all input handling
 
 ```bash
+# Canonical mode (line buffered)
+stty icanon
+read line  # Reads until Enter
+
+# Raw mode (character buffered)
+stty -icanon
+read -n1 char  # Reads single character immediately
+```
+
+### setterm: Terminal Appearance Control
+
+Modify terminal appearance and attributes:
+
+```bash
+# Hide/show cursor
 setterm -cursor off
-# Hide cursor
+# ... commands ...
+setterm -cursor on
 
+# Text formatting
 setterm -bold on
-echo "This text is bold"
+echo "Bold text"
 setterm -bold off
+
+setterm -reverse on
+echo "Reverse video"
+setterm -reverse off
+
+# Colors (if terminal supports)
+setterm -foreground white -background black
 ```
 
-### tset: Initialize Terminal
+---
 
-Show or initialize terminal settings.
+## 12.5. User Activity Logging
+
+### ac: Accumulated Connect Time
+
+Show total login time for users:
 
 ```bash
-bash$ tset -r
-Terminal type is xterm-xfree86.
-Kill is control-U (^U).
-Interrupt is control-C (^C).
+$ ac
+total       68.08
+
+$ ac -p
+user1        25.30
+user2        42.78
+
+$ ac -d
+Jan  1       15.50
+Jan  2       52.58
 ```
 
-### mesg: Terminal Write Access
+### logname: Login Name
 
-Enable or disable write access to current terminal.
+Show the name the user logged in with (from `/var/run/utmp`):
 
 ```bash
-mesg n
-# Disable write access
+$ logname
+alice
 
-mesg y
-# Enable write access
+# Different from whoami in some cases (after su)
+$ su bob
+$ whoami
+bob
 
-mesg
-# Show current status
+$ logname
+alice  # Still shows original login name
 ```
 
-## Best Practices
+---
 
-### User Management Security
+## Best Practices and Common Patterns
 
-1. Use `sudo` for privilege escalation rather than `su` when possible
-2. Always verify user exists before modifying with `grep /etc/passwd`
-3. Lock unused accounts with `usermod -L` rather than deleting
-4. Set appropriate group memberships using `usermod -aG group user`
-5. Regular password audits with `lastlog` and `last` commands
+### 1. Always Check Privileges Before Administrative Operations
 
-### Terminal Safety in Scripts
+```bash
+#!/bin/bash
 
-1. Always save and restore terminal settings
-2. Disable echo for sensitive input
-3. Use canonical mode by default unless raw input is needed
-4. Test terminal operations carefully before production deployment
+require_root() {
+  if [ "$EUID" -ne 0 ]; then
+    echo "✗ This script requires root privileges"
+    echo "   Run with: sudo $0"
+    exit 1
+  fi
+}
+
+require_root
+
+# Now safe to do privileged operations
+```
+
+### 2. Verify User Existence Before Operations
+
+```bash
+# Good: Check before modification
+if ! id "$username" &>/dev/null; then
+  echo "User not found: $username"
+  exit 1
+fi
+
+usermod -aG sudo "$username"
+
+# Bad: Assumes user exists
+usermod -aG sudo "$username"  # May fail silently
+```
+
+### 3. Always Save and Restore Terminal Settings
+
+```bash
+#!/bin/bash
+
+cleanup() {
+  stty "$saved_tty"  # Restore no matter how script exits
+}
+
+trap cleanup EXIT
+
+saved_tty=$(stty -g)
+
+stty -echo  # Disable echo
+read password
+# cleanup runs automatically on exit
+```
+
+### 4. Use sudo for Privilege Escalation Instead of su
+
+```bash
+# Good: sudo logs commands, respects sudoers
+sudo useradd newuser
+
+# Avoid: su requires password, no audit log
+su - root -c "useradd newuser"
+```
+
+### 5. Handle Multi-User Environments
+
+```bash
+# Check for running processes before deleting user
+if pgrep -u "$username" &>/dev/null; then
+  echo "User has running processes. Kill them first."
+  pkill -u "$username"
+  sleep 2
+fi
+
+userdel -r "$username"
+```
+
+---
+
+## 10 Core Programming Concepts from System Administration
+
+### 1. **Identity and Access Control**
+Users and groups implement the fundamental security model—identity defines access rights. Understanding UID/GID is essential to system security.
+
+```bash
+uid=501(alice) gid=501(alice) groups=501(alice),4(adm),27(sudo)
+# Identity hierarchy: user → primary group → supplementary groups
+```
+
+### 2. **Privilege Escalation and Capability Dropping**
+`sudo` and `su` demonstrate controlled privilege elevation—granting temporary elevated access while maintaining audit trails and capability restrictions.
+
+### 3. **Session Management**
+`who`, `w`, `last` show how systems track sessions—each login is a session with identity, terminal, duration, and activity.
+
+### 4. **Terminal as State Machine**
+`stty` reveals terminals as finite state machines with modes (canonical/raw), settings (echo on/off), and behaviors that scripts must understand and manage.
+
+### 5. **TTY and Pseudo-Terminal Concepts**
+`tty`, `pts`, `/dev/tty` demonstrate how terminal I/O is abstracted—real terminals (ttyN) vs. pseudo-terminals (ptsN) for SSH, screen, etc.
+
+### 6. **Interactive vs. Non-Interactive Execution**
+Detecting whether running interactively (`[ -t 0 ]`) determines what prompts/interactions are appropriate—fundamental to robust scripts.
+
+### 7. **State Preservation and Restoration**
+Saving terminal settings before modifications and restoring on exit is a general pattern for managing stateful resources.
+
+```bash
+saved_state=$(stty -g)
+trap "stty "$saved_state"" EXIT
+```
+
+### 8. **Auditing and Accountability**
+Login history (`last`, `ac`, `w`) provides accountability—tracking who did what when. This is critical for security and forensics.
+
+### 9. **Password and Authentication Handling**
+Secure password input (disabling echo, immediate reading) demonstrates security best practices for sensitive data.
+
+### 10. **User and Group Hierarchies**
+The multi-level identity model (user → primary group → supplementary groups → other) creates flexible permission hierarchies used throughout Unix systems.
+
+---
+
+## Summary Table: Common Commands
+
+| Command | Purpose | Example |
+|---------|---------|---------|
+| `useradd` | Create user account | `useradd -m -s /bin/bash alice` |
+| `userdel` | Remove user account | `userdel -r alice` |
+| `usermod` | Modify user account | `usermod -aG sudo alice` |
+| `passwd` | Change password | `passwd alice` |
+| `chown` | Change file owner | `chown alice file.txt` |
+| `chgrp` | Change group owner | `chgrp staff file.txt` |
+| `id` | Show user/group IDs | `id alice` |
+| `groups` | Show group membership | `groups alice` |
+| `who` | List logged-in users | `who` |
+| `whoami` | Current username | `whoami` |
+| `w` | User and process list | `w` |
+| `last` | Login history | `last` |
+| `tty` | Show terminal device | `tty` |
+| `stty` | Terminal settings | `stty -a` |
+| `setterm` | Terminal appearance | `setterm -bold on` |
+| `su` | Switch user | `su - alice` |
+| `sudo` | Execute as root | `sudo useradd alice` |
+
+---
 
 ## Exercises
 
-1. **User Account Script:** Write a script to add a new user with home directory, set password from stdin, and add to specific groups.
+1. **User Creation Script**: Write a script that creates multiple users from a CSV file, setting passwords and group memberships.
 
-2. **Login Monitor:** Create a script that logs all user logins/logouts by parsing output from `last` and `who`.
+2. **Account Auditor**: Build a script that checks for disabled accounts, verifies home directories exist, and reports anomalies.
 
-3. **Terminal Control:** Build an interactive form using `stty -icanon` that reads menu selections without ENTER.
+3. **Terminal Control Form**: Create an interactive form using `stty` that reads menu selections without requiring Enter.
 
-4. **Session Tracker:** Write a script that reports which users are currently logged in and how long they've been idle.
+4. **Session Monitor**: Write a script that tracks user logins/logouts by monitoring `who` output over time.
 
-5. **Password Security:** Create a wrapper for `passwd` that enforces password complexity requirements before setting.
+5. **Password Validator**: Build a password strength checker that enforces complexity requirements (length, mixed case, numbers, special chars).
 
-6. **Terminal Saver:** Build a function that automatically saves/restores terminal settings in all scripts.
+6. **Cleanup Automation**: Create a script that safely removes user accounts, killing running processes and archiving home directories.
 
-7. **Group Manager:** Write a script to bulk-add users to groups with validation and error handling.
+7. **SSH Key Manager**: Write a script to manage SSH authorized_keys for multiple users with validation.
 
-8. **Activity Report:** Generate a daily report of user logins, logouts, and failed attempts.
+8. **Audit Report**: Generate a daily report of user activities, failed login attempts, and sudo usage from system logs.
+
+---
 
 ## Summary
 
-System and administrative commands provide essential user and group management capabilities:
+**User and Group Management:**
+- **`useradd`, `userdel`, `usermod`**: Account lifecycle management
+- **`passwd`**: Password control (setting, locking, unlocking)
+- **`chown`, `chgrp`**: File ownership and group assignment
+- **`id`, `groups`**: Identity information and verification
 
-- **User Management:** `useradd`, `userdel`, `usermod`, `chown`, `chgrp`
-- **User Information:** `who`, `whoami`, `id`, `groups`, `last`
-- **Password Control:** `passwd` with options for locking, unlocking, and deletion
-- **Terminal Control:** `stty` and `setterm` for terminal behavior
-- **Terminal Modes:** Canonical (buffered) vs. raw (immediate) input modes
-- **Session Tracking:** `w`, `logname`, `ac` for user activity monitoring
+**Session Tracking:**
+- **`who`, `w`, `last`**: User session monitoring
+- **`ac`**: Accumulated login time
+- **`logname`**: Show login identity
+
+**Terminal Control:**
+- **`tty`**: Detect terminal and interaction mode
+- **`stty`**: Terminal settings (echo, canonical mode, characters)
+- **`setterm`**: Terminal appearance and attributes
+
+**Security:**
+- **`sudo`**: Privilege escalation with auditing
+- **`su`**: User switching (less preferred than sudo)
+- **Session management**: Tracking identity and access
+
+**Key insight**: System administration commands are your interface to Unix identity and access control. Understanding them means understanding how systems enforce security, track accountability, and manage the relationships between users, files, and processes. These concepts are fundamental not just to shell scripting, but to all systems programming.
