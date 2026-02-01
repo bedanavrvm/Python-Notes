@@ -6,6 +6,8 @@ Functions are the primary method of code reuse in Python. In JavaScript.info sty
 
 A function is defined using the `def` keyword, followed by the function name, parentheses `()`, and a colon `:`. The code block inside the function is indented.
 
+Example: define a simple function and call it.
+
 ```python
 def greet(name):
     """Return a greeting message."""
@@ -25,6 +27,8 @@ print(message)  # Hello, Alice!
 ### The return Statement
 
 If a function does not have an explicit `return` statement, it returns `None` by default. Unlike some languages, Python allows you to return multiple values separated by commas, which actually returns a single tuple.
+
+Example: return a tuple and observe the implicit `None` return.
 
 ```python
 def get_coordinates():
@@ -62,6 +66,8 @@ Python functions are incredibly flexible regarding how they receive data.
 - **Positional**: Arguments assigned based on their order
 - **Keyword**: Arguments assigned by explicitly naming the parameter
 
+Example: positional, keyword, and mixed calls.
+
 ```python
 def describe_pet(animal_type, pet_name):
     print(f"I have a {animal_type} named {pet_name}.")
@@ -80,6 +86,8 @@ describe_pet("Cat", pet_name="Whiskers")
 
 You can provide default values for parameters:
 
+Example: use a default greeting and override it when needed.
+
 ```python
 def greet(name, greeting="Hello"):
     return f"{greeting}, {name}!"
@@ -87,6 +95,8 @@ def greet(name, greeting="Hello"):
 print(greet("Alice"))  # Hello, Alice!
 print(greet("Bob", "Hi"))  # Hi, Bob!
 ```
+
+Compare a mutable-default pitfall with the safer `None` pattern.
 
 {% tabs %}
 
@@ -123,6 +133,8 @@ Sometimes you don't know how many arguments will be passed.
 - `*args`: Collects extra positional arguments into a tuple
 - `**kwargs`: Collects extra keyword arguments into a dictionary
 
+Example: collect extra toppings and metadata.
+
 ```python
 def make_pizza(size, *toppings, **details):
     print(f"Making a {size} inch pizza with:")
@@ -146,6 +158,8 @@ log_message("INFO", "System started", "v1.0", timestamp="12:00")
 
 You can unpack sequences and dictionaries into function arguments:
 
+Example: unpack a list and a dictionary into parameters.
+
 ```python
 def describe_person(name, age, city):
     print(f"{name} is {age} years old and lives in {city}")
@@ -168,6 +182,8 @@ Scope determines where a variable is accessible. Python follows the LEGB rule to
 - **Global (G)**: Defined at the top level of the script or module
 - **Built-in (B)**: Pre-installed names like `print`, `len`, `range`
 
+Example: see how Python resolves the same name through each scope.
+
 ```python
 x = "global"  # Global scope
 
@@ -188,6 +204,8 @@ print(x)  # Finds global
 ### The global and nonlocal Keywords
 
 To modify a variable outside the local scope, you must explicitly declare it.
+
+Example: mutate a global counter and an enclosing variable.
 
 ```python
 count = 0  # Global variable
@@ -216,6 +234,8 @@ outer()
 ## Higher-Order Functions
 
 Since functions are first-class citizens, you can pass them as arguments and return them from other functions.
+
+Example: apply a function to a list and return a custom multiplier.
 
 ```python
 def apply_operation(func, numbers):
@@ -249,6 +269,8 @@ print(triple(5))  # 15
 
 A closure is a function object that remembers values in enclosing scopes even when they are not present in memory. This allows functions to maintain state between calls.
 
+Example: create multipliers and greeters that capture configuration.
+
 ```python
 def make_multiplier(factor):
     """Return a function that multiplies by factor."""
@@ -278,6 +300,8 @@ print(goodbye("Bob"))   # Goodbye, Bob!
 
 ### Closure Applications
 
+Example: memoize results using a cache captured by a closure.
+
 ```python
 # Memoization with closures
 def memoize(func):
@@ -299,6 +323,8 @@ def fibonacci(n):
 ## Function Composition
 
 Function composition is the process of combining simple functions to build more complex operations, often by passing functions as arguments.
+
+Example: compose math functions and chain string transformations.
 
 ```python
 def compose(f, g):
@@ -329,6 +355,8 @@ print(process_text("   HELLO WORLD   "))  # Hello world
 
 ### Composition Patterns
 
+Example: pipeline pattern applying multiple transforms in sequence.
+
 ```python
 # Pipeline pattern
 def pipeline(data, *functions):
@@ -339,10 +367,12 @@ def pipeline(data, *functions):
     return result
 
 def clean_data(data):
-    return pipeline(data, 
-                    lambda x: [item for item in x if item],  # Remove None
-                    lambda x: sorted(set(x)),               # Remove duplicates
-                    lambda x: x[:5])                          # Take first 5
+    return pipeline(
+        data,
+        lambda x: [item for item in x if item],  # Remove None
+        lambda x: sorted(set(x)),  # Remove duplicates
+        lambda x: x[:5],  # Take first 5
+    )
 
 messy_data = [1, 2, None, 2, 3, None, 4, 1]
 clean = clean_data(messy_data)
@@ -354,6 +384,8 @@ print(clean)  # [1, 2, 3, 4]
 Recursion is a technique where a function calls itself to solve problems that can be broken down into smaller instances of the same problem.
 
 ### Basic Recursion
+
+Example: factorial and Fibonacci recursion with base cases.
 
 ```python
 def factorial(n):
@@ -374,6 +406,8 @@ print(fibonacci(10))  # 55
 ```
 
 ### Recursive vs Iterative
+
+Compare recursive, iterative, and tail-recursive styles.
 
 {% tabs %}
 
@@ -418,6 +452,8 @@ def sum_tail_recursive(lst, acc=0):
 
 ### Practical Recursion Examples
 
+Expanded examples include directory traversal and tree depth calculations.
+
 <details>
 <summary>Show practical recursion examples</summary>
 
@@ -447,13 +483,15 @@ def tree_depth(tree):
     return 1 + max(tree_depth(item) for item in tree)
 
 # Example usage
-nested = [1, [2, [3, [4, 5]], 6]
+nested = [1, [2, [3, [4, 5]], 6]]
 print(tree_depth(nested))  # 3
 ```
 
 </details>
 
 ### Recursion Best Practices
+
+Example: set guardrails for depth and always include a base case.
 
 ```python
 import sys
@@ -473,6 +511,8 @@ def safe_recursive(data, depth=0):
 ## Decorators
 
 Decorators are functions that modify other functions. They are a powerful way to extend function behavior.
+
+Example: timing decorator and stacked decorators (use `functools.wraps` in real projects).
 
 <details>
 <summary>Show decorator examples</summary>
@@ -521,6 +561,8 @@ A lambda function is a small, anonymous function defined without a name. It is r
 
 **Syntax**: `lambda arguments: expression`
 
+Example: compare a regular function to a lambda.
+
 ```python
 # Standard function
 def square(x):
@@ -535,6 +577,8 @@ print(square_lambda(5))  # 25
 ### When to Use Lambdas?
 
 Lambdas are best used as "throw-away" functions, often passed as arguments to higher-order functions like `map()`, `filter()`, or `sorted()`.
+
+Example: sorting, mapping, filtering, and reducing with lambdas.
 
 ```python
 pairs = [(1, 'one'), (2, 'two'), (3, 'three'), (4, 'four')]
@@ -568,6 +612,8 @@ product = reduce(lambda x, y: x * y, numbers, 1)
 
 Docstrings provide documentation for your functions:
 
+Example: a full docstring with args, returns, and raises.
+
 ```python
 def calculate_area(length, width):
     """
@@ -596,11 +642,13 @@ def calculate_area(length, width):
 
 Python 3.5+ supports type hints for better code documentation:
 
+Example: type-annotated processing and Optional returns.
+
 ```python
 from typing import List, Dict, Optional, Union
 
 def process_data(
-    data: List[int], 
+    data: List[int],
     multiplier: float = 1.0
 ) -> List[float]:
     """
@@ -631,6 +679,8 @@ def find_user(
 ### Do One Thing
 
 Functions should have a single, clear responsibility:
+
+Compare a multi-responsibility function with smaller focused helpers.
 
 {% tabs %}
 
@@ -677,6 +727,8 @@ def log_activity(activity):
 
 Pure functions have no side effects and always return the same output for the same input:
 
+Compare pure and impure behavior side-by-side.
+
 {% tabs %}
 
 {% tab title="Pure" %}
@@ -704,6 +756,8 @@ def add_and_print(a, b):
 {% endtabs %}
 
 ### Error Handling
+
+Example: handle division errors explicitly.
 
 ```python
 def safe_divide(a, b):

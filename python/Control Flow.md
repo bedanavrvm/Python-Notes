@@ -12,6 +12,8 @@ The if statement allows you to execute a block of code only if a specific condit
 - `elif`: Short for "else if." It allows you to check multiple expressions
 - `else`: The "catch-all" that executes if none of the previous conditions were true
 
+Example: classify an age into groups and print the matching label.
+
 ```python
 age = 20
 
@@ -26,6 +28,8 @@ else:
 ### Nested Conditionals
 
 You can nest if statements inside each other for more complex logic:
+
+This example checks age first, then verifies license status.
 
 ```python
 age = 25
@@ -43,6 +47,9 @@ else:
 ### Conditional Expressions (Ternary Operator)
 
 Python provides a concise way to write simple if-else statements:
+
+Use ternaries for simple assignments; prefer full `if` blocks for
+complex logic.
 
 {% tabs %}
 
@@ -83,6 +90,8 @@ In Python, every object has an inherent boolean value. This is known as Truthine
 
 Everything else is generally considered Truthy.
 
+Example: the `if` blocks only run for truthy values.
+
 ```python
 # Examples of truthiness checks
 if "hello":      # Truthy (non-empty string)
@@ -101,6 +110,8 @@ if [1, 2, 3]:   # Truthy (non-empty list)
 ### Custom Truthiness
 
 You can define custom truthiness for your classes by implementing the `__bool__` or `__len__` methods:
+
+The class below treats empty containers as falsy.
 
 ```python
 class Container:
@@ -134,6 +145,8 @@ Loops allow you to repeat a block of code. Python provides two primary types: `w
 
 The while loop repeats as long as a condition remains True.
 
+Example: a countdown that stops at zero.
+
 ```python
 count = 5
 while count > 0:
@@ -145,6 +158,8 @@ while count > 0:
 
 A while loop can have an `else` clause that executes when the loop completes normally (not via break):
 
+This example shows the `else` block running after a normal completion.
+
 ```python
 number = 0
 while number < 5:
@@ -155,6 +170,8 @@ else:
 ```
 
 #### Infinite Loops and Break
+
+Use `break` to exit an infinite loop when a condition is met.
 
 ```python
 while True:
@@ -170,6 +187,8 @@ Unlike languages that use a counter-based for loop (like `for(i=0; i<10; i++)`),
 
 The `in` keyword tells Python to pick the next element from the collection and assign it to the variable.
 
+Example: iterate over a list of fruits.
+
 ```python
 fruits = ["apple", "banana", "cherry"]
 
@@ -178,6 +197,8 @@ for fruit in fruits:
 ```
 
 #### Iterating Over Different Types
+
+This block shows strings, dictionaries, `enumerate()`, and `zip()`.
 
 ```python
 # Strings
@@ -209,6 +230,8 @@ for name, age in zip(names, ages):
 
 To loop a specific number of times, we use the `range(start, stop, step)` function.
 
+The stop value is exclusive, and the step defaults to 1.
+
 ```python
 # range(5) generates numbers from 0 to 4
 for i in range(5):
@@ -232,6 +255,8 @@ for i in range(5, 0, -1):
 - `break`: Terminate the loop immediately
 - `continue`: Skip the rest of the current iteration and move to the next one
 
+These examples show how each statement affects loop flow.
+
 ```python
 # Example with break
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -249,6 +274,8 @@ for num in numbers:
 
 #### Loop with else Clause
 
+The first loop completes normally; the second hits `break` and skips `else`.
+
 ```python
 for i in range(5):
     print(i)
@@ -257,7 +284,7 @@ else:
 
 for i in range(5):
     if i == 3:
-        break
+        break  # Exits early, so the else below won't run
     print(i)
 else:
     print("This won't print because of break")
@@ -270,6 +297,8 @@ Introduced in Python 3.10, the match statement is Python's version of the switch
 ### Basic Syntax
 
 The `_` case acts as a wildcard (similar to `default` in other languages).
+
+Example: map HTTP status codes to messages.
 
 ```python
 status = 404
@@ -289,6 +318,8 @@ match status:
 
 The match statement can also "deconstruct" data structures, which is where it truly shines compared to a standard if/else block.
 
+Example: match a tuple coordinate and bind values.
+
 ```python
 point = (0, 5)  # A coordinate (x, y)
 
@@ -307,8 +338,9 @@ In the example above, `case (0, y)` not only matches a tuple starting with 0 but
 
 ### Advanced Pattern Matching
 
+Use guard clauses (`if`) to add extra conditions to a match:
+
 ```python
-# Matching with guards
 data = {"type": "user", "name": "Alice", "age": 25}
 
 match data:
@@ -320,8 +352,11 @@ match data:
         print("Admin user")
     case _:
         print("Unknown data type")
+```
 
-# Matching with classes
+Pattern matching also works with classes when you match on attribute names:
+
+```python
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -336,11 +371,14 @@ match p:
         print(f"On X-axis at {x}")
     case Point(x=x, y=y):
         print(f"Point at ({x}, {y})")
+```
 
-# Matching with lists
-data = [1, 2, 3, 4, 5]
+Sequence patterns let you match list shapes and capture the remainder:
 
-match data:
+```python
+numbers = [1, 2, 3, 4, 5]
+
+match numbers:
     case []:
         print("Empty list")
     case [first]:
@@ -354,6 +392,8 @@ match data:
 ### Nested Loops
 
 Loops placed inside other loops, useful for processing multi-dimensional data structures.
+
+Two examples: a multiplication table and a 2D list traversal.
 
 ```python
 # Example: Multiplication table
@@ -372,23 +412,26 @@ for row in matrix:
 
 #### Loop Control in Nested Loops
 
+To break out of nested loops, either break the inner loop or use a flag
+to exit the outer loop.
+
 ```python
 # Using break in nested loops
-for i in range(3):
-    for j in range(3):
-        if i == 1 and j == 1:
+for row in range(3):
+    for col in range(3):
+        if row == 1 and col == 1:
             break  # Only breaks inner loop
-        print(f"({i}, {j})")
+        print(f"({row}, {col})")
 
-    # Using flag to break outer loop
-    found = False
-    for i in range(3):
-        for j in range(3):
-            if i == 1 and j == 1:
-                found = True
-                break
-        if found:
+# Using a flag to break the outer loop
+found = False
+for row in range(3):
+    for col in range(3):
+        if row == 1 and col == 1:
+            found = True
             break
+    if found:
+        break
 ```
 
 ### Loop Optimization
@@ -396,6 +439,8 @@ for i in range(3):
 Techniques for improving loop performance and readability.
 
 #### List Comprehensions
+
+Compare a traditional loop to a list comprehension.
 
 {% tabs %}
 
@@ -426,6 +471,8 @@ even_squares = [i ** 2 for i in range(10) if i % 2 == 0]
 
 #### Generator Expressions
 
+Generators are lazy; they do not build the full list in memory.
+
 {% tabs %}
 
 {% tab title="List (eager)" %}
@@ -449,6 +496,8 @@ sum_squares = sum(i ** 2 for i in range(1000000))
 {% endtabs %}
 
 #### Built-in Functions
+
+Built-ins often replace manual loops with faster, clearer intent.
 
 {% tabs %}
 
@@ -493,6 +542,8 @@ evens = list(filter(lambda x: x % 2 == 0, numbers))
 
 Behavior where logical operators stop evaluating as soon as the result is determined.
 
+These examples show when Python skips evaluation.
+
 ```python
 # AND operator: stops at first False
 def expensive_check():
@@ -518,6 +569,8 @@ name = user_data.get("name") and user_data["name"].upper()
 
 #### Performance Implications
 
+Order cheaper checks first to avoid unnecessary work.
+
 ```python
 # Inefficient: checks expensive condition even when cheap one fails
 if expensive_function() and simple_check():
@@ -534,6 +587,8 @@ value = user_input or "default"  # Uses default if input is falsy
 ## Exception Handling in Control Flow
 
 Control flow isn't just about conditions and loops—it's also about handling errors gracefully.
+
+The examples below show common try/except patterns.
 
 ```python
 # Basic try-except
@@ -622,6 +677,8 @@ Order in which statements are executed, including conditional branching, looping
 2. **Selection**: Choose between different paths (if/elif/else, match)
 3. **Iteration**: Repeat blocks of code (while, for)
 4. **Exception Handling**: Manage errors and special conditions
+
+This example combines selection, iteration, and exception handling.
 
 ```python
 # Example combining multiple control flow types

@@ -14,6 +14,10 @@ rich standard library make it productive for scripting, automation, web
 development, and rapid application development. Python emphasizes
 readability, which keeps programs approachable as they grow.
 
+The standard interpreter is **CPython**, the reference implementation
+written in C. When this guide says "Python," it typically means CPython
+unless stated otherwise.
+
 ### Key Characteristics
 
 - **Dynamic typing:** Names are bound to objects at runtime, so you do not
@@ -51,6 +55,16 @@ to languages like C++ or Rust.
 (`.pyc` files stored in `__pycache__`) and then executes that bytecode
 with the Python Virtual Machine (PVM). This keeps the rapid edit-run
 cycle while still caching work between runs.
+
+**How CPython runs code:**
+1. Source (`.py`) is compiled into bytecode instructions.
+2. The Python Virtual Machine (PVM) executes that bytecode in a
+   stack-based interpreter loop.
+3. Bytecode is cached in `__pycache__` to speed up future runs.
+
+The PVM is part of the CPython interpreter itself (not a separate app).
+Bytecode is a compact, platform-independent instruction set that the
+PVM understands.
 
 #### Performance Considerations
 
@@ -112,6 +126,17 @@ environments keep each project's dependencies isolated.
 ```bash
 python -m venv venv
 ```
+
+In `python -m venv venv`, the first `venv` (after `-m`) is the module
+name, and the second `venv` is the folder name for the environment.
+
+- `python` is the interpreter you want to use.
+- `-m venv` runs the standard library module named `venv`.
+- The final `venv` is the directory that will be created.
+
+The `-m` flag ensures the module runs with the active interpreter, so the
+environment matches the exact Python version you intend to use. Common
+choices for the folder name are `venv` or `.venv`.
 
 2. Activate it:
 
@@ -268,7 +293,7 @@ PEP 8 is the official document that defines how Python code should be formatted.
 {% tab title="Non-Pythonic" %}
 
 ```python
-# ❌ Non-Pythonic (unclear names, cramped formatting)
+# Non-Pythonic (unclear names, cramped formatting)
 def check_val(X):
     if X > 10: return True
     else: return False
@@ -279,7 +304,7 @@ def check_val(X):
 {% tab title="Pythonic" %}
 
 ```python
-# ✅ Pythonic (Readable, follows PEP 8)
+# Pythonic (readable, follows PEP 8)
 def is_threshold_reached(value):
     """Checks if the value exceeds the standard threshold."""
     return value > 10
@@ -321,11 +346,20 @@ supported. All new development should target Python 3.
 
 ### CPython
 
+CPython is the reference implementation of the Python language, written
+primarily in C. When people say "Python," they usually mean CPython.
+It implements the language specification, but it is not the language
+itself.
+
 - The standard and most widely used implementation
 - Written in C and Python
 - Reference implementation that other versions are based on
 
 ### Alternative Implementations
+
+Alternative runtimes implement the same language specification, but use
+different virtual machines or JIT compilers. Performance characteristics
+and C-extension compatibility can vary.
 
 - **PyPy:** JIT-compiled implementation, often faster
   for long-running applications
@@ -356,6 +390,20 @@ when using alternative runtimes.
 
 Intermediate instructions (`.pyc` files stored in `__pycache__`) generated
 from Python source and executed by the Python Virtual Machine (PVM).
+
+### **Python Virtual Machine (PVM)**
+
+The interpreter loop inside CPython that executes bytecode instructions.
+
+### **CPython**
+
+The reference implementation of the Python language, written mainly in C.
+Most documentation and third-party packages target CPython.
+
+### **Alternative Runtimes**
+
+Other implementations of Python (PyPy, Jython, IronPython, MicroPython)
+that use different VMs or JITs and may have different extension support.
 
 ### **Dynamic Typing**
 
