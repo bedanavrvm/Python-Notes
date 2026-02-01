@@ -99,20 +99,15 @@ print(greet("Bob", "Hi"))  # Hi, Bob!
 Compare a mutable-default pitfall with the safer `None` pattern.
 
 {% tabs %}
-
 {% tab title="Bad: mutable default" %}
-
 ```python
 # Common pitfall: mutable default arguments
 def add_item(item, items=[]):  # BAD: list is shared across calls
     items.append(item)
     return items
 ```
-
 {% endtab %}
-
 {% tab title="Better: default None" %}
-
 ```python
 # Better approach
 def add_item(item, items=None):
@@ -121,9 +116,7 @@ def add_item(item, items=None):
     items.append(item)
     return items
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 2. Arbitrary Arguments: *args and **kwargs
@@ -142,8 +135,14 @@ def make_pizza(size, *toppings, **details):
         print(f"- {topping}")
     print(f"Delivery details: {details}")
 
-make_pizza(12, "mushrooms", "peppers", "onions", 
-           address="123 Python St", express=True)
+make_pizza(
+    12,
+    "mushrooms",
+    "peppers",
+    "onions",
+    address="123 Python St",
+    express=True,
+)
 
 def log_message(level, message, *args, **kwargs):
     timestamp = kwargs.get('timestamp', 'now')
@@ -410,9 +409,7 @@ print(fibonacci(10))  # 55
 Compare recursive, iterative, and tail-recursive styles.
 
 {% tabs %}
-
 {% tab title="Recursive" %}
-
 ```python
 # Recursive approach (elegant but may hit recursion limit)
 def sum_recursive(lst):
@@ -420,11 +417,8 @@ def sum_recursive(lst):
         return 0
     return lst[0] + sum_recursive(lst[1:])
 ```
-
 {% endtab %}
-
 {% tab title="Iterative" %}
-
 ```python
 # Iterative approach (more efficient for large lists)
 def sum_iterative(lst):
@@ -433,11 +427,8 @@ def sum_iterative(lst):
         total += item
     return total
 ```
-
 {% endtab %}
-
 {% tab title="Tail recursion" %}
-
 ```python
 # Tail recursion optimization (Python doesn't optimize automatically)
 def sum_tail_recursive(lst, acc=0):
@@ -445,9 +436,7 @@ def sum_tail_recursive(lst, acc=0):
         return acc
     return sum_tail_recursive(lst[1:], acc + lst[0])
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### Practical Recursion Examples
@@ -667,7 +656,7 @@ def process_data(
 from typing import Dict, List, Optional
 
 def find_user(
-    user_id: int, 
+    user_id: int,
     database: Dict[int, str]
 ) -> Optional[str]:
     """Find user by ID or return None if not found."""
@@ -683,9 +672,7 @@ Functions should have a single, clear responsibility:
 Compare a multi-responsibility function with smaller focused helpers.
 
 {% tabs %}
-
 {% tab title="Bad" %}
-
 ```python
 # Bad: Does too many things
 def process_user_input(input_data):
@@ -696,11 +683,8 @@ def process_user_input(input_data):
     # Log activity
     pass
 ```
-
 {% endtab %}
-
 {% tab title="Good" %}
-
 ```python
 # Good: Single responsibility
 def validate_input(input_data):
@@ -718,9 +702,7 @@ def send_notification(user, message):
 def log_activity(activity):
     pass
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### Pure Functions
@@ -730,19 +712,14 @@ Pure functions have no side effects and always return the same output for the sa
 Compare pure and impure behavior side-by-side.
 
 {% tabs %}
-
 {% tab title="Pure" %}
-
 ```python
 # Pure function (predictable, testable)
 def add(a, b):
     return a + b
 ```
-
 {% endtab %}
-
 {% tab title="Impure" %}
-
 ```python
 # Impure function (side effects)
 def add_and_print(a, b):
@@ -750,9 +727,7 @@ def add_and_print(a, b):
     print(f"Result: {result}")  # Side effect
     return result
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### Error Handling

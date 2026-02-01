@@ -129,9 +129,7 @@ Floating point numbers are stored in binary, so some decimals cannot be
 represented exactly. Compare floats using rounding or `math.isclose`.
 
 {% tabs %}
-
 {% tab title="float" %}
-
 ```python
 # Be careful with floating point arithmetic
 result = 0.1 + 0.2  # 0.30000000000000004 (not exactly 0.3)
@@ -140,19 +138,14 @@ print(round(result, 2))  # 0.3 (rounded)
 import math
 print(math.isclose(result, 0.3))  # True
 ```
-
 {% endtab %}
-
 {% tab title="Decimal" %}
-
 ```python
 # For precise decimal arithmetic, use Decimal
 from decimal import Decimal
 precise = Decimal("0.1") + Decimal("0.2")  # 0.3 exactly
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 3. Booleans (bool)
@@ -179,9 +172,13 @@ containers and `0` are falsy; most other values are truthy.
 ```python
 # Truthy values
 if "hello":      # Non-empty strings
-if [1, 2, 3]:   # Non-empty lists
-if 42:          # Non-zero numbers
-    print("This is truthy")
+    print("String is truthy")
+
+if [1, 2, 3]:    # Non-empty lists
+    print("List is truthy")
+
+if 42:           # Non-zero numbers
+    print("Number is truthy")
 
 # Falsy values
 if not ("" or [] or {} or 0 or None):
@@ -213,34 +210,27 @@ greeting = first + " " + second  # "Hello World"
 ```
 
 {% tabs %}
-
 {% tab title="f-string" %}
-
 ```python
 name = "Alice"
 age = 25
 formatted = f"{name} is {age} years old"  # f-string (Python 3.6+)
 ```
 {% endtab %}
-
 {% tab title="% formatting" %}
-
 ```python
 name = "Alice"
 age = 25
 old_style = "%s is %d years old" % (name, age)
 ```
 {% endtab %}
-
 {% tab title=".format()" %}
-
 ```python
 name = "Alice"
 age = 25
 format_method = "{} is {} years old".format(name, age)
 ```
 {% endtab %}
-
 {% endtabs %}
 
 ```python

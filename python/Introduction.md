@@ -87,23 +87,16 @@ between apps. Virtual environments provide that sandbox.
 First, ensure you have Python installed. You can check this in your terminal:
 
 {% tabs %}
-
 {% tab title="python" %}
-
 ```bash
 python --version
 ```
-
 {% endtab %}
-
 {% tab title="python3" %}
-
 ```bash
 python3 --version
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 If `python` is not found on Windows, try the `py` launcher
@@ -121,7 +114,7 @@ environments keep each project's dependencies isolated.
 
 **Creation and Activation:**
 
-1. Create the environment (named `venv`):
+**Step 1: Create the environment (named `venv`).**
 
 ```bash
 python -m venv venv
@@ -138,26 +131,19 @@ The `-m` flag ensures the module runs with the active interpreter, so the
 environment matches the exact Python version you intend to use. Common
 choices for the folder name are `venv` or `.venv`.
 
-2. Activate it:
+**Step 2: Activate it.**
 
 {% tabs %}
-
 {% tab title="Windows" %}
-
 ```bash
 .\venv\Scripts\activate
 ```
-
 {% endtab %}
-
 {% tab title="macOS/Linux" %}
-
 ```bash
 source venv/bin/activate
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 Once activated, your terminal prompt will usually show `(venv)`,
@@ -289,29 +275,22 @@ PEP 8 is the official document that defines how Python code should be formatted.
 ### Example of Non-Pythonic vs. Pythonic code
 
 {% tabs %}
-
 {% tab title="Non-Pythonic" %}
-
 ```python
 # Non-Pythonic (unclear names, cramped formatting)
 def check_val(X):
     if X > 10: return True
     else: return False
 ```
-
 {% endtab %}
-
 {% tab title="Pythonic" %}
-
 ```python
 # Pythonic (readable, follows PEP 8)
 def is_threshold_reached(value):
     """Checks if the value exceeds the standard threshold."""
     return value > 10
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ## Python Versions and Compatibility
