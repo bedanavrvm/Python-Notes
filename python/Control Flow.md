@@ -51,26 +51,29 @@ Python provides a concise way to write simple if-else statements:
 Use ternaries for simple assignments; prefer full `if` blocks for
 complex logic.
 
-{% tabs %}
-{% tab title="Traditional" %}
-    # Traditional if-else
-    age = 18
- 
-    if age >= 18:
-        status = "adult"
-    else:
-        status = "minor"
-{% endtab %}
-{% tab title="Ternary" %}
-    # Ternary operator
-    age = 18
- 
-    status = "adult" if age >= 18 else "minor"
- 
-    # Nested ternary
-    message = "senior" if age >= 65 else "adult" if age >= 18 else "minor"
-{% endtab %}
-{% endtabs %}
+#### Traditional
+
+```python
+# Traditional if-else
+age = 18
+
+if age >= 18:
+    status = "adult"
+else:
+    status = "minor"
+```
+
+#### Ternary
+
+```python
+# Ternary operator
+age = 18
+
+status = "adult" if age >= 18 else "minor"
+
+# Nested ternary
+message = "senior" if age >= 65 else "adult" if age >= 18 else "minor"
+```
 
 ## Truthiness and Falsiness
 
@@ -435,68 +438,77 @@ Techniques for improving loop performance and readability.
 
 Compare a traditional loop to a list comprehension.
 
-{% tabs %}
-{% tab title="Traditional" %}
-    # Traditional loop
-    squares = []
-    for i in range(10):
-        squares.append(i ** 2)
-{% endtab %}
-{% tab title="Comprehension" %}
-    # List comprehension (faster and more readable)
-    squares = [i ** 2 for i in range(10)]
- 
-    # With condition
-    even_squares = [i ** 2 for i in range(10) if i % 2 == 0]
-{% endtab %}
-{% endtabs %}
+#### Traditional
+
+```python
+# Traditional loop
+squares = []
+for i in range(10):
+    squares.append(i ** 2)
+```
+
+#### Comprehension
+
+```python
+# List comprehension (faster and more readable)
+squares = [i ** 2 for i in range(10)]
+
+# With condition
+even_squares = [i ** 2 for i in range(10) if i % 2 == 0]
+```
 
 #### Generator Expressions
 
 Generators are lazy; they do not build the full list in memory.
 
-{% tabs %}
-{% tab title="List (eager)" %}
-    # List comprehension (creates entire list in memory)
-    sum_squares = sum([i ** 2 for i in range(1000000)])
-{% endtab %}
-{% tab title="Generator (lazy)" %}
-    # Generator expression (lazy evaluation, memory efficient)
-    sum_squares = sum(i ** 2 for i in range(1000000))
-{% endtab %}
-{% endtabs %}
+#### List (eager)
+
+```python
+# List comprehension (creates entire list in memory)
+sum_squares = sum([i ** 2 for i in range(1000000)])
+```
+
+#### Generator (lazy)
+
+```python
+# Generator expression (lazy evaluation, memory efficient)
+sum_squares = sum(i ** 2 for i in range(1000000))
+```
 
 #### Built-in Functions
 
 Built-ins often replace manual loops with faster, clearer intent.
 
-{% tabs %}
-{% tab title="Manual" %}
-    # Instead of manual loops
-    numbers = [1, 2, 3, 4, 5]
- 
-    # Manual sum
-    total = 0
-    for num in numbers:
-        total += num
- 
-    # Manual filtering
-    evens = []
-    for num in numbers:
-        if num % 2 == 0:
-            evens.append(num)
-{% endtab %}
-{% tab title="Built-ins" %}
-    # Instead of manual loops
-    numbers = [1, 2, 3, 4, 5]
- 
-    # Built-in sum (faster)
-    total = sum(numbers)
- 
-    # Built-in filter (more efficient)
-    evens = list(filter(lambda x: x % 2 == 0, numbers))
-{% endtab %}
-{% endtabs %}
+#### Manual
+
+```python
+# Instead of manual loops
+numbers = [1, 2, 3, 4, 5]
+
+# Manual sum
+total = 0
+for num in numbers:
+    total += num
+
+# Manual filtering
+evens = []
+for num in numbers:
+    if num % 2 == 0:
+        evens.append(num)
+```
+
+#### Built-ins
+
+```python
+# Instead of manual loops
+numbers = [1, 2, 3, 4, 5]
+
+# Built-in sum (faster)
+total = sum(numbers)
+
+# Built-in filter (more efficient)
+evens = list(filter(lambda x: x % 2 == 0, numbers))
+```
 
 ### Short-circuit Evaluation
 
