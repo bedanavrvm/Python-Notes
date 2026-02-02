@@ -259,11 +259,13 @@ Context managers provide a clean way to handle resources that need setup and cle
 {% tabs %}
 {% tab title="Traditional" %}
 ```python
+file = None
 try:
     file = open("data.txt", "w")
     file.write("Hello, World!")
 finally:
-    file.close()
+    if file is not None:
+        file.close()
 ```
 {% endtab %}
 {% tab title="Context manager" %}

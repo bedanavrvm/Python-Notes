@@ -55,6 +55,8 @@ complex logic.
 {% tab title="Traditional" %}
 ```python
 # Traditional if-else
+age = 18
+
 if age >= 18:
     status = "adult"
 else:
@@ -64,6 +66,8 @@ else:
 {% tab title="Ternary" %}
 ```python
 # Ternary operator
+age = 18
+
 status = "adult" if age >= 18 else "minor"
 
 # Nested ternary
