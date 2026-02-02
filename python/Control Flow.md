@@ -548,6 +548,12 @@ name = user_data.get("name") and user_data["name"].upper()
 Order cheaper checks first to avoid unnecessary work.
 
 ```python
+def expensive_function():
+    return True
+
+def simple_check():
+    return True
+
 # Inefficient: checks expensive condition even when cheap one fails
 if expensive_function() and simple_check():
     pass
@@ -557,6 +563,7 @@ if simple_check() and expensive_function():
     pass
 
 # Default values with short-circuiting
+user_input = ""
 value = user_input or "default"  # Uses default if input is falsy
 ```
 
@@ -643,16 +650,16 @@ Behavior where logical operators (`and`, `or`) stop evaluating as soon as the re
 
 Mechanism for managing runtime errors using `try`, `except`, `else`, and `finally` blocks.
 
-### Control Flow
+### **Control Flow**
 
 Order in which statements are executed, including conditional branching, looping, and error handling.
 
-#### Types of Control Flow
+Types of Control Flow:
 
-1. **Sequential**: Statements executed one after another
-2. **Selection**: Choose between different paths (if/elif/else, match)
-3. **Iteration**: Repeat blocks of code (while, for)
-4. **Exception Handling**: Manage errors and special conditions
+- **Sequential**: Statements executed one after another
+- **Selection**: Choose between different paths (if/elif/else, match)
+- **Iteration**: Repeat blocks of code (while, for)
+- **Exception Handling**: Manage errors and special conditions
 
 This example combines selection, iteration, and exception handling.
 
