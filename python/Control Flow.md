@@ -1,6 +1,6 @@
 # Control Flow
 
-Control flow is the order in which individual statements, instructions, or function calls are executed. In Python, this is governed by conditional logic and loops. One of Python's most distinct features is that it uses indentation to define blocks of code, rather than curly braces {}.
+Control flow is the order in which individual statements, instructions, or function calls are executed. In Python, this is governed by conditional logic and loops. One of Python's most distinct features is that it uses indentation to define blocks of code, rather than `{}`.
 
 ## Conditional Branching
 
