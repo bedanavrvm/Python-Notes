@@ -10,6 +10,11 @@ A Class is a blueprint; an Instance (Object) is a house built from that blueprin
 
 In Python, `self` represents the specific instance of an object. It is the first argument to every instance method, allowing code to distinguish between "my data" and "the class's data."
 
+This example shows the typical class layout:
+
+- `__init__` stores instance state on `self`.
+- Instance methods read that state back.
+
 ```python
 class Robot:
     def __init__(self, name, model):
@@ -26,6 +31,12 @@ print(r1.identify())
 ```
 
 ### Class and Instance Attributes
+
+The key idea is that **class attributes** live on the class and are shared,
+while **instance attributes** live on each object.
+
+This example also shows why changing a class attribute updates the value for
+existing instances.
 
 ```python
 class Car:
@@ -55,6 +66,12 @@ Inheritance allows a class (Child) to derive attributes and methods from another
 ### Method Resolution Order (MRO)
 
 Python supports Multiple Inheritance, which can get complex. To decide which method to run if multiple parents have the same name, Python uses the MRO (accessible via `ClassName.mro()`).
+
+This example demonstrates:
+
+- Simple single inheritance (`Drone` inherits `Machine`).
+- Multiple inheritance with two parents (`Duck(Flyable, Swimmable)`).
+- How to inspect the resolution order with `Duck.mro()`.
 
 ```python
 class Machine:
@@ -97,6 +114,9 @@ print(Duck.mro())
 
 The `super()` function allows you to call parent class methods:
 
+In this example, `Dog.speak()` reuses the parent's implementation and then
+adds its own behavior on top.
+
 ```python
 class Animal:
     def speak(self):
@@ -116,6 +136,9 @@ print(dog.speak())  # Some sound - Woof!
 
 "Dunder" stands for Double Underscore. These methods allow your custom objects to hook into Python's built-in syntax (like `+`, `len()`, or `print()`).
 
+The example below implements `__str__` so `print(book)` produces a readable
+string instead of a default memory-address representation.
+
 | Method | Triggered by... | Purpose |
 |---------|------------------|---------|
 | `__init__` | `Object()` | Initializing object's state. |
@@ -128,6 +151,10 @@ print(dog.speak())  # Some sound - Woof!
 | `__getitem__` | `obj[key]` | Dictionary-like access. |
 | `__setitem__` | `obj[key] = value` | Dictionary-like assignment. |
 | `__call__` | `obj()` | Make object callable. |
+
+Key takeaway: dunder methods let your objects participate in Python syntax.
+You should implement them when it makes your domain object feel “natural” to
+use (like numbers, collections, or value objects).
 
 ```python
 class Book:
@@ -158,6 +185,12 @@ print(combined.pages)  # 700
 ```
 
 ### Comparison Methods
+
+Why/when:
+
+- Implement comparisons when objects have a meaningful ordering or equality.
+- Return `NotImplemented` when comparison doesn't make sense, so Python can
+  try the reverse comparison or fall back cleanly.
 
 ```python
 class Student:
@@ -196,6 +229,12 @@ print(sorted_students)  # Sorted by GPA
 ## Properties: @property, Getters, and Setters
 
 In languages like Java, you write `getAge()` and `setAge()`. In Python, we use the `@property` decorator. This allows you to access a method like an attribute while still maintaining control over validation.
+
+Key takeaways:
+
+- Use properties to keep a clean API while enforcing invariants.
+- Start with simple public attributes; introduce properties when you need
+  validation, computed values, or backwards-compatible refactors.
 
 ```python
 class Employee:
@@ -236,6 +275,11 @@ print(circle.area)  # 78.53981633974483
 
 ### Computed Properties
 
+Why/when:
+
+- Computed properties are useful when the value is derived from other fields.
+- They keep call sites clean (`rect.area` instead of `rect.area()`).
+
 ```python
 class Rectangle:
     def __init__(self, width, height):
@@ -260,9 +304,7 @@ print(f"Area: {rect.area}, Perimeter: {rect.perimeter}")
 - `@staticmethod`: Receives neither `self` nor `cls`. It's just a regular function that lives inside the class namespace because it's logically related.
 
 {% tabs %}
-
 {% tab title="@staticmethod" %}
-
 ```python
 class DateConverter:
     @staticmethod
@@ -272,11 +314,8 @@ class DateConverter:
 # Static method usage
 print(DateConverter.is_valid_year(2024))  # True
 ```
-
 {% endtab %}
-
 {% tab title="@classmethod" %}
-
 ```python
 class DateConverter:
     @staticmethod
@@ -295,14 +334,18 @@ class DateConverter:
 date_obj = DateConverter.from_string("25/12/2024")
 print(date_obj)  # DateConverter instance
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ## Advanced OOP Concepts
 
 ### Encapsulation
+
+Key takeaway:
+
+- A single underscore (`_name`) is a convention: “internal use”.
+- Double underscores (`__name`) trigger name-mangling; they help avoid
+  accidental overrides, but they are not strict privacy.
 
 ```python
 class BankAccount:
@@ -327,6 +370,12 @@ print(account.get_balance())  # 1500
 ```
 
 ### Polymorphism
+
+Why/when:
+
+- Polymorphism is about programming to an interface: any object with `area()`
+  works with `print_area`.
+- In Python, this often means duck typing rather than deep inheritance trees.
 
 ```python
 class Shape:
@@ -361,6 +410,9 @@ print_area(circle)   # Circle's area method
 ```
 
 ### Abstract Base Classes
+
+Key takeaway: ABCs let you enforce “must implement these methods” at
+instantiation time.
 
 ```python
 from abc import ABC, abstractmethod
@@ -400,6 +452,12 @@ print(bird.move())      # Flying
 
 ### Composition over Inheritance
 
+Why/when:
+
+- Prefer composition when you want to swap parts independently.
+- Deep inheritance trees make change harder; composition keeps dependencies
+  explicit.
+
 ```python
 class Engine:
     def start(self):
@@ -431,6 +489,11 @@ car.drive()
 <details>
 <summary>Show singleton pattern example</summary>
 
+Why/when:
+
+- Mostly educational; singletons make state global and can complicate tests.
+- Prefer explicit dependencies (pass objects in) when possible.
+
 ```python
 class Singleton:
     _instance = None
@@ -455,6 +518,11 @@ print(s1 is s2)  # True (same instance)
 
 <details>
 <summary>Show observer pattern example</summary>
+
+Why/when:
+
+- Useful for event-driven systems.
+- In real projects, consider existing event libraries or callback patterns.
 
 ```python
 class Subject:
@@ -492,19 +560,20 @@ subject.notify("Hello Observers!")
 <details>
 <summary>Show dataclasses example</summary>
 
+Key takeaways:
+
+- `@dataclass` removes boilerplate for “data containers”.
+- `field(default_factory=list)` avoids shared mutable defaults.
+
 ```python
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 @dataclass
 class Person:
     name: str
     age: int
-    emails: List[str] = None
-
-    def __post_init__(self):
-        if self.emails is None:
-            self.emails = []
+    emails: List[str] = field(default_factory=list)
 
 # Auto-generates __init__, __repr__, __eq__, etc.
 person = Person("Alice", 25, ["alice@email.com"])

@@ -10,35 +10,30 @@ A Module is simply a file containing Python definitions and statements. The file
 
 When you import a module, Python executes the code in that file and creates a module object in the current scope.
 
+This tabbed example compares the most common import styles:
+- `import module` keeps the module namespace (you access `module.name`).
+- `from module import name` pulls specific names into your local scope.
+- The trade-off is clarity vs. brevity: explicit module prefixes make large codebases easier to read.
+
 {% tabs %}
-
 {% tab title="calculator.py" %}
-
 ```python
 def add(a, b):
     return a + b
 ```
-
 {% endtab %}
-
 {% tab title="main.py (import module)" %}
-
 ```python
 import calculator
 print(calculator.add(5, 3))
 ```
-
 {% endtab %}
-
 {% tab title="main.py (from ... import ...)" %}
-
 ```python
 from calculator import add
 print(add(5, 3))
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### Module Search Path (`sys.path`)
@@ -48,6 +43,9 @@ When you run `import abc`, Python looks for a file named `abc.py` in this order:
 1. The directory containing the input script (current directory)
 2. `PYTHONPATH` (an environment variable)
 3. The installation-dependent default (standard libraries)
+
+This snippet prints `sys.path` so you can see where Python is looking.
+It is useful when imports work in one environment but fail in another.
 
 ```python
 import sys
@@ -59,6 +57,11 @@ for path in sys.path:
 ### Module Attributes
 
 Every module has special attributes that provide information about the module:
+
+These attributes are commonly used for debugging, logging, and tooling:
+- `__name__`: the module's import name.
+- `__file__`: where it was loaded from.
+- `__dict__`: the module namespace (everything defined at top-level).
 
 ```python
 # calculator.py
@@ -82,6 +85,9 @@ print(calculator.__dict__)    # Module's symbol table
 ### Module Reloading
 
 During development, you can reload modules to pick up changes without restarting:
+
+Reloading is mostly a REPL/notebook convenience. In production systems, you
+typically restart the process instead of reloading modules at runtime.
 
 ```python
 import importlib
@@ -121,6 +127,11 @@ my_project/
 
 ### Creating Packages
 
+This example shows a few important package patterns:
+- Relative imports like `from .primitives import draw_line` only work when imported as a package.
+- `__all__` is an *export list* that controls what `from package import *` exposes.
+- `__version__` is a common convention for package version metadata.
+
 ```python
 # graphics/__init__.py
 """
@@ -145,29 +156,22 @@ When working within a package, you have two ways to reference other modules.
 Specifies the full path from the project's root folder. This is the preferred method (PEP 8) because it is clear and unambiguous.
 
 {% tabs %}
-
 {% tab title="Absolute" %}
-
 ```python
 # Inside effects.py
 from graphics.primitives import draw_line
 ```
-
 {% endtab %}
-
 {% tab title="Relative" %}
-
 ```python
 # Inside effects.py
 from .primitives import draw_line
 
-# Warning: Relative imports only work within packages. 
-# If you try to run effects.py as a standalone script, 
+# Warning: Relative imports only work within packages.
+# If you try to run effects.py as a standalone script,
 # relative import will fail.
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 2. Relative Imports
@@ -178,6 +182,12 @@ Uses leading dots to indicate the current and parent packages.
 - `..` refers to the parent package
 
 ### Import Best Practices
+
+A few practical rules that keep imports predictable and readable:
+- Keep imports at the top of the file.
+- Prefer explicit imports over wildcard imports.
+- Use aliases (`import numpy as np`) when the alias is conventional.
+- Avoid multiple imports on one line to keep diffs clean.
 
 ```python
 # Good: Specific imports
@@ -192,7 +202,8 @@ import numpy as np
 import pandas as pd
 
 # Group related imports
-import os, sys
+import os
+import sys
 from pathlib import Path
 ```
 
@@ -221,6 +232,8 @@ Python follows the "Batteries Included" philosophy. Some essential modules you s
 
 Interacting with the operating system and file paths.
 
+This example uses `pathlib` for path handling and `os` for OS-level info.
+
 ```python
 import os
 from pathlib import Path
@@ -240,6 +253,9 @@ print(os.getcwd())
 
 System-specific parameters and functions.
 
+`sys.argv` is how scripts receive command line arguments. `sys.exit()` is a
+conventional way to return a success/failure exit code to the shell.
+
 ```python
 import sys
 
@@ -257,6 +273,9 @@ print(sys.platform)
 
 Parsing and creating JSON data.
 
+`json.dumps()` turns Python objects into JSON text.
+`json.loads()` parses JSON text back into Python objects.
+
 ```python
 import json
 
@@ -272,6 +291,9 @@ print(parsed["name"])  # Alice
 
 Handling dates and times.
 
+`datetime` supports arithmetic with `timedelta`, which is usually easier and
+safer than manually calculating seconds.
+
 ```python
 from datetime import datetime, timedelta
 
@@ -286,6 +308,9 @@ print(f"Future: {future}")
 
 Mathematical constants and functions.
 
+Use `math` for numeric primitives; for large array math, you typically move
+to `numpy`.
+
 ```python
 import math
 
@@ -296,9 +321,22 @@ print(math.factorial(5)) # 120
 
 ## Advanced Module Concepts
 
+These topics matter more as projects grow:
+
+- You start shipping code as packages.
+- Imports become part of your architecture (boundaries, plugin systems).
+- Debugging import behavior becomes a practical skill.
+
 ### Namespace Packages
 
 Modern Python allows packages without `__init__.py` files:
+
+Why/when:
+
+- Namespace packages are most common when multiple distributions contribute
+  to the same package namespace.
+- In many projects, a regular package with `__init__.py` is simpler and more
+  explicit.
 
 ```text
 # my_project/
@@ -314,6 +352,9 @@ Modern Python allows packages without `__init__.py` files:
 ### Circular Imports
 
 When two modules import each other, you can create circular dependencies:
+
+Key takeaway: circular imports are usually a design smell. If two modules need
+each other, consider extracting shared code into a third module.
 
 ```python
 # module_a.py
@@ -334,16 +375,26 @@ def func_b():
 
 Import modules dynamically at runtime:
 
+Why/when:
+
+- Plugin systems and optional dependencies.
+- Avoiding heavy imports on startup.
+- Loading modules by name from configuration.
+
 ```python
 import importlib
+import importlib.util
 
 # Import by name
 module = importlib.import_module("math")
 result = module.sqrt(16)
 
 # Import from file path
-spec = importlib.util.spec_from_file_location("custom_module.py", "/path/to/module")
+spec = importlib.util.spec_from_file_location("custom_module", "/path/to/module.py")
+if spec is None or spec.loader is None:
+    raise ImportError("Could not load module spec")
 custom_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(custom_module)
 ```
 
 ### Lazy Import
@@ -351,15 +402,25 @@ custom_module = importlib.util.module_from_spec(spec)
 A **lazy import** defers loading until the module is actually used, improving
 startup performance:
 
+Key takeaway: lazy imports trade a small delay at first use for faster startup
+and fewer optional dependency issues.
+
 ```python
 def heavy_operation():
-    import pandas  # Imported only when function is called
+    import pandas as pd  # Imported only when function is called
     return pd.DataFrame()
 ```
 
 ### Package Distribution
 
 Creating distributable packages:
+
+Why/when:
+
+- Use packaging when you want reuse across repositories or want to publish to
+  an internal index/PyPI.
+- Modern projects usually prefer `pyproject.toml`, but `setup.py` is still
+  widely understood.
 
 <details>
 <summary>Show setup.py example</summary>
@@ -395,10 +456,11 @@ be invoked via command-line tools (e.g., `console_scripts` in `setup.cfg`).
 
 Isolating package dependencies:
 
+Key takeaway: a virtual environment isolates dependencies per project, which
+prevents version conflicts.
+
 {% tabs %}
-
 {% tab title="Linux/macOS" %}
-
 ```bash
 # Create virtual environment
 python -m venv my_env
@@ -412,11 +474,8 @@ pip install requests numpy pandas
 # Freeze dependencies
 pip freeze > requirements.txt
 ```
-
 {% endtab %}
-
 {% tab title="Windows" %}
-
 ```bash
 # Create virtual environment
 python -m venv my_env
@@ -430,9 +489,7 @@ pip install requests numpy pandas
 # Freeze dependencies
 pip freeze > requirements.txt
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 #### Version Management
@@ -450,7 +507,17 @@ compatibility. Use `pip-tools` or `poetry` to lock dependency versions.
 
 ## Module Discovery and Inspection
 
+Why/when:
+
+- Useful for debugging and tooling.
+- Useful for building developer-friendly CLIs and plugin systems.
+
 ### Inspecting Modules
+
+Key takeaways:
+
+- `inspect.signature()` is a great way to print a callable's parameters.
+- `inspect.getsource()` only works when source code is available.
 
 ```python
 import inspect
@@ -470,6 +537,12 @@ for name, obj in inspect.getmembers(calculator):
 ### Package Resources
 
 Accessing data files within packages:
+
+Why/when:
+
+- Packages often include non-code assets (JSON, templates, SQL, model files).
+- Prefer modern `importlib.resources` for new code; `pkg_resources` is older
+  and heavier, but still common.
 
 <details>
 <summary>Show package resources example</summary>
@@ -497,11 +570,20 @@ An **import hook** allows customizing the import process by registering finders
 and loaders. This enables loading modules from databases, zip files, or remote
 sources.
 
+Key takeaway: import hooks are powerful and advanced—use them when you truly
+need custom loading behavior.
+
 ### Plugin Systems
 
 A **plugin system** loads additional functionality dynamically at runtime.
 Plugins are modules that implement a defined interface and are discovered via
 entry points or directory scanning.
+
+Why/when:
+
+- Extensible applications (formatters, linters, web frameworks).
+- When you want third-party code to register functionality without modifying
+  the core codebase.
 
 ### Library vs Framework
 
@@ -552,7 +634,7 @@ Object created when a module is imported, containing the module's namespace and 
 
 Container that holds the names (variables, functions, classes) defined in a module or package.
 
-### ****init**.py**
+### **`__init__.py`**
 
 Special file that marks a directory as a Python package and can contain initialization code.
 
@@ -572,11 +654,11 @@ List of directories Python searches when importing modules, determining where to
 
 Environment variable that adds additional directories to Python's module search path.
 
-### ****name****
+### **`__name__`**
 
 Special variable that indicates whether a module is being run as a script or imported as a library.
 
-### ****main****
+### **`__main__`**
 
 Value of `__name__` when a Python file is executed directly, allowing script-specific code execution.
 

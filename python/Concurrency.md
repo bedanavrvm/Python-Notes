@@ -13,11 +13,21 @@ In Python, the best concurrency tool depends on whether your workload is:
 - **I/O-bound**: waiting on network, disk, databases, subprocess output.
 - **CPU-bound**: heavy computation in Python (parsing, simulation, math).
 
+Key takeaway: "go faster" depends on what you're waiting for.
+
+- If you're waiting on I/O, concurrency helps you overlap waiting time.
+- If you're burning CPU, you need true parallelism (processes or native code).
+
 ## The Global Interpreter Lock (GIL)
 
 CPython (the standard Python implementation) has a **Global Interpreter
 Lock (GIL)**: a mutex that allows only one thread to execute Python bytecode
 at a time.
+
+Why this matters:
+
+- The GIL is the reason threads usually do **not** speed up CPU-bound Python.
+- It does **not** prevent concurrency for I/O-bound tasks.
 
 ### Why the GIL exists
 
@@ -87,11 +97,19 @@ have overhead:
 In modern Python, prefer `concurrent.futures.ThreadPoolExecutor` for most
 thread pooling.
 
+Why/when:
+
+- Use a thread pool when your tasks spend most of their time waiting (HTTP requests, disk reads).
+- The executor abstracts away manual thread lifecycle management.
+
 An **executor** manages a pool of worker threads (or processes) and gives
 you a higher-level API than manually creating `Thread`/`Process` objects.
 
 <details>
 <summary>Show ThreadPoolExecutor example</summary>
+
+Key takeaway: you submit work as futures, then iterate completed futures to
+collect results.
 
 ```python
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -118,6 +136,9 @@ if __name__ == "__main__":
 When multiple threads read/write shared data without coordination, you can get
 a **race condition**.
 
+Key takeaway: shared memory needs coordination (locks) or an alternative design
+(like message passing).
+
 Use synchronization primitives such as:
 
 - `threading.Lock` (mutual exclusion)
@@ -127,6 +148,11 @@ Use synchronization primitives such as:
 
 <details>
 <summary>Show race condition / locking example</summary>
+
+Why/when:
+
+- This pattern is common when updating shared counters, caches, or in-memory state.
+- The lock ensures only one thread mutates `counter` at a time.
 
 ```python
 import threading
@@ -163,8 +189,16 @@ To reduce deadlocks:
 Prefer `concurrent.futures.ProcessPoolExecutor` for simple CPU-bound
 parallelism.
 
+Why/when:
+
+- Use processes when CPU work is the bottleneck.
+- Each process has its own interpreter, so it bypasses the GIL.
+
 <details>
 <summary>Show ProcessPoolExecutor example</summary>
+
+Key takeaway: process pools require pickling arguments/results, which is why
+some objects (open files, lambdas, some closures) can't be sent to workers.
 
 ```python
 from concurrent.futures import ProcessPoolExecutor
@@ -202,11 +236,19 @@ closures, lambdas), you may get errors when passing it to a process pool.
 
 In `asyncio`, an `async def` function defines a **coroutine**.
 
+Why/when:
+
+- Use `asyncio` when you need to handle many concurrent I/O operations efficiently.
+- Use it when you can use async-compatible libraries (HTTP clients, DB drivers).
+
 - You use `await` to pause until an awaitable completes.
 - The event loop switches to other ready tasks at `await` points.
 
 <details>
 <summary>Show asyncio gather example</summary>
+
+Key takeaway: `asyncio.gather` runs multiple awaitables concurrently and returns
+their results in order.
 
 ```python
 import asyncio
@@ -234,6 +276,9 @@ A **task** is a scheduled coroutine.
 
 <details>
 <summary>Show tasks / cancellation / timeouts example</summary>
+
+Key takeaway: timeouts are essential guardrails in production systems; combine
+`wait_for` with cancellation to prevent runaway tasks.
 
 ```python
 import asyncio

@@ -10,6 +10,9 @@ Lists are ordered, mutable collections that can hold a mix of different data typ
 
 Lists come with a rich set of built-in methods to modify their contents:
 
+This example focuses on the most common mutations: adding, inserting,
+removing, and popping elements.
+
 ```python
 fruits = ["apple", "banana"]
 
@@ -20,6 +23,10 @@ popped_item = fruits.pop() # Removes and returns last item
 ```
 
 #### More List Methods
+
+This example shows a wider selection of list operations. The key idea is
+that some methods modify the list in-place (like `sort()`), while others
+return a new object (like `sorted()` and `reversed()`).
 
 ```python
 numbers = [3, 1, 4, 1, 5, 9, 2]
@@ -76,6 +83,11 @@ print(cube[1][0][1])  # 6
 ```
 
 #### Matrix Operations
+
+These examples show two common patterns when working with nested lists:
+
+- `transpose()` uses a nested comprehension to flip rows into columns.
+- `flatten()` uses recursion to walk an arbitrarily nested structure.
 
 ```python
 # Transpose a matrix
@@ -356,20 +368,15 @@ Comprehensions provide a concise way to create new collections based on existing
 **Syntax**: `[expression for item in iterable if condition]`
 
 {% tabs %}
-
 {% tab title="Instead of this" %}
-
 ```python
 # Instead of this
 squares = []
 for x in range(5):
     squares.append(x**2)
 ```
-
 {% endtab %}
-
 {% tab title="Do this" %}
-
 ```python
 # Do this
 squares = [x**2 for x in range(5)]  # [0, 1, 4, 9, 16]
@@ -385,9 +392,7 @@ matrix = [[i*j for j in range(3)] for i in range(3)]
 nested = [[1, 2], [3, [4, 5]], 6]
 flat = [item for sublist in nested for item in sublist]
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### Dictionary & Set Comprehensions

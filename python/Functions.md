@@ -6,6 +6,12 @@ Functions are the primary method of code reuse in Python. In JavaScript.info sty
 
 A function is defined using the `def` keyword, followed by the function name, parentheses `()`, and a colon `:`. The code block inside the function is indented.
 
+Key takeaways:
+
+- Functions let you name a behavior and reuse it.
+- A good function name communicates intent.
+- A function boundary is also a scope boundary (more on that in LEGB).
+
 Example: define a simple function and call it.
 
 ```python
@@ -28,6 +34,13 @@ print(message)  # Hello, Alice!
 
 If a function does not have an explicit `return` statement, it returns `None` by default. Unlike some languages, Python allows you to return multiple values separated by commas, which actually returns a single tuple.
 
+Why/when:
+
+- Returning multiple values (a tuple) is common when you naturally compute a pair
+  like `(x, y)` or a `(value, error)` style result.
+- Prefer returning a small dataclass or a named tuple when the meaning of tuple
+  positions is not obvious.
+
 Example: return a tuple and observe the implicit `None` return.
 
 ```python
@@ -46,6 +59,9 @@ print(result)  # None
 ### Early Returns
 
 Functions can have multiple return statements for different conditions:
+
+Key takeaway: early returns can reduce nesting and make guard conditions
+clear.
 
 ```python
 def classify_number(num):
@@ -66,6 +82,11 @@ Python functions are incredibly flexible regarding how they receive data.
 - **Positional**: Arguments assigned based on their order
 - **Keyword**: Arguments assigned by explicitly naming the parameter
 
+Key takeaway:
+
+- Use keyword arguments at call sites when it improves readability.
+- Use positional arguments for obvious “primary” inputs.
+
 Example: positional, keyword, and mixed calls.
 
 ```python
@@ -85,6 +106,12 @@ describe_pet("Cat", pet_name="Whiskers")
 ### Default Parameters
 
 You can provide default values for parameters:
+
+Why/when:
+
+- Defaults are great for optional behavior.
+- Be careful with mutable defaults (next example) because the default is
+  evaluated once at function definition time.
 
 Example: use a default greeting and override it when needed.
 
@@ -125,6 +152,13 @@ Sometimes you don't know how many arguments will be passed.
 
 - `*args`: Collects extra positional arguments into a tuple
 - `**kwargs`: Collects extra keyword arguments into a dictionary
+
+Why/when:
+
+- Use `*args`/`**kwargs` when writing wrapper functions (decorators), adapters,
+  or APIs that forward arguments.
+- Avoid overusing them in application code; explicit parameters are easier to
+  read and validate.
 
 Example: collect extra toppings and metadata.
 
@@ -181,6 +215,9 @@ Scope determines where a variable is accessible. Python follows the LEGB rule to
 - **Global (G)**: Defined at the top level of the script or module
 - **Built-in (B)**: Pre-installed names like `print`, `len`, `range`
 
+Key takeaway: Python resolves names by searching scopes from most local to most
+global.
+
 Example: see how Python resolves the same name through each scope.
 
 ```python
@@ -203,6 +240,12 @@ print(x)  # Finds global
 ### The global and nonlocal Keywords
 
 To modify a variable outside the local scope, you must explicitly declare it.
+
+Why/when:
+
+- `global` is rare in well-structured code; prefer returning values or storing
+  state in an object.
+- `nonlocal` is useful for closures that maintain state.
 
 Example: mutate a global counter and an enclosing variable.
 
@@ -233,6 +276,12 @@ outer()
 ## Higher-Order Functions
 
 Since functions are first-class citizens, you can pass them as arguments and return them from other functions.
+
+Why/when:
+
+- Use higher-order functions to parameterize behavior ("apply this operation").
+- In many cases, comprehensions are the most readable approach; higher-order
+  functions shine when you already have a named function to reuse.
 
 Example: apply a function to a list and return a custom multiplier.
 
@@ -268,6 +317,9 @@ print(triple(5))  # 15
 
 A closure is a function object that remembers values in enclosing scopes even when they are not present in memory. This allows functions to maintain state between calls.
 
+Key takeaway: closures capture *variables*, not just values, which is why they
+can be used to “carry configuration” (like a factor or greeting).
+
 Example: create multipliers and greeters that capture configuration.
 
 ```python
@@ -301,6 +353,12 @@ print(goodbye("Bob"))   # Goodbye, Bob!
 
 Example: memoize results using a cache captured by a closure.
 
+Why/when:
+
+- Memoization helps when the same inputs occur repeatedly.
+- Prefer `functools.lru_cache` for production code unless you need custom cache
+  behavior.
+
 ```python
 # Memoization with closures
 def memoize(func):
@@ -322,6 +380,8 @@ def fibonacci(n):
 ## Function Composition
 
 Function composition is the process of combining simple functions to build more complex operations, often by passing functions as arguments.
+
+Key takeaway: composition keeps each step small and testable.
 
 Example: compose math functions and chain string transformations.
 
@@ -356,6 +416,12 @@ print(process_text("   HELLO WORLD   "))  # Hello world
 
 Example: pipeline pattern applying multiple transforms in sequence.
 
+Why/when:
+
+- Pipelines are a clean way to express “apply these transforms in order”.
+- If the pipeline steps become hard to read, consider named functions instead
+  of lambdas.
+
 ```python
 # Pipeline pattern
 def pipeline(data, *functions):
@@ -382,6 +448,11 @@ print(clean)  # [1, 2, 3, 4]
 
 Recursion is a technique where a function calls itself to solve problems that can be broken down into smaller instances of the same problem.
 
+Why/when:
+
+- Recursion is natural for tree-like data (nested lists, directory trees).
+- In Python, iterative solutions are often faster and avoid recursion limits.
+
 ### Basic Recursion
 
 Example: factorial and Fibonacci recursion with base cases.
@@ -407,6 +478,9 @@ print(fibonacci(10))  # 55
 ### Recursive vs Iterative
 
 Compare recursive, iterative, and tail-recursive styles.
+
+Key takeaway: Python does not optimize tail recursion, so “tail recursive”
+solutions still consume stack frames.
 
 {% tabs %}
 {% tab title="Recursive" %}
@@ -482,6 +556,9 @@ print(tree_depth(nested))  # 3
 
 Example: set guardrails for depth and always include a base case.
 
+Key takeaway: recursion needs a base case and guardrails; raising the recursion
+limit can be risky in real systems.
+
 ```python
 import sys
 
@@ -501,6 +578,12 @@ def safe_recursive(data, depth=0):
 
 Decorators are functions that modify other functions. They are a powerful way to extend function behavior.
 
+Why/when:
+
+- Good for cross-cutting concerns (timing, logging, caching, authorization).
+- Keep decorators small and predictable; complicated decorators can obscure
+  control flow.
+
 Example: timing decorator and stacked decorators (use `functools.wraps` in real projects).
 
 <details>
@@ -510,11 +593,13 @@ Example: timing decorator and stacked decorators (use `functools.wraps` in real 
 def timing_decorator(func):
     """Decorator to time function execution."""
     import time
+    import functools
 
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        start = time.time()
+        start = time.perf_counter()
         result = func(*args, **kwargs)
-        end = time.time()
+        end = time.perf_counter()
         print(f"{func.__name__} took {end - start:.4f} seconds")
         return result
     return wrapper
@@ -529,6 +614,9 @@ slow_function()
 
 # Multiple decorators
 def uppercase_decorator(func):
+    import functools
+
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         return result.upper()
@@ -567,6 +655,8 @@ print(square_lambda(5))  # 25
 
 Lambdas are best used as "throw-away" functions, often passed as arguments to higher-order functions like `map()`, `filter()`, or `sorted()`.
 
+Key takeaway: if a lambda becomes hard to read, give it a name with `def`.
+
 Example: sorting, mapping, filtering, and reducing with lambdas.
 
 ```python
@@ -601,6 +691,11 @@ product = reduce(lambda x, y: x * y, numbers, 1)
 
 Docstrings provide documentation for your functions:
 
+Why/when:
+
+- Docstrings are for humans first (and tools second).
+- A good docstring explains intent, arguments, return values, and edge cases.
+
 Example: a full docstring with args, returns, and raises.
 
 ```python
@@ -631,6 +726,9 @@ def calculate_area(length, width):
 
 Python 3.5+ supports type hints for better code documentation:
 
+Key takeaway: type hints are optional metadata. They improve readability and
+tooling (IDE + static analysis), but they do not enforce types at runtime.
+
 Example: type-annotated processing and Optional returns.
 
 ```python
@@ -652,9 +750,6 @@ def process_data(
     """
     return [x * multiplier for x in data]
 
-# Complex type hints
-from typing import Dict, List, Optional
-
 def find_user(
     user_id: int,
     database: Dict[int, str]
@@ -665,9 +760,17 @@ def find_user(
 
 ## Function Best Practices
 
+These practices help functions stay readable as codebases grow.
+
 ### Do One Thing
 
 Functions should have a single, clear responsibility:
+
+Why/when:
+
+- Smaller functions are easier to test, reuse, and change.
+- If a function name needs "and" (e.g., "parse_and_save"), it is often a sign
+  it should be split.
 
 Compare a multi-responsibility function with smaller focused helpers.
 
@@ -709,6 +812,12 @@ def log_activity(activity):
 
 Pure functions have no side effects and always return the same output for the same input:
 
+Key takeaways:
+
+- Pure functions are easier to test because they depend only on inputs.
+- Side effects (I/O, mutation, randomness, time) make behavior harder to
+  reason about.
+
 Compare pure and impure behavior side-by-side.
 
 {% tabs %}
@@ -733,6 +842,12 @@ def add_and_print(a, b):
 ### Error Handling
 
 Example: handle division errors explicitly.
+
+Key takeaways:
+
+- Catch the most specific exceptions you expect.
+- Decide on a strategy: return a sentinel value (like `inf`) or raise a clear
+  error for the caller.
 
 ```python
 def safe_divide(a, b):

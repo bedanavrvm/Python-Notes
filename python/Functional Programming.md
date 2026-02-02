@@ -13,6 +13,12 @@ To understand how Python loops work under the hood, we must distinguish between 
 
 When you use a for loop, Python calls `iter()` on the collection to get an iterator, and then calls `next()` repeatedly until a `StopIteration` exception is raised.
 
+Key takeaways:
+
+- `iter(obj)` gives you an iterator.
+- `next(it)` advances one step.
+- `StopIteration` is how Python signals "no more values" internally.
+
 ```python
 nums = [1, 2]
 it = iter(nums)
@@ -26,6 +32,11 @@ print(next(it))  # 2
 ### Custom Iterators
 
 You can create your own iterator classes:
+
+Why/when:
+
+- Useful when you need a stateful traversal that doesn't fit a simple loop.
+- In most day-to-day Python, a generator (`yield`) is usually simpler than writing `__iter__` / `__next__` manually.
 
 ```python
 class CountUpTo:
@@ -56,6 +67,11 @@ Generators are a simple way to create iterators using functions. Instead of retu
 
 Unlike a List, which stores all its elements in memory, a Generator calculates each value on the fly (Lazy Evaluation).
 
+Why/when:
+
+- Use generators for large streams of data or infinite sequences.
+- Use lists when you need random access, reuse, or the total size is small.
+
 ```python
 def count_up_to(max):
     count = 1
@@ -74,19 +90,19 @@ print(next(counter))  # 2
 
 Concise syntax for creating generators:
 
+Key takeaway:
+
+- A list comprehension builds the full list immediately.
+- A generator expression builds an iterator that produces values on demand.
+
 {% tabs %}
-
 {% tab title="List (eager)" %}
-
 ```python
 # List comprehension (creates full list in memory)
 squares_list = [x**2 for x in range(1000000)]
 ```
-
 {% endtab %}
-
 {% tab title="Generator (lazy)" %}
-
 ```python
 # Generator expression (creates generator object)
 squares_gen = (x**2 for x in range(1000000))
@@ -95,15 +111,19 @@ print(squares_gen)  # <generator object <genexpr> at 0x...>
 print(next(squares_gen))  # 0
 print(next(squares_gen))  # 1
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### Advanced Generator Patterns
 
 <details>
 <summary>Show advanced generator patterns</summary>
+
+These patterns show how generators compose:
+
+- An infinite generator (`fibonacci`) produces an unbounded stream.
+- "Pipeline" generators transform values step-by-step.
+- The result is lazy: nothing runs until you iterate.
 
 ```python
 # Infinite generator
@@ -143,9 +163,17 @@ result = list(process_data(data))  # [0, 4, 16, 36, 64]
 
 A decorator is a function that takes another function as an argument and extends its behavior without explicitly modifying it. In JavaScript terms, this is a "Wrapper."
 
+Why/when:
+
+- Add cross-cutting behavior (logging, timing, caching, authorization) without duplicating code.
+- Keep the core function focused on business logic.
+
 ### Basic Syntax
 
 Decorators use the `@decorator_name` "syntactic sugar" above the function definition.
+
+Key takeaway: a decorator typically returns a new function (`wrapper`) that
+calls the original function.
 
 ```python
 def my_decorator(func):
@@ -165,6 +193,8 @@ say_hello()
 ### Decorators with Arguments
 
 To decorate functions that take arguments, we use `*args` and `**kwargs` inside the wrapper.
+
+Key takeaway: `*args`/`**kwargs` lets your wrapper forward any signature.
 
 ```python
 def log_execution(func):
@@ -186,6 +216,12 @@ print(add(5, 10))
 
 <details>
 <summary>Show decorator patterns</summary>
+
+This section shows common production patterns:
+
+- A decorator factory (`repeat(times)`) that returns a decorator.
+- A class-based decorator using `__call__` to behave like a function.
+- `functools.wraps` to preserve metadata for tools, docs, and debugging.
 
 ```python
 def repeat(times):
@@ -258,24 +294,26 @@ print(my_function.__doc__)   # Original function docstring (preserved)
 
 Functions that take other functions as arguments or return functions.
 
+Why/when:
+
+- Use higher-order functions when you want to parameterize behavior ("apply this transform") rather than write many near-duplicate loops.
+- In Python, comprehensions are often the most readable choice; `map`/`filter` can be useful when you already have a function and want a pipeline.
+
 ### map()
 
 Apply a function to all items in an iterable:
 
+Key takeaway: `map(func, items)` applies `func` to each item.
+
 {% tabs %}
-
 {% tab title="lambda" %}
-
 ```python
 numbers = [1, 2, 3, 4, 5]
 squared = list(map(lambda x: x**2, numbers))
 print(squared)  # [1, 4, 9, 16, 25]
 ```
-
 {% endtab %}
-
 {% tab title="named function" %}
-
 ```python
 numbers = [1, 2, 3, 4, 5]
 
@@ -285,29 +323,24 @@ def double(x):
 doubled = list(map(double, numbers))
 print(doubled)  # [2, 4, 6, 8, 10]
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### filter()
 
 Select items from an iterable based on a condition:
 
+Key takeaway: `filter(pred, items)` keeps items where `pred(item)` is truthy.
+
 {% tabs %}
-
 {% tab title="lambda" %}
-
 ```python
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 evens = list(filter(lambda x: x % 2 == 0, numbers))
 print(evens)  # [2, 4, 6, 8, 10]
 ```
-
 {% endtab %}
-
 {% tab title="named function" %}
-
 ```python
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -322,14 +355,17 @@ def is_prime(n):
 primes = list(filter(is_prime, numbers))
 print(primes)  # [2, 3, 5, 7]
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### reduce()
 
 Apply a function cumulatively to items of an iterable:
+
+Why/when:
+
+- `reduce` is useful for folding values into one result.
+- In many cases, a loop (or built-ins like `sum`) is clearer in Python.
 
 ```python
 from functools import reduce
@@ -347,6 +383,11 @@ print(sum_with_start)  # 25 (10 + 1 + 2 + 3 + 4 + 5)
 
 ### all() and any()
 
+Key takeaway:
+
+- `all(...)` answers "are *all* items truthy?"
+- `any(...)` answers "is *any* item truthy?"
+
 ```python
 numbers = [2, 4, 6, 8, 10]
 print(all(x % 2 == 0 for x in numbers))  # True (all even)
@@ -358,6 +399,11 @@ print(any(x % 2 == 0 for x in mixed))  # True (some even)
 ### zip()
 
 Combine multiple iterables:
+
+Key takeaway:
+
+- `zip(a, b)` pairs elements by index.
+- `zip(*pairs)` is a common way to "unzip".
 
 ```python
 names = ["Alice", "Bob", "Charlie"]
@@ -375,6 +421,11 @@ names, ages, cities = zip(*combined)
 
 Add index to iteration:
 
+Why/when:
+
+- Use `enumerate` instead of manually tracking an index.
+- Set `start=1` when you want human-friendly numbering.
+
 ```python
 fruits = ["apple", "banana", "cherry"]
 for index, fruit in enumerate(fruits):
@@ -388,6 +439,11 @@ for index, fruit in enumerate(fruits, start=1):
 ## Lambda Functions
 
 Anonymous functions for simple operations:
+
+Why/when:
+
+- Great for short callbacks (sorting keys, simple mapping).
+- Avoid complex lambdas; prefer a named `def` for anything non-trivial.
 
 ```python
 # Basic lambda
@@ -413,6 +469,9 @@ sorted_by_age = sorted(people, key=lambda person: person["age"])
 
 ### Function Composition
 
+Key takeaway: `compose(f, g)` returns a new function that applies `g` first,
+then `f`.
+
 ```python
 def compose(f, g):
     return lambda x: f(g(x))
@@ -436,6 +495,11 @@ print(multiply_then_add(5))   # add_one(multiply_by_two(5)) = 11
 <details>
 <summary>Show currying example</summary>
 
+Why/when:
+
+- Currying/partial application lets you create "configured" functions.
+- In Python, `functools.partial` is often a simpler way to do this.
+
 ```python
 def curry(func):
     def curried(*args, **kwargs):
@@ -458,6 +522,11 @@ result = add_5(10)  # 15
 
 <details>
 <summary>Show memoization examples</summary>
+
+Key takeaway:
+
+- Caching avoids repeating expensive work when inputs repeat.
+- Prefer `functools.lru_cache` when possible; it is battle-tested.
 
 ```python
 from functools import lru_cache
@@ -494,6 +563,12 @@ print(expensive_calculation(5))  # Returns cached result
 
 <details>
 <summary>Show data processing pipeline example</summary>
+
+Why/when:
+
+- Pipelines are useful when you have a sequence of transforms.
+- If nesting becomes hard to read, consider breaking steps into named
+  functions or using intermediate variables.
 
 ```python
 def process_data(data):

@@ -6,9 +6,21 @@ In Python, errors are not just "failures"—they are objects. Managing them effe
 
 When an error occurs, Python "raises" an exception. If you don't "catch" it, the program stops. To handle this, we use a structured block of four possible parts.
 
+Key takeaways:
+
+- `try` is where you put code that might fail.
+- `except` is where you handle specific failures.
+- `else` runs only when no exception happens.
+- `finally` runs no matter what (best for cleanup).
+
 ### 1. try and except
 
 The `try` block contains code that might fail. The `except` block contains code that runs only if an error occurs.
+
+Why/when:
+
+- Use `try/except` when you expect a particular operation to fail sometimes (parsing user input, file access, network calls).
+- Catch the most specific exceptions you can; broad catching hides bugs.
 
 ```python
 try:
@@ -26,6 +38,8 @@ except ValueError:
 
 - `else`: Runs only if the `try` block was successful (no exceptions were raised)
 - `finally`: Runs always, regardless of whether an error occurred or not. This is typically used for "cleanup" (e.g., closing a file or a database connection)
+
+Key takeaway: `finally` is your last line of defense for cleanup.
 
 ```python
 try:
@@ -47,6 +61,11 @@ finally:
 
 You can catch different types of exceptions in the same try block:
 
+Why/when:
+
+- Use multiple `except` blocks when different failures need different handling.
+- Put more specific exceptions first; broader ones later.
+
 ```python
 try:
     # Some risky operation
@@ -67,6 +86,8 @@ except Exception as e:
 
 Python 3 allows exception chaining to preserve the original exception context:
 
+Key takeaway: `raise ... from e` keeps the root cause visible in the traceback.
+
 ```python
 try:
     # Some operation that might fail
@@ -78,6 +99,10 @@ except ValueError as e:
 ## Raising Exceptions
 
 Sometimes your code needs to signal that something has gone wrong based on your own logic. We use the `raise` keyword for this.
+
+Why/when:
+
+- Raise early when inputs violate assumptions. It is usually better than returning “sentinel” values that callers might forget to check.
 
 ```python
 def set_age(age):
@@ -98,7 +123,10 @@ except ValueError as e:
     print(f"Processing error: {e}")
     raise  # Re-raise the same exception
 
-# Or add context
+# Or add context (exception chaining)
+try:
+    # Some operation
+    pass
 except ValueError as e:
     raise RuntimeError("Processing failed") from e
 ```
@@ -168,6 +196,11 @@ except DatabaseError as e:
 
 Python has a well-defined exception hierarchy. Understanding it helps with catching appropriate exceptions:
 
+Why/when:
+
+- Catching a base class (like `OSError`) can be useful when the handling is truly the same.
+- Prefer catching the specific subclass when you can (like `FileNotFoundError`).
+
 ```text
 BaseException
 ├── SystemExit
@@ -224,9 +257,7 @@ except ZeroDivisionError as e:
 Context managers provide a clean way to handle resources that need setup and cleanup.
 
 {% tabs %}
-
 {% tab title="Traditional" %}
-
 ```python
 try:
     file = open("data.txt", "w")
@@ -234,19 +265,14 @@ try:
 finally:
     file.close()
 ```
-
 {% endtab %}
-
 {% tab title="Context manager" %}
-
 ```python
 with open("data.txt", "w") as file:
     file.write("Hello, World!")
     # File automatically closed here
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### Creating Custom Context Managers
@@ -376,20 +402,15 @@ def get_data_with_fallback(primary_source, fallback_source):
 ### 1. Be Specific
 
 {% tabs %}
-
 {% tab title="Bad" %}
-
 ```python
 try:
     operation()
 except:
     pass  # Catches everything, including system exit
 ```
-
 {% endtab %}
-
 {% tab title="Good" %}
-
 ```python
 try:
     operation()
@@ -398,55 +419,41 @@ except (ValueError, TypeError) as e:
 except Exception as e:
     handle_unexpected_error(e)
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 2. Fail Fast
 
 {% tabs %}
-
 {% tab title="Bad" %}
-
 ```python
 def process_data(data):
     if not isinstance(data, list):
         return []  # Silent failure
     # Continue processing with empty list...
 ```
-
 {% endtab %}
-
 {% tab title="Good" %}
-
 ```python
 def process_data(data):
     if not isinstance(data, list):
         raise TypeError(f"Expected list, got {type(data).__name__}")
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 3. Don't Suppress Important Errors
 
 {% tabs %}
-
 {% tab title="Bad" %}
-
 ```python
 try:
     config = load_config()
 except:
     config = {}  # Use default config, but problem might persist
 ```
-
 {% endtab %}
-
 {% tab title="Good" %}
-
 ```python
 try:
     config = load_config()
@@ -454,34 +461,25 @@ except FileNotFoundError:
     print("Configuration file missing!")
     raise  # Re-raise for caller to handle
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 4. Provide Context
 
 {% tabs %}
-
 {% tab title="Bad" %}
-
 ```python
 raise ValueError("Error in processing")
 ```
-
 {% endtab %}
-
 {% tab title="Good" %}
-
 ```python
 raise ValueError(
     f"Cannot process user {user_id}: "
     f"Invalid age {age}. Age must be between 0 and 120."
 )
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 5. Use Type Hints

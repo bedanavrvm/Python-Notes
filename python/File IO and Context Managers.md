@@ -6,6 +6,10 @@ Interacting with the file system is a fundamental task for any programmer. In Py
 
 The basic function for interacting with files is `open()`. It requires a file path and a mode.
 
+When you use `open()`, you are borrowing an operating system resource (a file
+handle). The core goal of this chapter is to show how to acquire that
+resource safely and release it reliably.
+
 ### Common File Modes
 
 | Mode | Description |
@@ -19,10 +23,11 @@ The basic function for interacting with files is `open()`. It requires a file pa
 
 Before context managers, you had to manually close files. If an error occurred between open and close, the file might remain locked in memory, leading to resource leaks.
 
+Key takeaway: prefer `with open(...) as f:` so cleanup happens even if an
+exception is raised.
+
 {% tabs %}
-
 {% tab title="Manual close" %}
-
 ```python
 f = open("data.txt", "w")
 f.write("Hello World")
@@ -30,21 +35,16 @@ f.write("Hello World")
 # If a crash happens here, the file stays open
 f.close()
 ```
-
 {% endtab %}
-
 {% tab title="with statement" %}
-
 ```python
 with open("data.txt", "r") as file:
     content = file.read()
     print(content)
 
-## File is automatically closed here
+# File is automatically closed here
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### The `with` Statement (Context Managers)
@@ -59,21 +59,26 @@ When a `with` block is entered, Python sets up a resource. When the block is exi
 
 While older Python code uses the `os.path` module (which treats paths as strings), modern Python uses the `pathlib` module. `pathlib` treats paths as objects, making them much easier to manipulate across different operating systems (Windows uses `\`, while Linux/macOS use `/`).
 
+Use `pathlib` when:
+
+- You want clearer, safer path joins (using `/`).
+- You need code to work consistently across operating systems.
+
 #### Basic Path Operations
 
 ```python
 from pathlib import Path
 
-## Create a path object
+# Create a path object
 current_dir = Path.cwd()
 data_file = current_dir / "logs" / "test.txt"
 
-## Check attributes
+# Check attributes
 print(data_file.exists())  # True/False
 print(data_file.suffix)  # .txt
 print(data_file.stem)  # test
 
-## Reading/Writing without explicit open()
+# Reading/Writing without explicit open()
 data_file.write_text("Logging event...")
 print(data_file.read_text())
 ```
@@ -108,6 +113,11 @@ print(f"Modified: {file_info.st_mtime}")
 
 When working with text files, encoding is crucial:
 
+If you do not specify an encoding, Python uses a platform-dependent default.
+That can lead to "works on my machine" bugs when reading or writing
+non-ASCII text. For teaching and for production code, explicitly setting
+`encoding="utf-8"` is a good default.
+
 ```python
 # Specify encoding explicitly
 with open("data.txt", "r", encoding="utf-8") as file:
@@ -126,12 +136,16 @@ with open("output.txt", "w", encoding="utf-8") as file:
 
 You can create your own context managers to handle any resource that requires a "setup" and "teardown" phase (like a database connection or a network socket).
 
+The context manager contract is:
+
+- `__enter__` returns the object you want bound after `as ...`.
+- `__exit__` runs cleanup. Returning `False` means "do not suppress" the
+  exception.
+
 ### 1. Class-based (`__enter__` and `__exit__`)
 
 {% tabs %}
-
 {% tab title="Class-based" %}
-
 ```python
 class DatabaseConnection:
     def __enter__(self):
@@ -148,11 +162,8 @@ class DatabaseConnection:
 with DatabaseConnection() as db:
     print("Executing queries...")
 ```
-
 {% endtab %}
-
 {% tab title="Generator-based (contextlib)" %}
-
 ```python
 from contextlib import contextmanager
 
@@ -165,9 +176,7 @@ def temp_header():
 with temp_header():
     print("I am the middle of a sandwich.")
 ```
-
 {% endtab %}
-
 {% endtabs %}
 
 ### 2. Generator-based (`contextlib`)
@@ -175,6 +184,13 @@ with temp_header():
 A more concise way to create context managers is using the `@contextmanager` decorator.
 
 ### 3. Multiple Resource Context Manager
+
+Why/when:
+
+- Useful when an operation needs multiple resources that must be closed
+  together.
+- The main goal is symmetry: everything opened in `__enter__` is cleaned up
+  in `__exit__`.
 
 ```python
 class FileProcessor:
@@ -207,38 +223,65 @@ with FileProcessor("input.txt", "output.txt") as processor:
 
 ## Advanced File Operations
 
+These examples show patterns you run into in real applications: coordinating
+concurrent access, working with temporary files, handling binary formats, and
+optimizing I/O.
+
 ### File Locking
 
 For concurrent access to files:
+
+Why/when:
+
+- Use locking when multiple workers/processes might read/write the same file.
+- Locking is OS-specific. The example below uses `fcntl` which is available on
+  Linux/macOS, but not on Windows.
 
 <details>
 <summary>Show file locking example</summary>
 
 ```python
-import fcntl
+from contextlib import contextmanager
+
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
+
 import os
 
 def acquire_file_lock(file_path):
-    """Acquire exclusive lock on file."""
+    """Acquire exclusive lock on a sidecar lock file and return its fd."""
+    if fcntl is None:
+        raise RuntimeError("fcntl-based locking is not available on Windows")
+
     lock_file = f"{file_path}.lock"
-
+    lock_fd = os.open(lock_file, os.O_CREAT | os.O_RDWR)
     try:
-        lock_fd = os.open(lock_file, os.O_CREAT | os.O_EXCL)
         fcntl.flock(lock_fd, fcntl.LOCK_EX)
-        return True
-    except OSError:
-        return False
+        return lock_fd
+    except Exception:
+        os.close(lock_fd)
+        raise
 
+@contextmanager
 def with_file_lock(file_path, mode="r"):
     """Context manager for file locking."""
-    if acquire_file_lock(file_path):
+    lock_file = f"{file_path}.lock"
+    lock_fd = acquire_file_lock(file_path)
+    try:
+        with open(file_path, mode) as file:
+            yield file
+    finally:
         try:
-            with open(file_path, mode) as file:
-                yield file
+            if fcntl is not None:
+                fcntl.flock(lock_fd, fcntl.LOCK_UN)
         finally:
-            os.remove(f"{file_path}.lock")
-    else:
-        raise IOError(f"Could not acquire lock for {file_path}")
+            os.close(lock_fd)
+            try:
+                os.remove(lock_file)
+            except OSError:
+                pass
 
 # Usage
 with with_file_lock("shared_data.txt") as file:
@@ -253,9 +296,17 @@ with with_file_lock("shared_data.txt") as file:
 <details>
 <summary>Show temporary files example</summary>
 
+Key takeaways:
+
+- Temporary files are useful for intermediate outputs (downloads, exports,
+  atomic writes).
+- Use `TemporaryDirectory()` when you need a scratch folder that is cleaned
+  up automatically.
+
 ```python
 import tempfile
 import shutil
+from pathlib import Path
 
 # Create temporary file
 with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
@@ -269,7 +320,7 @@ with open(temp_path, 'r') as persistent_file:
 
 # Temporary directory
 with tempfile.TemporaryDirectory() as temp_dir:
-    temp_file = temp_dir / "data.txt"
+    temp_file = Path(temp_dir) / "data.txt"
     temp_file.write_text("Temporary directory data")
     print(f"Temp dir: {temp_dir}")
 # Directory automatically cleaned up
@@ -282,6 +333,12 @@ with tempfile.TemporaryDirectory() as temp_dir:
 <details>
 <summary>Show file system monitoring example</summary>
 
+Why/when:
+
+- Monitoring folders is useful for small automation scripts.
+- For real applications, prefer dedicated libraries (e.g., watchdog) because
+  cross-platform filesystem events are tricky.
+
 ```python
 import os
 import time
@@ -290,17 +347,20 @@ from pathlib import Path
 def watch_directory(path, callback):
     """Simple file system watcher."""
     last_modified = {}
-
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            file_path = Path(root) / file
-            current_modified = file_path.stat().st_mtime
-
-            if file_path not in last_modified or current_modified > last_modified[file_path]:
-                last_modified[file_path] = current_modified
-                callback(file_path, "created" if file_path not in last_modified else "modified")
-
     print("Monitoring started...")
+
+    while True:
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                file_path = Path(root) / file
+                current_modified = file_path.stat().st_mtime
+
+                existed = file_path in last_modified
+                if (not existed) or (current_modified > last_modified[file_path]):
+                    last_modified[file_path] = current_modified
+                    callback(file_path, "modified" if existed else "created")
+
+        time.sleep(1)
 
 def file_changed_callback(file_path, event):
     print(f"File {file_path.name}: {event}")
@@ -420,18 +480,26 @@ except IOError as e:
 <details>
 <summary>Show cleanup-on-exit example</summary>
 
+Why/when:
+
+- Cleanup hooks can be useful for short-lived scripts that create temporary
+  artifacts.
+- Be careful: deleting broad directories (like the entire system temp folder)
+  is dangerous. Only delete paths your program created.
+
 ```python
 import atexit
 import tempfile
 import shutil
+from pathlib import Path
 
 def cleanup_on_exit():
     """Register cleanup function to run on program exit."""
-    # Remove temporary files
-    temp_dir = tempfile.gettempdir()
-    if os.path.exists(temp_dir):
-        shutil.rmtree(temp_dir)
-    print("Temporary files cleaned up")
+    # Remove only an app-specific temp directory
+    app_temp_dir = Path(tempfile.gettempdir()) / "my_app_tmp"
+    if app_temp_dir.exists():
+        shutil.rmtree(app_temp_dir)
+    print("App temporary files cleaned up")
 
 # Register cleanup
 atexit.register(cleanup_on_exit)
@@ -448,7 +516,12 @@ atexit.register(cleanup_on_exit)
 
 ```python
 # Buffering for better performance
-with open("large_file.txt", "r", buffering=8192) as file:
+filename = "large_file.txt"
+
+def process_line(line):
+    return line
+
+with open(filename, "r", buffering=8192) as file:
     # Larger buffer for better I/O performance
     data = file.read()  # Reads in larger chunks
 

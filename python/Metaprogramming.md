@@ -19,10 +19,21 @@ Python is dynamically typed, but as projects grow, type-related bugs become
 harder to spot. **Type hints** (PEP 484) let you annotate expected argument
 and return types.
 
+Why/when:
+
+- Type hints shine in larger codebases where refactors are common.
+- They improve IDE autocomplete and make APIs easier to understand.
+- They are optional: your code still runs without a type checker.
+
 Type hints do not change runtime behavior by default. They are primarily
 consumed by tools like `mypy` and by IDEs.
 
+Key takeaway: type hints are *metadata*, not runtime enforcement.
+
 ### Basic Syntax
+
+This example shows the simplest form: parameter annotations plus a return
+annotation.
 
 ```python
 def process_user_id(user_id: int) -> str:
@@ -30,6 +41,9 @@ def process_user_id(user_id: int) -> str:
 ```
 
 ### The `typing` module
+
+Use `typing` when you need to express richer intent than “plain Python types”
+can communicate (optionals, unions, protocols, generics).
 
 ```python
 from typing import Optional
@@ -52,6 +66,8 @@ Common `typing` concepts:
 
 Python stores annotations on functions and classes.
 
+Key takeaway: annotations are stored but not evaluated/enforced automatically.
+
 ```python
 def f(x: int, y: int) -> int:
     return x + y
@@ -64,24 +80,33 @@ If you need evaluated type hints (resolving forward references), use
 
 ## Introspection and Reflection
 
-{% tabs %}
+Key takeaway:
 
+- **Introspection** asks “what is this object?”
+- **Reflection** asks “can I change/call this object dynamically?”
+
+{% tabs %}
 {% tab title="Introspection" %}
 **Introspection** is examining objects at runtime (what is this object?
 what attributes does it have?).
 {% endtab %}
-
 {% tab title="Reflection" %}
 **Reflection** is changing behavior at runtime (setting attributes,
 dynamically calling functions, loading modules).
 {% endtab %}
-
 {% endtabs %}
 
 Frameworks use these ideas for routing, dependency injection, ORMs, and
 serialization.
 
 ### Common Introspection Tools
+
+Why/when:
+
+- Use `dir()`/`getattr()`/`hasattr()` when writing debuggers, serializers, CLIs,
+  or generic utilities.
+- Prefer direct attribute access in normal code; introspection is powerful but
+  easier to misuse.
 
 - `type(obj)`
 - `isinstance(obj, cls)`
@@ -110,6 +135,12 @@ print(spy.codename)
 The `inspect` module lets you inspect signatures, source code, and
 callability.
 
+Why/when:
+
+- Useful for building decorators, CLIs, validation layers, or plugin systems.
+- Helpful when you want to display callable signatures in docs or error
+  messages.
+
 ```python
 import inspect
 
@@ -125,6 +156,13 @@ print(sig)  # (name: str, excited: bool = False) -> str
 An **Abstract Base Class** defines a contract that subclasses must follow.
 If a subclass fails to implement an `@abstractmethod`, Python raises an
 error when you try to instantiate it.
+
+Key takeaway: ABCs are for *design-time guarantees* (interfaces/contracts).
+
+Why/when:
+
+- Use an ABC when you want a family of classes to share an API.
+- Prefer "duck typing" for small code; use ABCs when the abstraction matters.
 
 <details>
 <summary>Show ABC example</summary>
@@ -163,6 +201,8 @@ A **descriptor** is any object implementing one or more of:
 
 Descriptors are the mechanism behind `@property`, methods, and many ORM
 field systems.
+
+Key takeaway: descriptors are the low-level hook behind “smart attributes”.
 
 ### `@property` is a descriptor
 
@@ -224,6 +264,11 @@ p = Product(10)
 `__init_subclass__` runs automatically when a class is subclassed. This is a
 lightweight alternative to metaclasses for many use cases.
 
+Why/when:
+
+- Use it to auto-register plugins, validate subclasses, or enforce conventions.
+- It keeps the logic close to the base class without introducing a metaclass.
+
 <details>
 <summary>Show **init_subclass** registry example</summary>
 
@@ -247,6 +292,8 @@ print(PluginBase.registry)  # {'MyPlugin': <class '__main__.MyPlugin'>}
 
 In Python, classes are objects too. The default metaclass is `type`.
 
+Key takeaway: a metaclass is to a class what a class is to an instance.
+
 A **metaclass** can customize:
 
 - class creation (`__new__`)
@@ -254,6 +301,12 @@ A **metaclass** can customize:
 - instance creation (`__call__`)
 
 ### Singleton via metaclass
+
+Why/when:
+
+- This pattern is mostly educational. In real projects, singletons can make
+  code harder to test.
+- Prefer dependency injection or explicit shared objects when possible.
 
 <details>
 <summary>Show metaclass singleton example</summary>
