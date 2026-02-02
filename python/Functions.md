@@ -125,16 +125,17 @@ print(greet("Bob", "Hi"))  # Hi, Bob!
 
 Compare a mutable-default pitfall with the safer `None` pattern.
 
-{% tabs %}
-{% tab title="Bad: mutable default" %}
+#### Bad: mutable default
+
 ```python
 # Common pitfall: mutable default arguments
 def add_item(item, items=[]):  # BAD: list is shared across calls
     items.append(item)
     return items
 ```
-{% endtab %}
-{% tab title="Better: default None" %}
+
+#### Better: default None
+
 ```python
 # Better approach
 def add_item(item, items=None):
@@ -143,8 +144,6 @@ def add_item(item, items=None):
     items.append(item)
     return items
 ```
-{% endtab %}
-{% endtabs %}
 
 ### 2. Arbitrary Arguments: *args and **kwargs
 
@@ -482,8 +481,8 @@ Compare recursive, iterative, and tail-recursive styles.
 Key takeaway: Python does not optimize tail recursion, so “tail recursive”
 solutions still consume stack frames.
 
-{% tabs %}
-{% tab title="Recursive" %}
+#### Recursive
+
 ```python
 # Recursive approach (elegant but may hit recursion limit)
 def sum_recursive(lst):
@@ -491,8 +490,9 @@ def sum_recursive(lst):
         return 0
     return lst[0] + sum_recursive(lst[1:])
 ```
-{% endtab %}
-{% tab title="Iterative" %}
+
+#### Iterative
+
 ```python
 # Iterative approach (more efficient for large lists)
 def sum_iterative(lst):
@@ -501,8 +501,9 @@ def sum_iterative(lst):
         total += item
     return total
 ```
-{% endtab %}
-{% tab title="Tail recursion" %}
+
+#### Tail recursion
+
 ```python
 # Tail recursion optimization (Python doesn't optimize automatically)
 def sum_tail_recursive(lst, acc=0):
@@ -510,8 +511,6 @@ def sum_tail_recursive(lst, acc=0):
         return acc
     return sum_tail_recursive(lst[1:], acc + lst[0])
 ```
-{% endtab %}
-{% endtabs %}
 
 ### Practical Recursion Examples
 
@@ -774,8 +773,8 @@ Why/when:
 
 Compare a multi-responsibility function with smaller focused helpers.
 
-{% tabs %}
-{% tab title="Bad" %}
+#### Bad
+
 ```python
 # Bad: Does too many things
 def process_user_input(input_data):
@@ -786,8 +785,9 @@ def process_user_input(input_data):
     # Log activity
     pass
 ```
-{% endtab %}
-{% tab title="Good" %}
+
+#### Good
+
 ```python
 # Good: Single responsibility
 def validate_input(input_data):
@@ -805,8 +805,6 @@ def send_notification(user, message):
 def log_activity(activity):
     pass
 ```
-{% endtab %}
-{% endtabs %}
 
 ### Pure Functions
 
@@ -820,15 +818,16 @@ Key takeaways:
 
 Compare pure and impure behavior side-by-side.
 
-{% tabs %}
-{% tab title="Pure" %}
+#### Pure
+
 ```python
 # Pure function (predictable, testable)
 def add(a, b):
     return a + b
 ```
-{% endtab %}
-{% tab title="Impure" %}
+
+#### Impure
+
 ```python
 # Impure function (side effects)
 def add_and_print(a, b):
@@ -836,8 +835,6 @@ def add_and_print(a, b):
     print(f"Result: {result}")  # Side effect
     return result
 ```
-{% endtab %}
-{% endtabs %}
 
 ### Error Handling
 

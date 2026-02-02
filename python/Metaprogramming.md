@@ -85,16 +85,15 @@ Key takeaway:
 - **Introspection** asks “what is this object?”
 - **Reflection** asks “can I change/call this object dynamically?”
 
-{% tabs %}
-{% tab title="Introspection" %}
+#### Introspection
+
 **Introspection** is examining objects at runtime (what is this object?
 what attributes does it have?).
-{% endtab %}
-{% tab title="Reflection" %}
+
+#### Reflection
+
 **Reflection** is changing behavior at runtime (setting attributes,
 dynamically calling functions, loading modules).
-{% endtab %}
-{% endtabs %}
 
 Frameworks use these ideas for routing, dependency injection, ORMs, and
 serialization.

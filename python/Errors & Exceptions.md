@@ -256,8 +256,8 @@ except ZeroDivisionError as e:
 
 Context managers provide a clean way to handle resources that need setup and cleanup.
 
-{% tabs %}
-{% tab title="Traditional" %}
+#### Traditional
+
 ```python
 file = None
 try:
@@ -267,19 +267,28 @@ finally:
     if file is not None:
         file.close()
 ```
-{% endtab %}
-{% tab title="Context manager" %}
+
+#### Context manager
+
 ```python
 with open("data.txt", "w") as file:
     file.write("Hello, World!")
     # File automatically closed here
 ```
-{% endtab %}
-{% endtabs %}
 
 ### Creating Custom Context Managers
 
 ```python
+class DummyDatabase:
+    def query(self, sql):
+        return []
+
+    def close(self):
+        pass
+
+def connect_to_database(connection_string):
+    return DummyDatabase()
+
 class DatabaseConnection:
     def __init__(self, connection_string):
         self.connection_string = connection_string
@@ -318,6 +327,9 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+def risky_operation():
+    raise RuntimeError("Something went wrong")
 
 try:
     risky_operation()
@@ -378,6 +390,8 @@ except Exception as e:
 <summary>Show graceful degradation example</summary>
 
 ```python
+import logging
+
 class ServiceDegradationError(Exception):
     """Raised when a service is running in degraded mode."""
     pass
@@ -403,17 +417,30 @@ def get_data_with_fallback(primary_source, fallback_source):
 
 ### 1. Be Specific
 
-{% tabs %}
-{% tab title="Bad" %}
+#### Bad
+
 ```python
+def operation():
+    raise ValueError("Simulated failure")
+
 try:
     operation()
 except:
     pass  # Catches everything, including system exit
 ```
-{% endtab %}
-{% tab title="Good" %}
+
+#### Good
+
 ```python
+def operation():
+    raise ValueError("Simulated failure")
+
+def handle_specific_error(e):
+    print(f"Handled expected error: {e}")
+
+def handle_unexpected_error(e):
+    print(f"Handled unexpected error: {e}")
+
 try:
     operation()
 except (ValueError, TypeError) as e:
@@ -421,68 +448,69 @@ except (ValueError, TypeError) as e:
 except Exception as e:
     handle_unexpected_error(e)
 ```
-{% endtab %}
-{% endtabs %}
 
 ### 2. Fail Fast
 
-{% tabs %}
-{% tab title="Bad" %}
+#### Bad
+
 ```python
 def process_data(data):
     if not isinstance(data, list):
         return []  # Silent failure
     # Continue processing with empty list...
 ```
-{% endtab %}
-{% tab title="Good" %}
+
+#### Good
+
 ```python
 def process_data(data):
     if not isinstance(data, list):
         raise TypeError(f"Expected list, got {type(data).__name__}")
 ```
-{% endtab %}
-{% endtabs %}
 
 ### 3. Don't Suppress Important Errors
 
-{% tabs %}
-{% tab title="Bad" %}
+#### Bad
+
 ```python
+def load_config():
+    raise FileNotFoundError("config.json not found")
+
 try:
     config = load_config()
 except:
     config = {}  # Use default config, but problem might persist
 ```
-{% endtab %}
-{% tab title="Good" %}
+
+#### Good
+
 ```python
+def load_config():
+    raise FileNotFoundError("config.json not found")
+
 try:
     config = load_config()
 except FileNotFoundError:
     print("Configuration file missing!")
     raise  # Re-raise for caller to handle
 ```
-{% endtab %}
-{% endtabs %}
 
 ### 4. Provide Context
 
-{% tabs %}
-{% tab title="Bad" %}
+#### Bad
+
 ```python
 raise ValueError("Error in processing")
 ```
-{% endtab %}
-{% tab title="Good" %}
+
+#### Good
+
 ```python
 raise ValueError(
     f"Cannot process user {user_id}: "
     f"Invalid age {age}. Age must be between 0 and 120."
 )
 ```
-{% endtab %}
-{% endtabs %}
 
 ### 5. Use Type Hints
 

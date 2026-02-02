@@ -303,8 +303,8 @@ print(f"Area: {rect.area}, Perimeter: {rect.perimeter}")
 - `@classmethod`: Receives the class (`cls`) as first argument. Used for "factory methods" that create instances in different ways.
 - `@staticmethod`: Receives neither `self` nor `cls`. It's just a regular function that lives inside the class namespace because it's logically related.
 
-{% tabs %}
-{% tab title="@staticmethod" %}
+#### @staticmethod
+
 ```python
 class DateConverter:
     @staticmethod
@@ -314,8 +314,9 @@ class DateConverter:
 # Static method usage
 print(DateConverter.is_valid_year(2024))  # True
 ```
-{% endtab %}
-{% tab title="@classmethod" %}
+
+#### @classmethod
+
 ```python
 class DateConverter:
     @staticmethod
@@ -334,8 +335,6 @@ class DateConverter:
 date_obj = DateConverter.from_string("25/12/2024")
 print(date_obj)  # DateConverter instance
 ```
-{% endtab %}
-{% endtabs %}
 
 ## Advanced OOP Concepts
 

@@ -26,8 +26,8 @@ Before context managers, you had to manually close files. If an error occurred b
 Key takeaway: prefer `with open(...) as f:` so cleanup happens even if an
 exception is raised.
 
-{% tabs %}
-{% tab title="Manual close" %}
+#### Manual close
+
 ```python
 f = open("data.txt", "w")
 f.write("Hello World")
@@ -35,8 +35,9 @@ f.write("Hello World")
 # If a crash happens here, the file stays open
 f.close()
 ```
-{% endtab %}
-{% tab title="with statement" %}
+
+#### with statement
+
 ```python
 with open("data.txt", "r") as file:
     content = file.read()
@@ -44,8 +45,6 @@ with open("data.txt", "r") as file:
 
 # File is automatically closed here
 ```
-{% endtab %}
-{% endtabs %}
 
 ### The `with` Statement (Context Managers)
 
@@ -144,8 +143,8 @@ The context manager contract is:
 
 ### 1. Class-based (`__enter__` and `__exit__`)
 
-{% tabs %}
-{% tab title="Class-based" %}
+#### Class-based
+
 ```python
 class DatabaseConnection:
     def __enter__(self):
@@ -162,8 +161,9 @@ class DatabaseConnection:
 with DatabaseConnection() as db:
     print("Executing queries...")
 ```
-{% endtab %}
-{% tab title="Generator-based (contextlib)" %}
+
+#### Generator-based (contextlib)
+
 ```python
 from contextlib import contextmanager
 
@@ -176,8 +176,6 @@ def temp_header():
 with temp_header():
     print("I am the middle of a sandwich.")
 ```
-{% endtab %}
-{% endtabs %}
 
 ### 2. Generator-based (`contextlib`)
 

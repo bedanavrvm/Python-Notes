@@ -15,26 +15,26 @@ This tabbed example compares the most common import styles:
 - `from module import name` pulls specific names into your local scope.
 - The trade-off is clarity vs. brevity: explicit module prefixes make large codebases easier to read.
 
-{% tabs %}
-{% tab title="calculator.py" %}
+#### calculator.py
+
 ```python
 def add(a, b):
     return a + b
 ```
-{% endtab %}
-{% tab title="main.py (import module)" %}
+
+#### main.py (import module)
+
 ```python
 import calculator
 print(calculator.add(5, 3))
 ```
-{% endtab %}
-{% tab title="main.py (from ... import ...)" %}
+
+#### main.py (from ... import ...)
+
 ```python
 from calculator import add
 print(add(5, 3))
 ```
-{% endtab %}
-{% endtabs %}
 
 ### Module Search Path (`sys.path`)
 
@@ -155,14 +155,15 @@ When working within a package, you have two ways to reference other modules.
 
 Specifies the full path from the project's root folder. This is the preferred method (PEP 8) because it is clear and unambiguous.
 
-{% tabs %}
-{% tab title="Absolute" %}
+#### Absolute
+
 ```python
 # Inside effects.py
 from graphics.primitives import draw_line
 ```
-{% endtab %}
-{% tab title="Relative" %}
+
+#### Relative
+
 ```python
 # Inside effects.py
 from .primitives import draw_line
@@ -171,8 +172,6 @@ from .primitives import draw_line
 # If you try to run effects.py as a standalone script,
 # relative import will fail.
 ```
-{% endtab %}
-{% endtabs %}
 
 ### 2. Relative Imports
 
@@ -459,8 +458,8 @@ Isolating package dependencies:
 Key takeaway: a virtual environment isolates dependencies per project, which
 prevents version conflicts.
 
-{% tabs %}
-{% tab title="Linux/macOS" %}
+#### Linux/macOS
+
 ```bash
 # Create virtual environment
 python -m venv my_env
@@ -474,8 +473,9 @@ pip install requests numpy pandas
 # Freeze dependencies
 pip freeze > requirements.txt
 ```
-{% endtab %}
-{% tab title="Windows" %}
+
+#### Windows
+
 ```bash
 # Create virtual environment
 python -m venv my_env
@@ -489,8 +489,6 @@ pip install requests numpy pandas
 # Freeze dependencies
 pip freeze > requirements.txt
 ```
-{% endtab %}
-{% endtabs %}
 
 #### Version Management
 
@@ -554,12 +552,16 @@ Why/when:
 # └── __init__.py
 
 # In __init__.py
-import pkg_resources
 import json
+from importlib import resources
 
 def load_config():
-    with pkg_resources.resource_stream("my_package", "data/config.json") as f:
-        return json.load(f)
+    config_text = (
+        resources.files("my_package")
+        .joinpath("data", "config.json")
+        .read_text(encoding="utf-8")
+    )
+    return json.loads(config_text)
 ```
 
 </details>

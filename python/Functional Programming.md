@@ -95,14 +95,15 @@ Key takeaway:
 - A list comprehension builds the full list immediately.
 - A generator expression builds an iterator that produces values on demand.
 
-{% tabs %}
-{% tab title="List (eager)" %}
+#### List (eager)
+
 ```python
 # List comprehension (creates full list in memory)
 squares_list = [x**2 for x in range(1000000)]
 ```
-{% endtab %}
-{% tab title="Generator (lazy)" %}
+
+#### Generator (lazy)
+
 ```python
 # Generator expression (creates generator object)
 squares_gen = (x**2 for x in range(1000000))
@@ -111,8 +112,6 @@ print(squares_gen)  # <generator object <genexpr> at 0x...>
 print(next(squares_gen))  # 0
 print(next(squares_gen))  # 1
 ```
-{% endtab %}
-{% endtabs %}
 
 ### Advanced Generator Patterns
 
@@ -305,15 +304,16 @@ Apply a function to all items in an iterable:
 
 Key takeaway: `map(func, items)` applies `func` to each item.
 
-{% tabs %}
-{% tab title="lambda" %}
+#### lambda
+
 ```python
 numbers = [1, 2, 3, 4, 5]
 squared = list(map(lambda x: x**2, numbers))
 print(squared)  # [1, 4, 9, 16, 25]
 ```
-{% endtab %}
-{% tab title="named function" %}
+
+#### named function
+
 ```python
 numbers = [1, 2, 3, 4, 5]
 
@@ -323,8 +323,6 @@ def double(x):
 doubled = list(map(double, numbers))
 print(doubled)  # [2, 4, 6, 8, 10]
 ```
-{% endtab %}
-{% endtabs %}
 
 ### filter()
 
@@ -332,15 +330,16 @@ Select items from an iterable based on a condition:
 
 Key takeaway: `filter(pred, items)` keeps items where `pred(item)` is truthy.
 
-{% tabs %}
-{% tab title="lambda" %}
+#### lambda
+
 ```python
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 evens = list(filter(lambda x: x % 2 == 0, numbers))
 print(evens)  # [2, 4, 6, 8, 10]
 ```
-{% endtab %}
-{% tab title="named function" %}
+
+#### named function
+
 ```python
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -355,8 +354,6 @@ def is_prime(n):
 primes = list(filter(is_prime, numbers))
 print(primes)  # [2, 3, 5, 7]
 ```
-{% endtab %}
-{% endtabs %}
 
 ### reduce()
 
