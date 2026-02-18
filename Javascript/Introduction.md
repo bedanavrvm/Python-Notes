@@ -135,8 +135,8 @@ The traditional first program prints a message.
 ```js
 console.log("Hello, world!");
 ```
-- **Execution**: Runs directly in the runtime (Browser/Node).
-- **Difference**: Plain JavaScript logic without extra annotations.
+**Execution**: Runs directly in the runtime (Browser/Node).
+**Difference**: Plain JavaScript logic without extra annotations.
 {% endtab %}
 
 {% tab title="TypeScript" %}
@@ -144,8 +144,8 @@ console.log("Hello, world!");
 const message: string = "Hello, world!";
 console.log(message);
 ```
-- **Execution**: After compilation, it becomes plain JavaScript.
-- **Difference**: Adds type information (`: string`). TypeScript exists only during development.
+**Execution**: After compilation, it becomes plain JavaScript.
+**Difference**: Adds type information (`: string`). TypeScript exists only during development.
 {% endtab %}
 {% endtabs %}
 
