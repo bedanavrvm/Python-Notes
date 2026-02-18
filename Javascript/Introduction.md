@@ -134,7 +134,6 @@ The traditional first program prints a message.
 ```js
 console.log("Hello, world!");
 ```
-{% endcode %}
 
 **Execution**: Runs directly in the runtime (Browser/Node).
 
@@ -147,7 +146,6 @@ console.log("Hello, world!");
 const message: string = "Hello, world!";
 console.log(message);
 ```
-{% endcode %}
 
 **Execution**: After compilation, it becomes plain JavaScript.
 
@@ -187,14 +185,10 @@ After compilation, the browser runs only the resulting JavaScript.
 
 {% tab title="TypeScript" %}
 - Create `hello.ts`:
-
-{% code %}
 ```ts
-const message: string = "Hello from Node.js!";
-console.log(message);
+  const message: string = "Hello from Node.js!";
+  console.log(message);
 ```
-{% endcode %}
-
 - Compile: `tsc hello.ts`
 - Run the resulting JS: `node hello.js`
 - **Result**: Node runs the emitted JavaScript; TypeScript disappears after compilation.
@@ -212,7 +206,6 @@ console.log(message);
 let count = 1;
 count = count + 1;
 ```
-{% endcode %}
 
 - No built-in type annotations.
 {% endtab %}
@@ -223,7 +216,6 @@ count = count + 1;
 let count: number = 1;
 count = count + 1;
 ```
-{% endcode %}
 
 - Declares the variable type (`: number`).
 - **Runtime behavior**: Identical to JS.
