@@ -224,6 +224,13 @@ my-ts-project/
 
 This is a **modern workflow for TypeScript development** that avoids the pain of manually compiling your code every time.
 
+{% hint style="info" %}
+`tsc` - The TypeScript Compiler. Purpose: Convert TypeScript (`.ts`) into JavaScript (`.js`)
+
+`tsx` = tool similar to `ts-node`, but **faster and more modern.** Purpose: Run TypeScript files directly without manual compilation **(**&#x44;evelopment)\
+`node` **-** Runs **pre-compiled JS** → stable, fast, no TS overhead (Production)
+{% endhint %}
+
 ```json
 {
   "scripts": {
