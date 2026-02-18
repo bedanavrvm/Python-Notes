@@ -343,8 +343,7 @@ When debugging, source maps allow you to see your original `.ts` or source code 
 
 ## Tasks
 
-&#x20; 1\.  **Check Node Version**: Run `node -v` in your terminal.
-
+1. **Check Node Version**: Run `node -v` in your terminal.
 2. **Examine package.json**: Open a project and identify the `scripts` and `dependencies`.
 3.  **Semver Check**: Look at your version ranges. Are you using `^` or `~`?
 
