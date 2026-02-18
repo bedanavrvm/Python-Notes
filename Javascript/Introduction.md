@@ -2,7 +2,7 @@
 
 JavaScript (JS) is the programming language of the web.
 
-* <mark style="color:orange;">**JavaScript**</mark> answers: _what does the program do when it runs?_
+* <mark style="color:$primary;">**JavaScript**</mark> answers: _what does the program do when it runs?_
 * <mark style="color:$primary;">**TypeScript**</mark> answers: _can we catch some mistakes before it runs?_
 
 Think of them like this:
@@ -118,7 +118,7 @@ fs.readFile("file.txt", "utf8", (err, data) => {
 
 Browsers would never allow this — it would be a massive security risk.
 
-## The Big Idea
+## 3. The Big Idea
 
 JavaScript by itself is just a programming language. But it becomes powerful because of the runtime it lives inside. The runtime:
 
@@ -128,7 +128,7 @@ JavaScript by itself is just a programming language. But it becomes powerful bec
 
 This explains why some code works in the browser but not in Node, and vice-versa. The engine executes the logic, but the runtime gives it the body to interact with the world.
 
-## Your First Program: JavaScript vs TypeScript
+### Your First Program: JavaScript vs TypeScript
 
 The traditional first program prints a message.
 
@@ -204,21 +204,31 @@ console.log("Hello from Node.js!");
 {% endtab %}
 {% endtabs %}
 
-\## Code Structure: JS vs TS Side-by-Side
+### Code Structure: JS vs TS Side-by-Side
 
-### Statements\`
+### Statements:
 
-let count = 1; count = count + 1;
+{% tabs %}
+{% tab title="JavaScript" %}
+```javascript
+let count = 1; 
+count = count + 1;
+```
 
-````
+* No built-in type annotations.
+{% endtab %}
 
-- No built-in type annotations.</div><div data-gb-custom-block data-tag="tab" data-title='TypeScript'><div data-gb-custom-block data-tag="code"></div>```ts
+{% tab title="TypeScript" %}
+```typescript
 let count: number = 1;
 count = count + 1;
-````
+```
 
-* Declares the variable type (`: number`).
-* **Runtime behavior**: Identical to JS.### Semicolons: JavaScript vs TypeScript
+* Declares the variable type (\`: number\`).
+{% endtab %}
+{% endtabs %}
+
+### Semicolons:
 
 Semicolons are technically optional in both, but the practical usage differs.
 
@@ -240,7 +250,7 @@ Same syntax in both; TypeScript does not change comment behavior.
    comment */
 ```
 
-## Strict Mode: The Most Confusing “Strict”
+### Strict Mode: The Most Confusing “Strict”
 
 The word "strict" means something completely different in JS and TS.
 
@@ -265,7 +275,7 @@ Enabled via a setting in `tsconfig.json`: `{"strict": true}`. It affects **compi
 
 ***
 
-## The Core Mental Model
+## 4. The Core Mental Model
 
 Whenever you learn something new in the JS/TS ecosystem, ask:
 
@@ -278,13 +288,20 @@ Whenever you learn something new in the JS/TS ecosystem, ask:
 
 JavaScript is the engine’s language. TypeScript is a **safety layer** on top of it. They share the same runtime, the same execution model, and the same syntax foundation. TypeScript just adds a static type system to catch bugs early.
 
-## Tasks- **Task 1 (Browser)**: Open DevTools and run a `console.log` message.
+### Tasks
 
+{% tabs %}
+{% tab title="JavaScript " %}
+* **Task 1 (Browser): Open DevTools and run a console.log message.**
 * **Task 2 (Node.js)**: Create `hello.js` and run it using `node hello.js`.
-*   **Task 3 (ASI)**: Try writing code without semicolons and see if it runs in the browser console.
+* **Task 3 (ASI)**: Try writing code without semicolons and see if it runs in the browser console.
+{% endtab %}
 
-    \- **Task 1 (Workflow)**: Write a `.ts` file, compile it using `tsc`, and run the resulting `.js` file.
+{% tab title="TypeScript" %}
+* **Task 1 (Workflow)**: Write a `.ts` file, compile it using `tsc`, and run the resulting `.js` file.
 * **Task 2 (Type Safety)**: In a TS file, declare a `number` and try to assign a `string`. Observe the compiler error.
+{% endtab %}
+{% endtabs %}
 
 ## Important things to know
 
