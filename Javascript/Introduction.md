@@ -128,14 +128,14 @@ This explains why some code works in the browser but not in Node, and vice-versa
 
 The traditional first program prints a message.
 
-
-
 {% tabs %}
 {% tab title="JavaScript" %}
 ```js
 console.log("Hello, world!");
 ```
+
 **Execution**: Runs directly in the runtime (Browser/Node).
+
 **Difference**: Plain JavaScript logic without extra annotations.
 {% endtab %}
 
@@ -144,14 +144,14 @@ console.log("Hello, world!");
 const message: string = "Hello, world!";
 console.log(message);
 ```
+
 **Execution**: After compilation, it becomes plain JavaScript.
+
 **Difference**: Adds type information (`: string`). TypeScript exists only during development.
 {% endtab %}
 {% endtabs %}
 
 ### Run it in the Browser
-
-
 
 {% tabs %}
 {% tab title="JavaScript" %}
@@ -174,8 +174,6 @@ After compilation, the browser runs only the resulting JavaScript.
 
 ### Run it with Node.js
 
-
-
 {% tabs %}
 {% tab title="JavaScript" %}
 - Create `hello.js`: `console.log("Hello from Node.js!");`
@@ -185,10 +183,10 @@ After compilation, the browser runs only the resulting JavaScript.
 
 {% tab title="TypeScript" %}
 - Create `hello.ts`:
-  ```ts
+```ts
   const message: string = "Hello from Node.js!";
   console.log(message);
-  ```
+```
 - Compile: `tsc hello.ts`
 - Run the resulting JS: `node hello.js`
 - **Result**: Node runs the emitted JavaScript; TypeScript disappears after compilation.
@@ -205,6 +203,7 @@ After compilation, the browser runs only the resulting JavaScript.
 let count = 1;
 count = count + 1;
 ```
+
 - No built-in type annotations.
 {% endtab %}
 
@@ -213,6 +212,7 @@ count = count + 1;
 let count: number = 1;
 count = count + 1;
 ```
+
 - Declares the variable type (`: number`).
 - **Runtime behavior**: Identical to JS.
 {% endtab %}
