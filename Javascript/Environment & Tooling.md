@@ -1,17 +1,16 @@
-# Chapter 2 — Environment & Tooling
-
-(Learning JavaScript and TypeScript Together)
+# 2. Environment & Tooling
 
 This chapter answers one practical question: **How does my code actually run, and what tools sit between me and the runtime?**
 
-- **JavaScript** runs directly in a runtime.
-- **TypeScript** requires a build step before reaching that runtime.
+* **JavaScript** runs directly in a runtime.
+* **TypeScript** requires a build step before reaching that runtime.
 
 ## 1. Where JavaScript Runs
 
 JavaScript always runs inside a runtime environment. While runtimes provide the "body" for the code (as seen in Chapter 1), here we focus on the practical API differences.
 
 ### JavaScript in the Browser
+
 The browser runtime provides APIs for UI and network interaction.
 
 ```js
@@ -19,127 +18,171 @@ setTimeout(() => {
   console.log("Timer done");
 }, 1000);
 ```
-- **setTimeout**: Provided by the browser runtime (Web API).
-- **Function**: The arrow function `() => { ... }` runs after 1000ms.
-- **Constraint**: This works in browsers because they provide the timer system.
+
+* **setTimeout()**: is a function provided by the browser runtime (Web API) that takes **two main arguments**:
+  * **Callback Function**: The arrow function defined`() => { ... }` runs after 1000ms.
+  * **Delay:** After 1 second, the function runs and logs the message.
+
+This works in browsers because they provide the timer system.
 
 ### JavaScript in Node.js
+
 Node.js provides APIs for server-side tasks like file handling.
 
 ```js
 const fs = require("fs");
 
 fs.readFile("data.txt", "utf8", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
   console.log(data);
 });
 ```
-- **require("fs")**: Imports Node’s file system module.
-- **readFile**: Reads a file asynchronously.
-- **Callback**: `(err, data) => {}` handles the result; `err` for errors, `data` for content.
-- **Constraint**: This will **NOT** work in the browser.
+
+* **require("fs")**: Imports Node’s file system module.&#x20;
+* **fs.readFile()**: Reads a file asynchronously & takes **3 main arguments:**
+  * **File path :** **`"data.txt"`** is the filename.
+  * **Encoding (optional):** **`"utf8"`** specifies text encoding
+  * **Callback Function:** `(err, data) => {}` handles the result;&#x20;
+    * `err` contains an error if something went wrong.&#x20;
+    * `data` contains the result if successful.
+* **Constraint**: This will **NOT** work in the browser.
 
 ## 2. How TypeScript Fits Into This
 
-JavaScript runs directly. TypeScript adds a mandatory build step: **Type-check → Compile → Execute**.
+JavaScript runs directly. TypeScript adds a mandatory build step:&#x20;
 
-### Minimal Setup: Running a File
+**Type-check → Compile(To JS) → Execute**.
 
-
+### Minimal Setup: Running a File- **File**: `index.js/ts`
 
 {% tabs %}
-{% tab title="JavaScript" %}
-- **File**: `index.js`
-  ```js
-  console.log("Hello JS");
-  ```
-- **Execution**: `node index.js`
-- **Fact**: Node executes the file directly. No build step required.
+{% tab title="index.js" %}
+```js
+console.log("Hello JS");
+```
+
+* **Execution**: `node index.js`
+* **Fact**: Node executes the file directly. No build step required.
 {% endtab %}
 
-{% tab title="TypeScript" %}
-- **File**: `src/index.ts`
-  ```ts
-  console.log("Hello TS");
-  ```
-- **Execution**:
+{% tab title="src/index.ts" %}
+```ts
+console.log("Hello TS");
+```
+
+* **Execution**:
   1. **Compile**: `npx tsc` (reads `tsconfig.json`, outputs JS to `dist/`).
   2. **Run**: `node dist/index.js`
-- **Fact**: The runtime cannot execute `.ts`. It only runs the emitted JavaScript.
+* **Fact**: The runtime cannot execute `.ts`. It only runs the emitted JavaScript.
 {% endtab %}
 {% endtabs %}
 
+
+
 ## 3. Node Version Management
 
-"It works on my machine" often means "your version of Node is different than mine." Node versions update frequently, and older code might break on newer versions (or vice versa).
+"It works on my machine (I don't know why it doesn't on yours)" often means "your version of Node is different than mine." Node versions update frequently, and older code might break on newer versions (or vice versa).
 
 ### Managing Versions with Tools
+
 Developers use **Version Managers** to quickly switch between versions:
-- **nvm (Node Version Manager)**: The classic choice for macOS/Linux.
-- **nvm-windows**: The standard for Windows users.
-- **fnm / volta**: Modern, fast alternatives written in newer languages like Rust.
+
+* **nvm (Node Version Manager)**: The classic choice for macOS/Linux.
+* **nvm-windows**: The standard for Windows users.
+* **fnm / volta**: Modern, fast alternatives written in newer languages like Rust.
 
 ### Pining the Version
+
 Projects use configuration files to tell these tools exactly which version to use:
-- **`.nvmrc`**: A simple file containing just the version (e.g., `18.17.0`).
-- **`.node-version`**: A more modern, tool-agnostic version of the same idea.
 
-When you enter a project folder, your version manager sees these files and says: *"Hey, you should be using Node 18 here,"* and switches for you.
+* **`.nvmrc`**: A simple file containing just the version (e.g., `18.17.0`).
+* **`.node-version`**: A more modern, tool-agnostic version of the same idea.
 
-## 4. The node_modules Directory
+When you enter a project folder, your version manager sees these files and says: _"Hey, you should be using Node 18 here,"_ and switches for you.
+
+## 4. The node\_modules Directory
 
 When you install a package, it gets downloaded into a folder called `node_modules`.
 
-- **Where your code lives**: `src/`
-- **Where other people's code lives**: `node_modules/`
+* **Where your code lives**: `src/`
+* **Where other people's code lives**: `node_modules/`
 
 ### Important Rules
-1. **Never Edit node_modules**: If you change code inside this folder, your changes will be deleted the next time you (or a teammate) run `npm install`.
-2. **Never Commit to Git**: This folder can contain thousands of files and take up GBs of space. We use a `.gitignore` file to tell Git to ignore it. 
+
+1. **Never Edit node\_modules**: If you change code inside this folder, your changes will be deleted the next time you (or a teammate) run `npm install`.
+2.  **Never Commit to Git**: This folder can contain thousands of files and take up GBs of space. We use a `.gitignore` file to tell Git to ignore it.&#x20;
+
+    ```
+    node_modules/
+    .env
+    dist/
+    npm-debug.log
+    ```
 3. **The "Black Hole"**: Because it contains every dependency of your dependencies (and their dependencies too!), it can grow massive very quickly.
 
 ### How to Restore
+
 If you delete your `node_modules`, don't panic! Just run `npm install`. The package manager will look at your **lockfile**, download everything again, and rebuild the folder perfectly.
 
 ## 5. Package Managers and Lockfiles
 
 Every modern project revolves around `package.json` and a **lockfile**.
 
-- **package.json**: Defines project name, dependencies, and `scripts`. This is the file you **manually edit** to add or update libraries.
-- **Lockfiles**: These are **automatically generated** by your package manager and should **never be edited manually**.
-  - **npm** generates `package-lock.json`
-  - **Yarn** generates `yarn.lock`
-  - **pnpm** generates `pnpm-lock.yaml`
-  
-  **Why they matter**: While `package.json` uses ranges (like `^1.2.3`), the lockfile "freezes" the exact version used at the moment of installation. This ensures that every developer on the team has the exact same code in their `node_modules`.
+* **package.json**: Defines project name, dependencies, and `scripts`. This is the file you **manually edit** to add or update libraries.
+*   **Lockfiles**: These are **automatically generated** by your package manager and should **never be edited manually**.
+
+    * **npm** generates `package-lock.json`
+    * **Yarn** generates `yarn.lock`
+    * **pnpm** generates `pnpm-lock.yaml`
+
+    **Why they matter**: While `package.json` uses ranges (like `^1.2.3`), the lockfile "freezes" the exact version used at the moment of installation. This ensures that every developer on the team has the exact same code in their `node_modules`.
 
 ### Identifying Your Manager
+
 You can tell which package manager a project uses just by looking at the lockfile in the root directory. If you see a `yarn.lock`, use `yarn install`. If you see `package-lock.json`, use `npm install`. Mixing them can lead to broken dependencies!
 
 ### Dependency Versions (Semver)
+
 Versions follow `MAJOR.MINOR.PATCH` (e.g., `1.2.3`).
-- **^1.2.3**: (~1.x.x) Allows Minor and Patch updates.
-- **~1.2.3**: (~1.2.x) Allows only Patch updates.
-- **1.2.3**: Exact version required.
+
+* **^1.2.3**: (\~1.x.x) Allows Minor and Patch updates.
+* **\~1.2.3**: (\~1.2.x) Allows only Patch updates.
+* **1.2.3**: Exact version required.
 
 ## 6. Recommended Project Structure
 
 A common layout separates source from output:
 
-```text
-my_project/
-  package.json
-  src/
-    index.ts   <-- Your source code
-  dist/
-    index.js   <-- Compiled output (for TS)
-```
-
-### Scripts: JS vs TS Comparisons
-
-
-
 {% tabs %}
 {% tab title="JavaScript Project" %}
+```
+my-js-project/
+├── package.json
+└── src/
+    └── index.js    ← Your source code (runs directly)
+```
+{% endtab %}
+
+{% tab title="TypeScript Project" %}
+```
+my-ts-project/
+├── package.json
+├── tsconfig.json
+├── src/
+│   └── index.ts    ← Your source code (cannot run directly)
+└── dist/
+    └── index.js    ← Compiled output (this is what actually runs)
+```
+{% endtab %}
+{% endtabs %}
+
+### Scripts (package.json): JS vs TS Comparisons
+
+{% tabs %}
+{% tab title="JS(package.json)" %}
 ```json
 {
   "name": "my-js-project",
@@ -149,11 +192,13 @@ my_project/
   }
 }
 ```
-- No build step; `start` runs the source directly.
+
+* **`"type": "module"`** tells Node to treat .js files as ES modules (so you can use import/export)
+* **`"start": "node src/index.js"`**— just run your source file directly. No intermediate step, what you write is what runs.
 {% endtab %}
 
-{% tab title="TypeScript Project" %}
-```json
+{% tab title="TS(package.json)" %}
+```typescript
 {
   "name": "my-ts-project",
   "type": "module",
@@ -166,19 +211,48 @@ my_project/
   }
 }
 ```
-- `build` runs the compiler; `start` runs the emitted JS.
+
+**`"build": "tsc"`** - runs the TypeScript compiler, which reads your `.ts` files and outputs plain `.js` files into a `dist/` folder
+
+**`"start": "node dist/index.js"` -** runs the _compiled output_, not your source. You never run the `.ts` file directly.
+
+**`"devDependencies" -`** lists `typescript` as a dev dependency, meaning it's only needed during development/compilation, not in production. The final deployed code is just plain JS.
 {% endtab %}
 {% endtabs %}
 
-## 7. Development Tools (TypeScript)
+## &#x20;7. Development Tools (TypeScript)
+
+This is a **modern workflow for TypeScript development** that avoids the pain of manually compiling your code every time.
+
+```json
+{
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  }
+}
+```
 
 Rebuilding manually is slow. Developers use tools like `tsx` for faster feedback:
-- **`tsx src/index.ts`**: Runs TS directly in development (internal compilation happens automatically).
-- **`tsc --noEmit`**: Type-check only. Useful for CI/CD pipelines where you don't need JS output yet.
+
+* `"dev":`` `**`tsx src/index.ts:`** Runs TS directly in development (internal compilation happens automatically).
+  * `npm run dev`
+* `"typecheck":`` `**`tsc --noEmit:`** Type-check only. Useful for CI/CD pipelines where you don't need JS output yet.
+  * `npm run typecheck`
+* `"build": "tsc"`→ compile for production.
+  * `npm run build`
+* `"start": "node dist/index.js"` → run compiled JS.
+  * `npm run start`
+
+{% hint style="info" %}
+All **`scripts` in `package.json` are** convenient shortcuts for long commands you’d otherwise type in the terminal.
+{% endhint %}
 
 ## 8. tsconfig.json (The Brain of TS)
 
-This file tells the TypeScript compiler how to behave. Without it, the compiler doesn't know where your files are or what kind of JavaScript you want to create.
+This file tells the **TypeScript compiler** how to behave. Without it, the compiler doesn't know where your files are or what kind of JavaScript you want to create.
 
 ### Code Example: tsconfig.json
 
@@ -206,56 +280,74 @@ This file tells the TypeScript compiler how to behave. Without it, the compiler 
 ```
 
 ### Key Settings Explained
-- **target**: If your code needs to run on very old browsers, you might set this to `ES5`. If it's for a modern server, `ES2020` is great.
-- **lib**: Tells TS which "Global" objects exist. For a browser project, you'd add `"DOM"`.
-- **strict**: This is the "Professional Switch." Turning this on makes the compiler harder to satisfy, but catches significantly more bugs.
+
+* **target**: If your code needs to run on very old browsers, you might set this to `ES5`. If it's for a modern server, `ES2020` is great.
+* **module:** Determines **how modules (`import` / `export`) are handled**.
+  * `"CommonJS"` → classic Node module system (`require`, `module.exports`)
+  * `"ESNext"` → preserves ES module syntax (`import/export`) in output
+  * `"NodeNext"` → TypeScript will follow Node.js’s ESM support rules, e.g., `.js` vs `.ts` extensions and package `"type": "module"`
+* **outDir:** Where compiled JavaScript goes.
+* **rootDir:** Where your source files lives. You can have multiple source folders with `"rootDirs": ["src", "shared"]`
+* **strict:** Turns on all strict type checking options. They include:
+  * `noImplicitAny`
+  * `strictNullChecks`
+  * `strictFunctionTypes`
+  * `strictBindCallApply`
+  * `strictPropertyInitialization`
+  * `noImplicitThis`
+  * `alwaysStrict`
+* **noImplicitAny:** Forces TypeScript to **complain when a variable has no type annotation** and TS can’t infer it. Eg `let x; // ❌ error if noImplicitAny is true`
+* **skipLibCheck:** Tells TypeScript to skip type checking of `node_modules` or external libraries.
+* **sourceMap:** Generates `.map` files alongside compiled JS. This allows debuggers (VS Code, Chrome DevTools) to map JS back to original TS.
+* **include:** Only compile files inside `src/`.
+  * Wildcards:
+    * `**/*` → recursive - everything inside `src/` and subfolders, no matter how deeply nested
+    * `*.ts` → only TypeScript files at that level
+  * **Alternative:**
+    * `"exclude": ["node_modules", "dist"]` → skip certain folders
 
 ## 9. Development Guards
 
 ### Linting vs Type-Checking
-- **TypeScript** checks if your **types** are correct (e.g., "is this a number?").
-- **Linting (ESLint)** checks for **code quality** (e.g., "did you forget an `await`?", "is this variable unused?").
-- **Formatting (Prettier)** ensures everyone's code looks identical.
+
+* **TypeScript** checks if your **types** are correct (e.g., "is this a number?").
+* **Linting (ESLint)** checks for **code quality** (e.g., "did you forget an `await`?", "is this variable unused?").
+* **Formatting (Prettier)** ensures everyone's code looks identical.
 
 ### Testing
+
 Types do not guarantee runtime correctness. Logic bugs (e.g., `1 + 1 = 3`) will pass type-checking but fail tests. **Type safety ≠ logic correctness.**
 
 ### Source Maps
+
 When debugging, source maps allow you to see your original `.ts` or source code in the debugger/stack trace, even though the runtime is executing compiled `.js`.
 
----
+***
 
 ## Important things to know
 
 ### Keywords & Extensions
 
-- **Semver**: Semantic Versioning (Major.Minor.Patch).
-- **Lockfile**: A file that "freezes" exact dependency versions to ensure consistency for all developers.
-- **Sandbox**: The secure environment in a browser that prevents JS from touching your files.
-- **Callback**: A function passed to another function to be executed later (found in Node APIs).
-- **ASI**: Automatic Semicolon Insertion; the JS engine's attempt to guess where semicolons belong.
-- **Development Dependency**: A tool (like `typescript` or `eslint`) needed to build/check code, but not needed to run the final app.
+* **Semver**: Semantic Versioning (Major.Minor.Patch).
+* **Lockfile**: A file that "freezes" exact dependency versions to ensure consistency for all developers.
+* **Sandbox**: The secure environment in a browser that prevents JS from touching your files.
+* **Callback**: A function passed to another function to be executed later (found in Node APIs).
+* **ASI**: Automatic Semicolon Insertion; the JS engine's attempt to guess where semicolons belong.
+* **Development Dependency**: A tool (like `typescript` or `eslint`) needed to build/check code, but not needed to run the final app.
 
 ### Concepts for Later
 
-- **CI (Continuous Integration)**: Automated pipelines that run your `typecheck`, `lint`, and `test` scripts whenever you change code.
-- **Bundlers**: Tools (like Vite or Webpack) that combine many small files into one large file for the browser.
-- **Transpilation**: The specific word for converting one high-level language (TS) into another (JS).
+* **CI (Continuous Integration)**: Automated pipelines that run your `typecheck`, `lint`, and `test` scripts whenever you change code.
+* **Bundlers**: Tools (like Vite or Webpack) that combine many small files into one large file for the browser.
+* **Transpilation**: The specific word for converting one high-level language (TS) into another (JS).
 
 ## Tasks
 
+&#x20; 1\.  **Check Node Version**: Run `node -v` in your terminal.
 
-
-{% tabs %}
-{% tab title="General" %}
-1. **Check Node Version**: Run `node -v` in your terminal.
 2. **Examine package.json**: Open a project and identify the `scripts` and `dependencies`.
-3. **Semver Check**: Look at your version ranges. Are you using `^` or `~`?
-{% endtab %}
+3.  **Semver Check**: Look at your version ranges. Are you using `^` or `~`?
 
-{% tab title="TypeScript" %}
-1. **Clean Start**: Delete your `dist/` folder and run `npx tsc` to see it regenerate.
-2. **Typecheck vs Build**: Run `npx tsc --noEmit` and confirm no JS files were created.
-3. **tsconfig Toggle**: Set `"strict": false` in a `tsconfig.json` and see if any previously flagged errors disappear (then turn it back on!).
-{% endtab %}
-{% endtabs %}
+    1\. **Clean Start**: Delete your `dist/` folder and run `npx tsc` to see it regenerate.
+4. **Typecheck vs Build**: Run `npx tsc --noEmit` and confirm no JS files were created.
+5. **tsconfig Toggle**: Set `"strict": false` in a `tsconfig.json` and see if any previously flagged errors disappear (then turn it back on!).
