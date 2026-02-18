@@ -44,7 +44,9 @@ JavaScript runs directly. TypeScript adds a mandatory build step: **Type-check â
 
 ### Minimal Setup: Running a File
 
+
 {% tabs %}
+
 {% tab title="JavaScript" %}
 
 - **File**: `index.js`
@@ -68,6 +70,7 @@ JavaScript runs directly. TypeScript adds a mandatory build step: **Type-check â
 - **Fact**: The runtime cannot execute `.ts`. It only runs the emitted JavaScript.
 
 {% endtab %}
+
 {% endtabs %}
 
 ## 3. Node Version Management
@@ -138,7 +141,9 @@ my_project/
 
 ### Scripts: JS vs TS Comparisons
 
+
 {% tabs %}
+
 {% tab title="JavaScript Project" %}
 
 ```json
@@ -150,6 +155,7 @@ my_project/
   }
 }
 ```
+
 - No build step; `start` runs the source directly.
 
 {% endtab %}
@@ -169,9 +175,11 @@ my_project/
   }
 }
 ```
+
 - `build` runs the compiler; `start` runs the emitted JS.
 
 {% endtab %}
+
 {% endtabs %}
 
 ## 7. Development Tools (TypeScript)
@@ -248,7 +256,9 @@ When debugging, source maps allow you to see your original `.ts` or source code 
 
 ## Tasks
 
+
 {% tabs %}
+
 {% tab title="General" %}
 
 1. **Check Node Version**: Run `node -v` in your terminal.
@@ -264,4 +274,5 @@ When debugging, source maps allow you to see your original `.ts` or source code 
 3. **tsconfig Toggle**: Set `"strict": false` in a `tsconfig.json` and see if any previously flagged errors disappear (then turn it back on!).
 
 {% endtab %}
+
 {% endtabs %}
