@@ -199,8 +199,6 @@ After compilation, the browser runs only the resulting JavaScript.
 
 ### Statements
 
-
-
 {% tabs %}
 {% tab title="JavaScript" %}
 ```js
@@ -249,7 +247,8 @@ The word "strict" means something completely different in JS and TS.
 
 
 {% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="JavaScript (Runtime)" %}
+
 Enabled with `"use strict";` (automatic in ES modules). It affects **runtime behavior**:
 - Prevents accidental globals.
 - Throws errors for unsafe actions.
