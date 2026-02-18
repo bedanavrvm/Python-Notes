@@ -1,5 +1,4 @@
-
-# 8. Django REST Framework (DRF)
+# 8. Django REST Framework
 
 As modern web development shifts toward decoupled architectures (where a frontend like React or Vue talks to a backend via JSON), the Django REST Framework (DRF) has become the industry standard for building powerful and flexible Web APIs.
 
@@ -7,10 +6,10 @@ As modern web development shifts toward decoupled architectures (where a fronten
 
 A REST (Representational State Transfer) API allows different systems to communicate over HTTP using standard methods. Instead of returning HTML templates, the server returns JSON data.
 
-- **GET**: Retrieve data
-- **POST**: Create data
-- **PUT/PATCH**: Update data
-- **DELETE**: Remove data
+* **GET**: Retrieve data
+* **POST**: Create data
+* **PUT/PATCH**: Update data
+* **DELETE**: Remove data
 
 ## Installation and Setup
 
@@ -207,61 +206,36 @@ urlpatterns = [
 
 This automatically creates URLs like:
 
-- `/api/posts/` (GET/POST) - List and create posts
-- `/api/posts/{id}/` (GET/PUT/DELETE) - Retrieve, update, delete post
+* `/api/posts/` (GET/POST) - List and create posts
+* `/api/posts/{id}/` (GET/PUT/DELETE) - Retrieve, update, delete post
 
 ## Mini Walkthrough: Build a Simple Posts API (Serializer → ViewSet → Router)
 
 This walkthrough shows the smallest “real” DRF setup you’ll use in most projects.
 
 {% tabs %}
-
 {% tab title="serializers.py" %}
+\`\`\`python
 
-```python
-# api/serializers.py
-from rest_framework import serializers
-from blog.models import Post
+## api/serializers.py
 
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['id', 'title', 'slug', 'content']
-```
+from rest\_framework import serializers from blog.models import Post
 
-{% endtab %}
+class PostSerializer(serializers.ModelSerializer): class Meta: model = Post fields = \['id', 'title', 'slug', 'content'] `</div><div data-gb-custom-block data-tag="tab" data-title='views.py'>`python
 
-{% tab title="views.py" %}
+## api/views.py
 
-```python
-# api/views.py
-from rest_framework import viewsets
-from blog.models import Post
-from .serializers import PostSerializer
+from rest\_framework import viewsets from blog.models import Post from .serializers import PostSerializer
 
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-```
+class PostViewSet(viewsets.ModelViewSet): queryset = Post.objects.all() serializer\_class = PostSerializer `</div><div data-gb-custom-block data-tag="tab" data-title='urls.py'>`python
 
-{% endtab %}
+## api/urls.py
 
-{% tab title="urls.py" %}
+from django.urls import include, path from rest\_framework.routers import DefaultRouter from .views import PostViewSet
 
-```python
-# api/urls.py
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-from .views import PostViewSet
+router = DefaultRouter() router.register(r'posts', PostViewSet, basename='post')
 
-router = DefaultRouter()
-router.register(r'posts', PostViewSet, basename='post')
-
-urlpatterns = [
-    path('', include(router.urls)),
-]
-```
-
+urlpatterns = \[ path('', include(router.urls)), ] \`\`\`
 {% endtab %}
 
 {% tab title="test" %}
@@ -271,12 +245,12 @@ If your project includes `api/urls.py` under `/api/`, you can test:
 
 `POST /api/posts/` with JSON to create one
 {% endtab %}
-
 {% endtabs %}
 
 ### Custom Actions in ViewSets
 
 <details>
+
 <summary>Show custom actions example</summary>
 
 ```python
@@ -559,31 +533,23 @@ class PostAPITestCase(APITestCase):
 
 ## Best Practices
 
-1. **Use ViewSets for standard CRUD**.
-   ViewSets + routers remove repetitive boilerplate and encourage consistent endpoint behavior.
-2. **Implement authentication and authorization early**.
-   Decide what is public, what requires login, and what requires ownership (object-level permissions). Security is much harder to retrofit later.
-3. **Add pagination to list endpoints**.
-   Large result sets slow down clients and servers. Pagination keeps responses predictable and fast.
-4. **Use serializers for validation**.
-   Treat serializers like your API “form layer”: validate input, control output shape, and keep validation logic close to the API boundary.
-5. **Add filtering/searching intentionally**.
-   Filtering makes APIs usable, but it’s also a surface area for expensive queries. Add indexes and limit fields where needed.
-6. **Version your APIs**.
-   Versioning lets you evolve endpoints without breaking existing clients.
-7. **Write endpoint tests**.
-   Tests catch breaking changes and validate permissions (the most common source of subtle bugs).
-8. **Use correct status codes**.
-   Status codes are part of your contract. For example: 201 on create, 204 on delete, 400 on validation errors, 401/403 for auth issues.
+1. **Use ViewSets for standard CRUD**. ViewSets + routers remove repetitive boilerplate and encourage consistent endpoint behavior.
+2. **Implement authentication and authorization early**. Decide what is public, what requires login, and what requires ownership (object-level permissions). Security is much harder to retrofit later.
+3. **Add pagination to list endpoints**. Large result sets slow down clients and servers. Pagination keeps responses predictable and fast.
+4. **Use serializers for validation**. Treat serializers like your API “form layer”: validate input, control output shape, and keep validation logic close to the API boundary.
+5. **Add filtering/searching intentionally**. Filtering makes APIs usable, but it’s also a surface area for expensive queries. Add indexes and limit fields where needed.
+6. **Version your APIs**. Versioning lets you evolve endpoints without breaking existing clients.
+7. **Write endpoint tests**. Tests catch breaking changes and validate permissions (the most common source of subtle bugs).
+8. **Use correct status codes**. Status codes are part of your contract. For example: 201 on create, 204 on delete, 400 on validation errors, 401/403 for auth issues.
 
 ## Summary
 
-- **DRF transforms Django** into a powerful backend for APIs
-- **Serializers convert** database models into JSON data
-- **ViewSets and Routers** eliminate the need for repetitive boilerplate code
-- **Permissions allow** for granular control over who can see or modify your API data
-- **Authentication methods** secure your API endpoints
-- **Pagination, filtering, and searching** enhance API usability
+* **DRF transforms Django** into a powerful backend for APIs
+* **Serializers convert** database models into JSON data
+* **ViewSets and Routers** eliminate the need for repetitive boilerplate code
+* **Permissions allow** for granular control over who can see or modify your API data
+* **Authentication methods** secure your API endpoints
+* **Pagination, filtering, and searching** enhance API usability
 
 ## Important Keywords
 

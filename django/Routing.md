@@ -1,5 +1,6 @@
+# 2. Routing
 
-# 2. Routing (The URL Dispatcher)
+## 2. Routing (The URL Dispatcher)
 
 The URL Dispatcher is the first point of contact when a request enters a Django application. It acts as a traffic controller, mapping a requested URL (like `/blog/post/5/`) to a specific logic handler (the View).
 
@@ -11,18 +12,18 @@ flowchart LR
     D --> E[HttpResponse / redirect]
 ```
 
-## URL Patterns
+### URL Patterns
 
 In Django, URLs are defined in `urls.py` files using the `path()` function. This function links a string pattern to a view function.
 
-### The path() Function
+#### The path() Function
 
 The `path()` function takes four arguments (two required, two optional):
 
-- **route**: The string pattern (the URL).
-- **view**: The function or class-based view to execute.
-- **kwargs**: (Optional) Extra arguments passed to the view.
-- **name**: (Optional) A unique name for the URL, used for "reverse" lookups.
+* **route**: The string pattern (the URL).
+* **view**: The function or class-based view to execute.
+* **kwargs**: (Optional) Extra arguments passed to the view.
+* **name**: (Optional) A unique name for the URL, used for "reverse" lookups.
 
 ```python
 from django.urls import path
@@ -33,57 +34,35 @@ urlpatterns = [
 ]
 ```
 
-## Dynamic Routing & Path Converters
+### Dynamic Routing & Path Converters
 
 Hardcoding every single URL (like `/post/1/`, `/post/2/`) is impossible for large sites. Django uses Path Converters to capture values from the URL and pass them as arguments to the view.
 
-### Syntax
+#### Syntax
 
 Use angle brackets `<type:variable_name>` to define a dynamic segment.
 
-| Converter | Description |
-|-----------|-------------|
-| `str` | Matches any non-empty string, excluding path separator `/`. (Default) |
-| `int` | Matches zero or any positive integer. |
-| `slug` | Matches any slug string (ASCII letters/numbers, plus hyphens/underscores). |
-| `uuid` | Matches a formatted UUID. |
-| `path` | Matches any non-empty string, including path separator `/`. |
+| Converter | Description                                                                |
+| --------- | -------------------------------------------------------------------------- |
+| `str`     | Matches any non-empty string, excluding path separator `/`. (Default)      |
+| `int`     | Matches zero or any positive integer.                                      |
+| `slug`    | Matches any slug string (ASCII letters/numbers, plus hyphens/underscores). |
+| `uuid`    | Matches a formatted UUID.                                                  |
+| `path`    | Matches any non-empty string, including path separator `/`.                |
 
-{% tabs %}
+## urls.py
 
-{% tab title="urls.py" %}
+path('post/[int:post\_id](int:post_id)/', views.post\_detail, name='post-detail'), `</div><div data-gb-custom-block data-tag="tab" data-title='views.py'>`python
 
-```python
-# urls.py
-path('post/<int:post_id>/', views.post_detail, name='post-detail'),
-```
+## views.py
 
-{% endtab %}
+def post\_detail(request, post\_id): # 'post\_id' is automatically passed as an integer argument return HttpResponse(f"Displaying post number {post\_id}")
 
-{% tab title="views.py" %}
-
-```python
-# views.py
-def post_detail(request, post_id):
-    # 'post_id' is automatically passed as an integer argument
-    return HttpResponse(f"Displaying post number {post_id}")
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-## App-Level vs. Project-Level URLs
+````</div></div>##
 
 To keep the "pluggable" philosophy, we don't put every URL in the main project folder. Instead, each App manages its own `urls.py`, and the main project "includes" them.
 
-### Project-Level (`my_project/urls.py`)
-
-{% tabs %}
-
-{% tab title="project urls.py" %}
-
-```python
+### Project-Level (`my_project/urls.py`)<div data-gb-custom-block data-tag="tabs"><div data-gb-custom-block data-tag="tab" data-title='project urls.py'>```python
 from django.contrib import admin
 from django.urls import include, path
 
@@ -91,26 +70,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('blog/', include('blog.urls')),  # Delegation to app
 ]
-```
-
-{% endtab %}
-
-{% tab title="app urls.py" %}
-
-```python
+```</div><div data-gb-custom-block data-tag="tab" data-title='app urls.py'>```python
 from django.urls import path
 from . import views
 
 urlpatterns = [
     path('latest/', views.recent_posts),
 ]
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-Resulting URL: `www.example.com/blog/latest/`
+```</div></div>Resulting URL: `www.example.com/blog/latest/`
 
 ## Namespacing and Reversing
 
@@ -126,37 +93,17 @@ app_name = 'blog'
 urlpatterns = [
     path('archive/', views.archive, name='post-archive'),
 ]
-```
+````
 
-### How to Reverse
+#### How to Reverse
 
-#### In Templates: Use the `{% url %}` tag
+**In Templates: Use the `{% url %}` tag\`\`\`html**
 
-{% tabs %}
+Go to Archive `</div><div data-gb-custom-block data-tag="tab" data-title='View (Python)'>`python from django.shortcuts import redirect from django.urls import reverse
 
-{% tab title="Template" %}
+def my\_view(request): return redirect(reverse('blog:post-archive'))
 
-```html
-<a href="{% url 'blog:post-archive' %}">Go to Archive</a>
-```
-
-{% endtab %}
-
-{% tab title="View (Python)" %}
-
-```python
-from django.shortcuts import redirect
-from django.urls import reverse
-
-def my_view(request):
-    return redirect(reverse('blog:post-archive'))
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-## Advanced Routing Patterns
+````</div></div>##
 
 ### Including URL Conf with Extra Namespace
 
@@ -167,44 +114,25 @@ You can include apps with an additional namespace for even better organization:
 urlpatterns = [
     path('api/v1/', include(('api.urls', 'api'), namespace='api')),
 ]
-```
+````
 
-### Reversing with Parameters
+#### Reversing with Parameters
 
 Pass dynamic data when reversing URLs:
 
 {% tabs %}
-
 {% tab title="View (Python)" %}
+\`\`\`python
 
-```python
-# In views
-def create_post(request, post_id):
-    return redirect(reverse('blog:post-detail', kwargs={'post_id': post_id}))
-```
+## In views
 
-{% endtab %}
+def create\_post(request, post\_id): return redirect(reverse('blog:post-detail', kwargs={'post\_id': post\_id})) `</div><div data-gb-custom-block data-tag="tab" data-title='Template'>`html
 
-{% tab title="Template" %}
+Read More
 
-```html
-<!-- In templates -->
-<a href="{% url 'blog:post-detail' post_id=post.id %}">Read More</a>
-```
+````</div></div>###
 
-{% endtab %}
-
-{% endtabs %}
-
-### Custom Path Converters
-
-Create your own converters for specialized URL patterns:
-
-{% tabs %}
-
-{% tab title="converters.py" %}
-
-```python
+Create your own converters for specialized URL patterns:<div data-gb-custom-block data-tag="tabs"><div data-gb-custom-block data-tag="tab" data-title='converters.py'>```python
 # converters.py
 class YearConverter:
     regex = r'\d{4}'
@@ -214,13 +142,7 @@ class YearConverter:
 
     def to_url(self, value):
         return f'{value:04d}'
-```
-
-{% endtab %}
-
-{% tab title="urls.py" %}
-
-```python
+```</div><div data-gb-custom-block data-tag="tab" data-title='urls.py'>```python
 # urls.py
 from django.urls import path, register_converter
 
@@ -232,13 +154,7 @@ register_converter(YearConverter, 'year')
 urlpatterns = [
     path('archive/<year:year>/', views.year_archive),
 ]
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-## Mini Walkthrough: Blog Detail Page (URL → View → Template Link)
+```</div></div>## Mini Walkthrough: Blog Detail Page (URL → View → Template Link)
 
 This mini walkthrough ties routing to views and templates, and shows why naming URLs matters.
 
@@ -257,9 +173,9 @@ app_name = 'blog'
 urlpatterns = [
     path('posts/<slug:slug>/', views.post_detail, name='detail'),
 ]
-```
+````
 
-### 2. Use the URL parameter in your view
+#### 2. Use the URL parameter in your view
 
 ```python
 # blog/views.py
@@ -271,16 +187,14 @@ def post_detail(request, slug):
     return render(request, 'blog/post_detail.html', {'post': post})
 ```
 
-### 3. Generate links safely from templates
+#### 3. Generate links safely from templates
 
-```html
+````html
 <!-- blog/templates/blog/post_list.html -->
 {% for post in posts %}
   <a href="{% url 'blog:detail' post.slug %}">{{ post.title }}</a>
 {% endfor %}
-```
-
-</details>
+```</details>
 
 If you later change the URL from `posts/<slug:slug>/` to something else, **every template link keeps working** as long as the URL name (`blog:detail`) stays the same.
 
@@ -344,7 +258,7 @@ Generating URLs from their names instead of hardcoding them, allowing URL struct
 
 Python function that returns the URL for a given view name and optional parameters.
 
-### **{% url %}**
+### **<div data-gb-custom-block data-tag="url"></div>**
 
 Django template tag used to reverse URLs within templates, supporting namespacing and parameters.
 
@@ -371,3 +285,6 @@ Designing URL patterns that follow REST principles using HTTP methods (GET, POST
 ### **APPEND_SLASH**
 
 Django setting that determines whether URLs should end with a trailing slash, ensuring consistency across the site.
+````
+{% endtab %}
+{% endtabs %}

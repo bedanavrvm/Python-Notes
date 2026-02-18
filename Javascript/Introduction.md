@@ -1,34 +1,34 @@
-# Introduction (JavaScript & TypeScript)
+# 1. Introduction
 
 JavaScript (JS) is the programming language of the web.
 
-- **JavaScript** answers: *what does the program do when it runs?*
-- **TypeScript** answers: *can we catch some mistakes before it runs?*
+* <mark style="color:orange;">**JavaScript**</mark> answers: _what does the program do when it runs?_
+* <mark style="color:$primary;">**TypeScript**</mark> answers: _can we catch some mistakes before it runs?_
 
 Think of them like this:
 
-
-
 {% tabs %}
 {% tab title="JavaScript" %}
-- Runs directly in the runtime (browser/Node).
-- No build step required.
-- Errors show up at runtime.
+\- Runs directly in the runtime (browser/Node).
+
+* No build step required.
+* Errors show up at runtime.
 {% endtab %}
 
 {% tab title="TypeScript" %}
-- You still run JavaScript in the runtime.
-- TypeScript adds compile-time checks and then emits JavaScript.
-- Many mistakes can be caught before running.
+\- You still run JavaScript in the runtime.
+
+* TypeScript adds compile-time checks and then emits JavaScript.
+* Many mistakes can be caught before running.
 {% endtab %}
 {% endtabs %}
 
 This chapter gives you a practical starting point:
 
-- **What JavaScript is**
-- **Where it runs**
-- **How to run your first code**
-- **Where TypeScript fits (optional)**
+* **What JavaScript is**
+* **Where it runs**
+* **How to run your first code**
+* **Where TypeScript fits (optional)**
 
 ## What is JavaScript?
 
@@ -40,17 +40,18 @@ To understand this clearly, think of JavaScript as a **brain**. The brain can th
 
 At the core of every runtime is a **JavaScript engine**. This engine reads your code, understands it, and executes it.
 
-- **Google Chrome** uses the **V8** engine.
-- **Firefox** uses **SpiderMonkey**.
-- **Node.js** also uses **V8**.
+* **Google Chrome** uses the **V8** engine.
+* **Firefox** uses **SpiderMonkey**.
+* **Node.js** also uses **V8**.
 
 The engine only understands the JavaScript language itself:
-- Variables
-- Functions
-- Objects
-- Arrays
-- Promises
-- Basic language syntax
+
+* Variables
+* Functions
+* Objects
+* Arrays
+* Promises
+* Basic language syntax
 
 ```js
 let x = 5;
@@ -69,42 +70,44 @@ A runtime wraps around the JavaScript engine and provides extra capabilities. Di
 When JavaScript runs in a browser like Chrome or Firefox, it gets access to **Browser APIs**. These are not part of JavaScript the language; they are provided by the browser runtime.
 
 #### The DOM APIs (`document`, `window`)
+
 When you open a webpage, the browser loads HTML and converts it into a structure called the **DOM (Document Object Model)** — a tree representation of your page. The browser gives JavaScript access to this via objects like `document`.
 
 ```js
 document.getElementById("title").textContent = "Hello!";
 ```
 
-- **How it works**: The JS engine executes the code, but `document` is provided by the browser runtime.
-- **Node.js Check**: If you run this in Node.js, you get `ReferenceError: document is not defined` because Node.js does not provide DOM APIs.
+* **How it works**: The JS engine executes the code, but `document` is provided by the browser runtime.
+* **Node.js Check**: If you run this in Node.js, you get `ReferenceError: document is not defined` because Node.js does not provide DOM APIs.
 
 #### Web APIs (`fetch`, `localStorage`, `WebSocket`)
+
 Browsers provide tools to interact with things beyond just the page structure:
 
-- **fetch**: Allows you to make network requests. (`fetch("https://api...")`). JavaScript itself does not know how to make HTTP requests; the runtime provides this ability.
-- **localStorage**: Allows you to store data in the user’s browser.
-- **WebSocket**: Allows real-time, two-way communication with servers.
+* **fetch**: Allows you to make network requests. (`fetch("https://api...")`). JavaScript itself does not know how to make HTTP requests; the runtime provides this ability.
+* **localStorage**: Allows you to store data in the user’s browser.
+* **WebSocket**: Allows real-time, two-way communication with servers.
 
 #### The Security Model (Sandboxing and CORS)
-Browsers are designed with security in mind because they execute code from unknown websites. 
 
-**Sandboxing**
-Browser JavaScript runs inside a **sandbox**. Think of it as a controlled box: your code can play inside, but it cannot escape to harm the system. 
-- It cannot read files from your computer.
-- It cannot access your operating system.
-- It cannot inspect other browser tabs.
+Browsers are designed with security in mind because they execute code from unknown websites.
 
-**CORS (Cross-Origin Resource Sharing)**
-If your webpage is loaded from `https://example.com`, your JavaScript cannot freely request data from `https://another-site.com` unless that server explicitly allows it. This prevents malicious websites from stealing your data.
+**Sandboxing** Browser JavaScript runs inside a **sandbox**. Think of it as a controlled box: your code can play inside, but it cannot escape to harm the system.
+
+* It cannot read files from your computer.
+* It cannot access your operating system.
+* It cannot inspect other browser tabs.
+
+**CORS (Cross-Origin Resource Sharing)** If your webpage is loaded from `https://example.com`, your JavaScript cannot freely request data from `https://another-site.com` unless that server explicitly allows it. This prevents malicious websites from stealing your data.
 
 ### JavaScript in Node.js
 
 Node.js is designed for server environments where system access is necessary. It does not provide `document` or `window`, but it gives you:
 
-- **File system access (`fs`)**
-- **Operating system access**
-- **Process control**
-- **Server creation (`http` module)**
+* **File system access (`fs`)**
+* **Operating system access**
+* **Process control**
+* **Server creation (`http` module)**
 
 ```js
 const fs = require("fs");
@@ -118,9 +121,10 @@ Browsers would never allow this — it would be a massive security risk.
 ## The Big Idea
 
 JavaScript by itself is just a programming language. But it becomes powerful because of the runtime it lives inside. The runtime:
-- Provides APIs (like DOM, fetch, fs)
-- Controls security rules
-- Determines what your code can interact with
+
+* Provides APIs (like DOM, fetch, fs)
+* Controls security rules
+* Determines what your code can interact with
 
 This explains why some code works in the browser but not in Node, and vice-versa. The engine executes the logic, but the runtime gives it the body to interact with the world.
 
@@ -130,42 +134,40 @@ The traditional first program prints a message.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-{% code %}
-```js
+```javascript
 console.log("Hello, world!");
 ```
 
-**Execution**: Runs directly in the runtime (Browser/Node).
-
-**Difference**: Plain JavaScript logic without extra annotations.
+* **Execution**: Runs directly in the runtime (Browser/Node).
+* **Difference**: Plain JavaScript logic without extra annotations.
 {% endtab %}
 
-{% tab title="TypeScript" %}
-{% code %}
-```ts
+{% tab title="Typescript" %}
+```typescript
 const message: string = "Hello, world!";
 console.log(message);
 ```
 
-**Execution**: After compilation, it becomes plain JavaScript.
-
-**Difference**: Adds type information (`: string`). TypeScript exists only during development.
+* **Execution**: After compilation, it becomes plain JavaScript.
+* **Difference**: Adds type information (`: string`). TypeScript exists only during development.
 {% endtab %}
 {% endtabs %}
 
-### Run it in the Browser
+#### Run it in the Browser
 
 {% tabs %}
 {% tab title="JavaScript" %}
-- Open any website.
-- Press **F12** (DevTools) and go to the **Console**.
-- Run: `console.log("Hello from the browser!");`
-- **Result**: It works immediately.
+\- Open any website.
+
+* Press **F12** (DevTools) and go to the **Console**.
+* Run: `console.log("Hello from the browser!");`
+* **Result**: It works immediately.
 {% endtab %}
 
 {% tab title="TypeScript" %}
-- **Browsers do not understand TypeScript.**
-- **Workflow**:
+\- **Browsers do not understand TypeScript.**
+
+* **Workflow**:
   1. Write `.ts` code.
   2. Compile it to `.js`.
   3. Load the emitted `.js` in the browser.
@@ -174,65 +176,59 @@ After compilation, the browser runs only the resulting JavaScript.
 {% endtab %}
 {% endtabs %}
 
-### Run it with Node.js
+#### Run it with Node.js
 
 {% tabs %}
 {% tab title="JavaScript" %}
-- Create `hello.js`: `console.log("Hello from Node.js!");`
-- Run: `node hello.js`
-- **Result**: Node runs the JavaScript directly.
+\- Create `hello.js`:&#x20;
+
+```javascript
+console.log("Hello from Node.js!");
+```
+
+* Run: `node hello.js`
+* **Result**: Node runs the JavaScript directly.
 {% endtab %}
 
 {% tab title="TypeScript" %}
-- Create `hello.ts`:
+\- Create `hello.ts`:
+
 ```ts
   const message: string = "Hello from Node.js!";
   console.log(message);
 ```
-- Compile: `tsc hello.ts`
-- Run the resulting JS: `node hello.js`
-- **Result**: Node runs the emitted JavaScript; TypeScript disappears after compilation.
+
+* Compile: `tsc hello.ts`
+* Run the resulting JS: `node hello.js`
+* **Result**: Node runs the emitted JavaScript; TypeScript disappears after compilation.
 {% endtab %}
 {% endtabs %}
 
-## Code Structure: JS vs TS Side-by-Side
+\## Code Structure: JS vs TS Side-by-Side
 
-### Statements
+### Statements\`
 
-{% tabs %}
-{% tab title="JavaScript" %}
-{% code %}
-```js
-let count = 1;
-count = count + 1;
-```
+let count = 1; count = count + 1;
 
-- No built-in type annotations.
-{% endtab %}
+````
 
-{% tab title="TypeScript" %}
-{% code %}
-```ts
+- No built-in type annotations.</div><div data-gb-custom-block data-tag="tab" data-title='TypeScript'><div data-gb-custom-block data-tag="code"></div>```ts
 let count: number = 1;
 count = count + 1;
-```
+````
 
-- Declares the variable type (`: number`).
-- **Runtime behavior**: Identical to JS.
-{% endtab %}
-{% endtabs %}
-
-### Semicolons: JavaScript vs TypeScript
+* Declares the variable type (`: number`).
+* **Runtime behavior**: Identical to JS.### Semicolons: JavaScript vs TypeScript
 
 Semicolons are technically optional in both, but the practical usage differs.
 
-| Feature | JavaScript | TypeScript |
-| :--- | :--- | :--- |
-| **Required?** | No (**ASI** handles it) | No (follows JS syntax rules) |
-| **Common Practice** | Often used for safety | Very often enforced by convention |
+| Feature             | JavaScript              | TypeScript                        |
+| ------------------- | ----------------------- | --------------------------------- |
+| **Required?**       | No (**ASI** handles it) | No (follows JS syntax rules)      |
+| **Common Practice** | Often used for safety   | Very often enforced by convention |
 
-- **In JavaScript**: Automatic Semicolon Insertion (ASI) handles most cases, but it has edge cases. Many teams use them for consistency.
-- **In TypeScript**: Follows the same rules, but real-world TS projects often use strict formatting tools (**ESLint**, **Prettier**) that require semicolons.
+* **In JavaScript**: Automatic Semicolon Insertion (ASI) handles most cases, but it has edge cases. Many teams use them for consistency.
+* **In TypeScript**: Follows the same rules, but real-world TS projects often use strict formatting tools (**ESLint**, **Prettier**) that require semicolons.
 
 ### Comments
 
@@ -248,27 +244,26 @@ Same syntax in both; TypeScript does not change comment behavior.
 
 The word "strict" means something completely different in JS and TS.
 
-
-
 {% tabs %}
 {% tab title="JavaScript (Runtime)" %}
-
 Enabled with `"use strict";` (automatic in ES modules). It affects **runtime behavior**:
-- Prevents accidental globals.
-- Throws errors for unsafe actions.
-- Makes the engine execution more predictable.
+
+* Prevents accidental globals.
+* Throws errors for unsafe actions.
+* Makes the engine execution more predictable.
 {% endtab %}
 
 {% tab title="TypeScript" %}
 Enabled via a setting in `tsconfig.json`: `{"strict": true}`. It affects **compile-time safety**:
-- Enables stronger type checking.
-- catches common mistakes (like `undefined` access) before running.
+
+* Enables stronger type checking.
+* catches common mistakes (like `undefined` access) before running.
 {% endtab %}
 {% endtabs %}
 
 **The mental model**: JavaScript strict affects how the code **runs**. TypeScript strict affects how the code is **checked** during development.
 
----
+***
 
 ## The Core Mental Model
 
@@ -283,22 +278,13 @@ Whenever you learn something new in the JS/TS ecosystem, ask:
 
 JavaScript is the engine’s language. TypeScript is a **safety layer** on top of it. They share the same runtime, the same execution model, and the same syntax foundation. TypeScript just adds a static type system to catch bugs early.
 
-## Tasks
+## Tasks- **Task 1 (Browser)**: Open DevTools and run a `console.log` message.
 
+* **Task 2 (Node.js)**: Create `hello.js` and run it using `node hello.js`.
+*   **Task 3 (ASI)**: Try writing code without semicolons and see if it runs in the browser console.
 
-
-{% tabs %}
-{% tab title="JavaScript" %}
-- **Task 1 (Browser)**: Open DevTools and run a `console.log` message.
-- **Task 2 (Node.js)**: Create `hello.js` and run it using `node hello.js`.
-- **Task 3 (ASI)**: Try writing code without semicolons and see if it runs in the browser console.
-{% endtab %}
-
-{% tab title="TypeScript" %}
-- **Task 1 (Workflow)**: Write a `.ts` file, compile it using `tsc`, and run the resulting `.js` file.
-- **Task 2 (Type Safety)**: In a TS file, declare a `number` and try to assign a `string`. Observe the compiler error.
-{% endtab %}
-{% endtabs %}
+    \- **Task 1 (Workflow)**: Write a `.ts` file, compile it using `tsc`, and run the resulting `.js` file.
+* **Task 2 (Type Safety)**: In a TS file, declare a `number` and try to assign a `string`. Observe the compiler error.
 
 ## Important things to know
 
@@ -306,25 +292,25 @@ This section consolidates key terms and concepts introduced in this chapter.
 
 ### Core Concepts & Keywords
 
-- **JavaScript Engine**: The "brain" inside a runtime (like V8) that reads and executes code logic. It does not natively know about webpages or files.
-- **Runtime Environment**: The "body" or "home" where your code lives. It provides the tools (**APIs**) your code needs to interact with the world (e.g., the Browser or Node.js).
-- **API (Application Programming Interface)**: The set of tools and objects provided by the runtime (like `fetch`, `document`, or `fs`) that let you use its powers.
-- **DOM (Document Object Model)**: A tree-like representation of your HTML that the browser provides so JavaScript can change the page.
-- **Globals**: Variables or objects that are "built-in" and available everywhere in your code without having to create them (e.g., `console` is a global).
-- **Compile-time**: The period when your code is being checked for errors and converted (e.g., from TypeScript to JavaScript). Mistakes caught here never make it to the user.
-- **Runtime**: The period when your code is actually executing on a machine.
-- **ReferenceError**: An error that happens when you try to use something that the environment doesn't recognize (like trying to use `document` in Node.js).
-- **Sandboxing**: A security system that keeps your code in a "sandbox" so it cannot harm your computer or access private files.
-- **CORS (Cross-Origin Resource Sharing)**: A browser security rule that prevents websites from making requests to other sites unless explicitly permitted.
-- **ASI (Automatic Semicolon Insertion)**: A JavaScript feature where the engine tries to add semicolons for you if you leave them out.
+* **JavaScript Engine**: The "brain" inside a runtime (like V8) that reads and executes code logic. It does not natively know about webpages or files.
+* **Runtime Environment**: The "body" or "home" where your code lives. It provides the tools (**APIs**) your code needs to interact with the world (e.g., the Browser or Node.js).
+* **API (Application Programming Interface)**: The set of tools and objects provided by the runtime (like `fetch`, `document`, or `fs`) that let you use its powers.
+* **DOM (Document Object Model)**: A tree-like representation of your HTML that the browser provides so JavaScript can change the page.
+* **Globals**: Variables or objects that are "built-in" and available everywhere in your code without having to create them (e.g., `console` is a global).
+* **Compile-time**: The period when your code is being checked for errors and converted (e.g., from TypeScript to JavaScript). Mistakes caught here never make it to the user.
+* **Runtime**: The period when your code is actually executing on a machine.
+* **ReferenceError**: An error that happens when you try to use something that the environment doesn't recognize (like trying to use `document` in Node.js).
+* **Sandboxing**: A security system that keeps your code in a "sandbox" so it cannot harm your computer or access private files.
+* **CORS (Cross-Origin Resource Sharing)**: A browser security rule that prevents websites from making requests to other sites unless explicitly permitted.
+* **ASI (Automatic Semicolon Insertion)**: A JavaScript feature where the engine tries to add semicolons for you if you leave them out.
 
 ### Looking Ahead
 
 You encountered several terms that were not fully explored yet. You don’t need to master these now, but you will see them again:
 
-- **ES Modules**: A modern way of organizing code that enables "Strict Mode" automatically.
-- **Compiler / Emitted Code**: A **Compiler** is a tool that transforms code (TS → JS). The resulting JavaScript is called the **Emitted** code.
-- **Static Type System**: What TypeScript adds to JavaScript to catch bugs before they ever run.
-- **tsconfig.json**: A configuration file used by TypeScript to decide which safety rules (like "Strict Mode") to turn on.
-- **Promises**: Special JavaScript objects used to handle tasks that take time (like fetching data).
-- **Development Tooling**: Tools like **ESLint** and **Prettier** which are used in professional projects to enforce rules (like semicolons) and maintain code quality.
+* **ES Modules**: A modern way of organizing code that enables "Strict Mode" automatically.
+* **Compiler / Emitted Code**: A **Compiler** is a tool that transforms code (TS → JS). The resulting JavaScript is called the **Emitted** code.
+* **Static Type System**: What TypeScript adds to JavaScript to catch bugs before they ever run.
+* **tsconfig.json**: A configuration file used by TypeScript to decide which safety rules (like "Strict Mode") to turn on.
+* **Promises**: Special JavaScript objects used to handle tasks that take time (like fetching data).
+* **Development Tooling**: Tools like **ESLint** and **Prettier** which are used in professional projects to enforce rules (like semicolons) and maintain code quality.

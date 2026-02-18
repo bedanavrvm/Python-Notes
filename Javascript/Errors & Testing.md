@@ -1,49 +1,17 @@
-# Errors, Exceptions & Testing (JavaScript vs TypeScript)
+# 9. Errors & Testing
 
-JavaScript error handling is runtime-based.
-TypeScript helps you reduce certain classes of errors before runtime, but does not replace runtime handling.
+JavaScript error handling is runtime-based. TypeScript helps you reduce certain classes of errors before runtime, but does not replace runtime handling.
 
-## Throwing and catching
+## Throwing and catching\`\`\`js
 
-{% tabs %}
-
-{% tab title="JavaScript" %}
-
-```js
-function parseJson(text) {
-  try {
-    return JSON.parse(text);
-  } catch (err) {
-    throw new Error("Invalid JSON");
-  }
-}
-```
-
-{% endtab %}
-
-{% tab title="TypeScript" %}
-
-```ts
-function parseJson(text: string): unknown {
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error("Invalid JSON");
-  }
-}
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-### `catch` values can be anything
+function parseJson(text) { try { return JSON.parse(text); } catch (err) { throw new Error("Invalid JSON"); } } `</div><div data-gb-custom-block data-tag="tab" data-title='TypeScript'>`ts function parseJson(text: string): unknown { try { return JSON.parse(text); } catch { throw new Error("Invalid JSON"); } } \`\`\`### `catch` values can be anything
 
 In JavaScript, you can throw any value (`throw "oops"`, `throw 123`). In practice, teams standardize on throwing `Error` instances.
 
 TypeScript (in modern configs) treats `catch (err)` as `unknown`, forcing you to narrow before using it.
 
 <details>
+
 <summary>Show narrowing in a catch block (TS)</summary>
 
 ```ts
@@ -65,6 +33,7 @@ try {
 When wrapping an error, keep the original error as context.
 
 <details>
+
 <summary>Show error cause (when supported)</summary>
 
 ```js
@@ -77,43 +46,15 @@ try {
 
 </details>
 
-## Error types and custom errors
+## Error types and custom errors\`\`\`js
 
-{% tabs %}
+class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 
-{% tab title="JavaScript" %}
+throw new HttpError(404, "Not found"); `</div><div data-gb-custom-block data-tag="tab" data-title='TypeScript'>`ts class HttpError extends Error { status: number;
 
-```js
-class HttpError extends Error {
-  constructor(status, message) {
-    super(message);
-    this.status = status;
-  }
-}
+constructor(status: number, message: string) { super(message); this.status = status; } }
 
-throw new HttpError(404, "Not found");
-```
-
-{% endtab %}
-
-{% tab title="TypeScript" %}
-
-```ts
-class HttpError extends Error {
-  status: number;
-
-  constructor(status: number, message: string) {
-    super(message);
-    this.status = status;
-  }
-}
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-## The big TS limitation: exceptions are not typed
+````</div></div>##
 
 TypeScript does not enforce what a function can throw.
 This is why many TS codebases use “Result” types for expected failures.
@@ -131,54 +72,36 @@ function parseIntSafe(text: string): Result<number, "not_a_number"> {
   if (Number.isNaN(n)) return { ok: false, error: "not_a_number" };
   return { ok: true, value: n };
 }
-```
-
-</details>
+````
 
 ### When to prefer Result types
 
 Use Result-style values for **expected** failures where callers should handle the outcome:
 
-- parsing
-- validation
-- business rules (“not allowed”)
+* parsing
+* validation
+* business rules (“not allowed”)
 
 Use exceptions for **unexpected** failures:
 
-- programming bugs
-- I/O failures you cannot recover from locally
+* programming bugs
+* I/O failures you cannot recover from locally
 
 ## Runtime validation (JS and TS)
 
 If you receive external data (JSON), you must validate at runtime.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-```js
-function isUser(value) {
-  return value && typeof value.name === "string";
-}
-```
-
+`js function isUser(value) { return value && typeof value.name === "string"; }`
 {% endtab %}
 
 {% tab title="TypeScript" %}
+\`\`\`ts type User = { name: string };
 
-```ts
-type User = { name: string };
+function isUser(value: unknown): value is User { return !!value && typeof (value as any).name === "string"; }
 
-function isUser(value: unknown): value is User {
-  return !!value && typeof (value as any).name === "string";
-}
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-## Async errors and unhandled rejections
+````</div></div>##
 
 Async failures often show up as rejected Promises. If you forget to handle them, you can get unhandled rejection warnings/crashes.
 
@@ -191,11 +114,10 @@ fetch("/api")
   .catch((err) => {
     console.error("request failed", err);
   });
-```
-
-</details>
+````
 
 <details>
+
 <summary>Show try/catch with async/await</summary>
 
 ```js
@@ -212,14 +134,15 @@ async function load() {
 
 </details>
 
-## Don’t swallow errors (layering)
+### Don’t swallow errors (layering)
 
-Good error handling is often about *where* you handle errors:
+Good error handling is often about _where_ you handle errors:
 
-- Lower layers should attach context and rethrow/return a Result.
-- Higher layers decide user-facing behavior (retry, fallback, show message).
+* Lower layers should attach context and rethrow/return a Result.
+* Higher layers decide user-facing behavior (retry, fallback, show message).
 
 <details>
+
 <summary>Show adding context then rethrowing</summary>
 
 ```js
@@ -236,11 +159,12 @@ async function fetchUser(id) {
 
 </details>
 
-## Retry patterns (when appropriate)
+### Retry patterns (when appropriate)
 
 Retries are useful for transient failures (network hiccups), but dangerous for permanent failures.
 
 <details>
+
 <summary>Show a simple retry helper</summary>
 
 ```js
@@ -259,118 +183,57 @@ async function retry(fn, attempts) {
 
 </details>
 
-## Testing basics
+### Testing basics
 
 At minimum, tests should verify:
 
-- pure logic functions
-- boundary conditions
-- error cases
+* pure logic functions
+* boundary conditions
+* error cases
 
 <details>
+
 <summary>Show a tiny test style (framework-agnostic)</summary>
 
-{% tabs %}
-
-{% tab title="JavaScript" %}
-
-```js
-function add(a, b) {
-  return a + b;
-}
-
-function assertEqual(actual, expected) {
-  if (actual !== expected) {
-    throw new Error(`Expected ${expected} but got ${actual}`);
-  }
-}
-
-assertEqual(add(2, 3), 5);
-```
-
-{% endtab %}
-
-{% tab title="TypeScript" %}
-
-```ts
-function add(a: number, b: number): number {
-  return a + b;
-}
-
-function assertEqual<T>(actual: T, expected: T): void {
-  if (actual !== expected) {
-    throw new Error(`Expected ${expected} but got ${actual}`);
-  }
-}
-
-assertEqual(add(2, 3), 5);
-```
-
-{% endtab %}
-
-{% endtabs %}
+\`\`\`js function add(a, b) { return a + b; }function assertEqual(actual, expected) { if (actual !== expected) { throw new Error(Expected ${expected} but got ${actual}); } }assertEqual(add(2, 3), 5); \</div>\<div data-gb-custom-block data-tag="tab" data-title='TypeScript'>ts function add(a: number, b: number): number { return a + b; }function assertEqual(actual: T, expected: T): void { if (actual !== expected) { throw new Error(Expected ${expected} but got ${actual}); } }assertEqual(add(2, 3), 5);\</details>## Testing layers (reference)- Unit tests: fast, pure logic- Integration tests: boundaries (DB, filesystem, HTTP)- End-to-end tests: real user flows## Testing async codeAsync code introduces common mistakes:- tests that forget to \`await\`- flaky timing-based assertions\<details>\<summary>Show an async test pitfall (conceptual)\</summary>\`\`\`js// Bad: test may finish before the promise resolvesdoAsyncWork();// Good: await the work (or return the promise)await doAsyncWork();
 
 </details>
 
-## Testing layers (reference)
-
-- Unit tests: fast, pure logic
-- Integration tests: boundaries (DB, filesystem, HTTP)
-- End-to-end tests: real user flows
-
-## Testing async code
-
-Async code introduces common mistakes:
-
-- tests that forget to `await`
-- flaky timing-based assertions
-
-<details>
-<summary>Show an async test pitfall (conceptual)</summary>
-
-```js
-// Bad: test may finish before the promise resolves
-doAsyncWork();
-
-// Good: await the work (or return the promise)
-await doAsyncWork();
-```
-
-</details>
-
-## Mocking vs real dependencies
+### Mocking vs real dependencies
 
 Mocking is useful, but over-mocking can make tests meaningless.
 
 Practical guideline:
 
-- Mock at the edges (network/time)
-- Prefer real logic for the core
+* Mock at the edges (network/time)
+* Prefer real logic for the core
 
-## Summary
+### Summary
 
-- JS errors are runtime; you must handle and test them.
-- TS reduces type-related errors but does not remove the need for runtime validation.
-- Consider Result-style error handling for expected failures.
+* JS errors are runtime; you must handle and test them.
+* TS reduces type-related errors but does not remove the need for runtime validation.
+* Consider Result-style error handling for expected failures.
 
-## Important Keywords
+### Important Keywords
 
-### **Exception**
+#### **Exception**
 
 A runtime error represented by a thrown value (ideally an `Error`).
 
-### **Stack trace**
+#### **Stack trace**
 
 The call history captured when an error occurs.
 
-### **Unhandled rejection**
+#### **Unhandled rejection**
 
 A Promise rejection that is never handled with `catch`/`try-catch`.
 
-### **Type guard**
+#### **Type guard**
 
 Runtime check that narrows types (useful in `catch` blocks).
 
-### **Result type**
+#### **Result type**
 
 Value-based error handling pattern (e.g., `{ ok: true } | { ok: false }`).
+{% endtab %}
+{% endtabs %}

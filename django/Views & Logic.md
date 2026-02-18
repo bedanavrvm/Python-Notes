@@ -1,5 +1,4 @@
-
-# 3. Views & Logic (The Controller Layer)
+# 3. Views & Logic
 
 In the MVT pattern, the View is the bridge between the Model and the Template. It receives an HttpRequest, performs the necessary logic (like fetching data or processing a form), and returns an HttpResponse.
 
@@ -61,11 +60,11 @@ As your project grows, you'll find yourself repeating the same logic (fetching a
 
 Django provides "Generic" classes for common tasks:
 
-- **ListView**: To display a list of objects.
-- **DetailView**: To display a single object.
-- **CreateView / UpdateView**: To handle forms and database saving.
-- **DeleteView**: To handle object deletion.
-- **TemplateView**: To render a template without models.
+* **ListView**: To display a list of objects.
+* **DetailView**: To display a single object.
+* **CreateView / UpdateView**: To handle forms and database saving.
+* **DeleteView**: To handle object deletion.
+* **TemplateView**: To render a template without models.
 
 ```python
 from django.views.generic import ListView, DetailView
@@ -137,8 +136,8 @@ class PostUpdateView(UserPassesTestMixin, UpdateView):
 
 ### 4. When to use CBV vs FBV?
 
-- **Use FBVs** for complex, custom logic that doesn't fit a standard pattern. They are easier to read for beginners.
-- **Use CBVs** for standard CRUD (Create, Read, Update, Delete) operations. They make your code much shorter and more modular.
+* **Use FBVs** for complex, custom logic that doesn't fit a standard pattern. They are easier to read for beginners.
+* **Use CBVs** for standard CRUD (Create, Read, Update, Delete) operations. They make your code much shorter and more modular.
 
 ## The Request and Response Objects
 
@@ -201,53 +200,21 @@ def error_view(request):
 
 Django provides powerful form handling capabilities.
 
-### Using Django Forms
+### Using Django Forms\`\`\`python
 
-{% tabs %}
+from django import forms from .models import Post
 
-{% tab title="forms.py" %}
-
-```python
-from django import forms
-from .models import Post
-
-class PostForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = ['title', 'content', 'is_published']
-        widgets = {
-            'content': forms.Textarea(attrs={'rows': 10}),
-        }
-```
-
-{% endtab %}
-
-{% tab title="views.py" %}
-
-```python
-from django.shortcuts import redirect, render
+class PostForm(forms.ModelForm): class Meta: model = Post fields = \['title', 'content', 'is\_published'] widgets = { 'content': forms.Textarea(attrs={'rows': 10}), } `</div><div data-gb-custom-block data-tag="tab" data-title='views.py'>`python from django.shortcuts import redirect, render
 
 from .forms import PostForm
 
-def create_post(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('post-detail', pk=post.pk)
-    else:
-        form = PostForm()
+def create\_post(request): if request.method == 'POST': form = PostForm(request.POST) if form.is\_valid(): post = form.save(commit=False) post.author = request.user post.save() return redirect('post-detail', pk=post.pk) else: form = PostForm()
 
-    return render(request, 'blog/create_post.html', {'form': form})
+```
+return render(request, 'blog/create_post.html', {'form': form})
 ```
 
-{% endtab %}
-
-{% endtabs %}
-
-### Form Handling in CBVs
+````</div></div>###
 
 ```python
 from django.views.generic.edit import CreateView, UpdateView
@@ -261,7 +228,7 @@ class PostCreateView(CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
-```
+````
 
 ## Security in Views
 
@@ -269,21 +236,13 @@ class PostCreateView(CreateView):
 
 Django protects against Cross-Site Request Forgery attacks:
 
-```html
+````html
 <!-- In templates -->
 <form method="post">
     {% csrf_token %}
     <!-- form fields -->
 </form>
-```
-
-### Authentication and Permissions
-
-{% tabs %}
-
-{% tab title="FBV (decorators)" %}
-
-```python
+```### Authentication and Permissions<div data-gb-custom-block data-tag="tabs"><div data-gb-custom-block data-tag="tab" data-title='FBV (decorators)'>```python
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 
@@ -294,13 +253,7 @@ def my_protected_view(request):
 @permission_required('blog.add_post')
 def create_post_view(request):
     return render(request, 'create_post.html')
-```
-
-{% endtab %}
-
-{% tab title="CBV (mixins)" %}
-
-```python
+```</div><div data-gb-custom-block data-tag="tab" data-title='CBV (mixins)'>```python
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render
 from django.views import View
@@ -317,13 +270,7 @@ class AdminOnlyView(UserPassesTestMixin, View):
 
     def get(self, request):
         return render(request, 'admin_only.html')
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-### Input Validation
+```</div></div>### Input Validation
 
 ```python
 def safe_view(request):
@@ -340,7 +287,7 @@ def safe_view(request):
     except ValidationError:
         # Invalid email
         return HttpResponse("Invalid email", status=400)
-```
+````
 
 ## Error Handling
 
@@ -473,11 +420,11 @@ def manual_cache_view(request):
     return render(request, 'data.html', {'data': data})
 ```
 
-## Shortcuts: render and get_object_or_404
+## Shortcuts: render and get\_object\_or\_404
 
 Django provides shortcuts to make views more concise and robust.
 
-### get_object_or_404
+### get\_object\_or\_404
 
 Instead of writing a try/except block to catch objects that don't exist, use this:
 
@@ -515,9 +462,10 @@ def create_and_redirect(request):
 This walkthrough connects routing and views, and shows how context flows into templates.
 
 <details>
+
 <summary>Show walkthrough code</summary>
 
-### 1. URLs: define list + detail routes
+#### 1. URLs: define list + detail routes
 
 ```python
 # blog/urls.py
@@ -532,7 +480,7 @@ urlpatterns = [
 ]
 ```
 
-### 2. Views: fetch data and render templates
+#### 2. Views: fetch data and render templates
 
 ```python
 # blog/views.py
@@ -548,7 +496,7 @@ def post_detail(request, pk):
     return render(request, 'blog/post_detail.html', {'post': post})
 ```
 
-### 3. Template: generate links using URL names (no hardcoding)
+#### 3. Template: generate links using URL names (no hardcoding)
 
 ```html
 <!-- blog/templates/blog/post_list.html -->
@@ -561,30 +509,22 @@ def post_detail(request, pk):
 
 ## Best Practices
 
-1. **Keep views thin**.
-   A view should coordinate work, not contain all the business logic. As logic grows, push it into model methods, services, or utility functions so views stay readable and testable.
-2. **Use CBVs for standard patterns and FBVs for custom logic**.
-   CBVs (especially generic ones) reduce boilerplate for CRUD, pagination, and forms. FBVs are often clearer when you have a one-off flow that doesn’t fit a reusable pattern.
-3. **Always validate user input**.
-   Never trust `request.GET`/`request.POST` directly. Prefer Django Forms and model validation, and always handle invalid data explicitly.
-4. **Handle exceptions gracefully and log errors**.
-   Users should see helpful error pages; developers should get logs with enough context to debug. Avoid leaking stack traces or sensitive data in production.
-5. **Optimize database queries**.
-   Watch out for the N+1 query pattern when templates loop over related objects. Use `select_related()` and `prefetch_related()` when you know you’ll need related data.
-6. **Use appropriate HTTP status codes**.
-   Status codes are part of your API contract and make debugging easier. For example, return 201 on create, 400 on validation errors, and 404 when a resource doesn’t exist.
-7. **Implement authentication and authorization intentionally**.
-   Authentication answers “who are you?”; authorization answers “are you allowed to do this?”. Use decorators/mixins and Django permissions consistently.
-8. **Cache expensive operations**.
-   Cache is a tool to reduce load, but it adds complexity. Cache only after you understand what’s slow, and choose a cache key strategy that avoids serving the wrong user’s data.
+1. **Keep views thin**. A view should coordinate work, not contain all the business logic. As logic grows, push it into model methods, services, or utility functions so views stay readable and testable.
+2. **Use CBVs for standard patterns and FBVs for custom logic**. CBVs (especially generic ones) reduce boilerplate for CRUD, pagination, and forms. FBVs are often clearer when you have a one-off flow that doesn’t fit a reusable pattern.
+3. **Always validate user input**. Never trust `request.GET`/`request.POST` directly. Prefer Django Forms and model validation, and always handle invalid data explicitly.
+4. **Handle exceptions gracefully and log errors**. Users should see helpful error pages; developers should get logs with enough context to debug. Avoid leaking stack traces or sensitive data in production.
+5. **Optimize database queries**. Watch out for the N+1 query pattern when templates loop over related objects. Use `select_related()` and `prefetch_related()` when you know you’ll need related data.
+6. **Use appropriate HTTP status codes**. Status codes are part of your API contract and make debugging easier. For example, return 201 on create, 400 on validation errors, and 404 when a resource doesn’t exist.
+7. **Implement authentication and authorization intentionally**. Authentication answers “who are you?”; authorization answers “are you allowed to do this?”. Use decorators/mixins and Django permissions consistently.
+8. **Cache expensive operations**. Cache is a tool to reduce load, but it adds complexity. Cache only after you understand what’s slow, and choose a cache key strategy that avoids serving the wrong user’s data.
 
 ## Summary
 
-- Views handle request processing and response generation
-- FBVs are simple and explicit, CBVs are reusable and organized
-- Django provides shortcuts to reduce boilerplate code
-- Security features protect against common attacks
-- Proper error handling ensures robust applications
+* Views handle request processing and response generation
+* FBVs are simple and explicit, CBVs are reusable and organized
+* Django provides shortcuts to reduce boilerplate code
+* Security features protect against common attacks
+* Proper error handling ensures robust applications
 
 ## Important Keywords
 
@@ -620,7 +560,7 @@ Specialized HttpResponse that returns JSON-encoded data, commonly used for API e
 
 Django shortcut that combines a template with context data and returns an HttpResponse.
 
-### **get_object_or_404()**
+### **get\_object\_or\_404()**
 
 Shortcut that retrieves an object or raises Http404 exception if not found, simplifying error handling.
 
@@ -646,7 +586,7 @@ HTTP status code indicating the result of a request (200 OK, 404 Not Found, 201 
 
 ### **QuerySet Optimization**
 
-Techniques like select_related() and prefetch_related() to reduce database queries and improve performance.
+Techniques like select\_related() and prefetch\_related() to reduce database queries and improve performance.
 
 ### **Caching**
 

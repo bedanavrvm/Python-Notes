@@ -1,4 +1,3 @@
-
 # 10. Deployment & Best Practices
 
 Moving from a local development environment to a live server is the final hurdle. This chapter covers the transition from "it works on my machine" to a secure, scalable, and production-ready application.
@@ -7,14 +6,15 @@ Moving from a local development environment to a live server is the final hurdle
 
 In development, you use `runserver` and SQLite. In production, you need a more robust stack to handle multiple users and high traffic.
 
-- **Web Server (Nginx/Apache)**: Handles incoming traffic, manages SSL (HTTPS), and serves static files
-- **WSGI/ASGI Server (Gunicorn/Uvicorn)**: The "translator" that sits between the web server and Django
-- **Database (PostgreSQL/MySQL)**: A dedicated, high-performance database. SQLite is generally not recommended for production due to concurrency limits
-- **Process Manager (Systemd/Docker)**: Ensures your application starts automatically and restarts if it crashes
+* **Web Server (Nginx/Apache)**: Handles incoming traffic, manages SSL (HTTPS), and serves static files
+* **WSGI/ASGI Server (Gunicorn/Uvicorn)**: The "translator" that sits between the web server and Django
+* **Database (PostgreSQL/MySQL)**: A dedicated, high-performance database. SQLite is generally not recommended for production due to concurrency limits
+* **Process Manager (Systemd/Docker)**: Ensures your application starts automatically and restarts if it crashes
 
 ### Recommended Production Stack
 
 <details>
+
 <summary>Show docker-compose example</summary>
 
 ```yaml
@@ -95,6 +95,7 @@ gunicorn myproject.wsgi:application --bind 127.0.0.1:8000
 ### 4. Put Nginx in front (reverse proxy + static)
 
 <details>
+
 <summary>Show Nginx reverse proxy example</summary>
 
 ```nginx
@@ -256,41 +257,24 @@ LOGGING = {
 Use a library like `python-dotenv` or `django-environ` to keep sensitive information out of your version control (GitHub).
 
 {% tabs %}
-
 {% tab title=".env" %}
+\`\`\`python
 
-```python
-# .env file
-DEBUG=False
-SECRET_KEY=your-super-secret-key-here
-DATABASE_URL=postgres://user:password@localhost:5432/dbname
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password
-ALLOWED_HOSTS=localhost,127.0.0.1,yourdomain.com
-```
+## .env file
 
-{% endtab %}
+DEBUG=False SECRET\_KEY=your-super-secret-key-here DATABASE\_URL=postgres://user:password@localhost:5432/dbname EMAIL\_HOST\_USER=your-email@gmail.com EMAIL\_HOST\_PASSWORD=your-app-password ALLOWED\_HOSTS=localhost,127.0.0.1,yourdomain.com `</div><div data-gb-custom-block data-tag="tab" data-title='settings.py'>`python
 
-{% tab title="settings.py" %}
+## settings.py
 
-```python
-# settings.py
-import os
-from pathlib import Path
-from dotenv import load_dotenv
+import os from pathlib import Path from dotenv import load\_dotenv
 
-# Load environment variables
-load_dotenv()
+## Load environment variables
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-```
+load\_dotenv()
 
-{% endtab %}
+BASE\_DIR = Path(**file**).resolve().parent.parent SECRET\_KEY = os.getenv('SECRET\_KEY') DEBUG = os.getenv('DEBUG', 'False') == 'True' ALLOWED\_HOSTS = os.getenv('ALLOWED\_HOSTS', 'localhost,127.0.0.1').split(',')
 
-{% endtabs %}
+````</div></div>
 
 ## Static and Media Files
 
@@ -298,13 +282,14 @@ In production, Django does not serve static files. You must run:
 
 ```bash
 python manage.py collectstatic
-```
+````
 
 This gathers all assets into a single folder (`STATIC_ROOT`) so that Nginx can serve them directly.
 
-### Nginx Configuration
+#### Nginx Configuration
 
 <details>
+
 <summary>Show full Nginx config example</summary>
 
 ```nginx
@@ -339,11 +324,12 @@ server {
 
 </details>
 
-## Process Management
+### Process Management
 
-### Systemd Service File
+#### Systemd Service File
 
 <details>
+
 <summary>Show Systemd service example</summary>
 
 ```ini
@@ -378,9 +364,10 @@ sudo systemctl start django
 sudo systemctl status django
 ```
 
-## Optional: Docker Deployment
+### Optional: Docker Deployment
 
 <details>
+
 <summary>Show Dockerfile example</summary>
 
 ```dockerfile
@@ -413,15 +400,16 @@ CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000"]
 
 </details>
 
-## Monitoring and Logs
+### Monitoring and Logs
 
 Once your app is live, you need to know if something goes wrong.
 
-### Logging
+#### Logging
 
 Configure Django's logging to write errors to a file or a service like Sentry.
 
 <details>
+
 <summary>Show LOGGING example</summary>
 
 ```python
@@ -457,11 +445,12 @@ LOGGING = {
 
 </details>
 
-### Error Tracking
+#### Error Tracking
 
 Tools like Sentry or New Relic provide real-time alerts when your users hit a 500 error.
 
 <details>
+
 <summary>Show Sentry example</summary>
 
 ```python
@@ -480,9 +469,9 @@ sentry_sdk.init(
 
 </details>
 
-## Optional: Performance Optimization
+### Optional: Performance Optimization
 
-### Database Optimization
+#### Database Optimization
 
 ```python
 # settings.py
@@ -510,7 +499,7 @@ DATABASE_POOL_ARGS = {
 }
 ```
 
-### Caching
+#### Caching
 
 ```python
 # settings.py
@@ -528,7 +517,7 @@ CACHES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache.CacheSession'
 ```
 
-### Application Performance
+#### Application Performance
 
 ```python
 # settings.py
@@ -551,11 +540,12 @@ TEMPLATES = [
 ]
 ```
 
-## Optional: Backup Strategy
+### Optional: Backup Strategy
 
-### Database Backups
+#### Database Backups
 
 <details>
+
 <summary>Show database backup script</summary>
 
 ```bash
@@ -571,9 +561,10 @@ pg_dump -U $DB_USER -h localhost -F c $DB_NAME > "$BACKUP_DIR/$DB_NAME_$DATE.sql
 
 </details>
 
-### Media File Backups
+#### Media File Backups
 
 <details>
+
 <summary>Show media backup script</summary>
 
 ```bash
@@ -587,9 +578,9 @@ tar -czf "$BACKUP_DIR/media_$DATE.tar.gz" -C "$MEDIA_DIR" .
 
 </details>
 
-## Optional: Security Best Practices
+### Optional: Security Best Practices
 
-### Regular Maintenance
+#### Regular Maintenance
 
 ```python
 # settings.py
@@ -611,7 +602,7 @@ SESSION_COOKIE_AGE = 86400  # 24 hours
 SESSION_SAVE_EVERY_REQUEST = False  # Performance trade-off
 ```
 
-### Security Headers
+#### Security Headers
 
 ```python
 # settings.py
@@ -623,9 +614,9 @@ SECURE_HSTS_PRELOAD = True
 X_FRAME_OPTIONS = 'DENY'
 ```
 
-## Optional: Testing in Production
+### Optional: Testing in Production
 
-### Staging Environment
+#### Staging Environment
 
 ```python
 # settings/staging.py
@@ -635,9 +626,10 @@ DEBUG = True
 ALLOWED_HOSTS = ['staging.yourdomain.com']
 ```
 
-### Health Checks
+#### Health Checks
 
 <details>
+
 <summary>Show health check example</summary>
 
 ```python
@@ -663,11 +655,12 @@ def health_check(request):
 
 </details>
 
-## Optional: CI/CD Pipeline
+### Optional: CI/CD Pipeline
 
-### GitHub Actions Example
+#### GitHub Actions Example
 
 <details>
+
 <summary>Show GitHub Actions example</summary>
 
 ```yaml
@@ -705,11 +698,11 @@ jobs:
 
 </details>
 
-## Final Project Structure
+### Final Project Structure
 
 After following all these chapters, your repository should look organized and professional:
 
-```text
+```
 root/
 ├── SUMMARY.md (The GitBook sidebar)
 ├── django.md (Introduction page)
@@ -729,126 +722,128 @@ root/
     └── Deployment & Best Practices.md
 ```
 
-## Summary
+### Summary
 
-- **Nginx and Gunicorn** are the industry standards for serving Django
-- **PostgreSQL** is the preferred database for its reliability and features
-- **Environment Variables** protect your secrets
-- **DEBUG = False** is non-negotiable for live sites
-- **Monitoring** is essential for production stability
-- **Regular backups** protect against data loss
-- **Performance optimization** ensures your app scales with traffic
+* **Nginx and Gunicorn** are the industry standards for serving Django
+* **PostgreSQL** is the preferred database for its reliability and features
+* **Environment Variables** protect your secrets
+* **DEBUG = False** is non-negotiable for live sites
+* **Monitoring** is essential for production stability
+* **Regular backups** protect against data loss
+* **Performance optimization** ensures your app scales with traffic
 
-## Important Keywords
+### Important Keywords
 
-### **Production Environment**
+#### **Production Environment**
 
 Live server environment configured for real users, with security optimizations and performance settings.
 
-### **Web Server**
+#### **Web Server**
 
 Server software (like Nginx or Apache) that handles HTTP requests and serves your application.
 
-### **WSGI (Web Server Gateway Interface)**
+#### **WSGI (Web Server Gateway Interface)**
 
 Python standard that connects web servers to Python web applications.
 
-### **ASGI (Asynchronous Server Gateway Interface)**
+#### **ASGI (Asynchronous Server Gateway Interface)**
 
 Modern asynchronous interface for Python web applications, supporting async/await.
 
-### **Gunicorn**
+#### **Gunicorn**
 
 Popular WSGI server for Django applications in production.
 
-### **Uvicorn**
+#### **Uvicorn**
 
 ASGI server for Django applications supporting async views.
 
-### **Process Manager**
+#### **Process Manager**
 
 System service that manages application lifecycle (start, restart, monitor).
 
-### **Systemd**
+#### **Systemd**
 
 Linux init system and service manager used for process management.
 
-### **Docker**
+#### **Docker**
 
 Container platform that packages applications with all dependencies for deployment.
 
-### **Environment Variables**
+#### **Environment Variables**
 
 Configuration values stored outside the codebase, typically in `.env` files.
 
-### **Collectstatic**
+#### **Collectstatic**
 
 Django command that gathers all static files into a single location for serving.
 
-### **Static Files**
+#### **Static Files**
 
 CSS, JavaScript, images, and other assets that don't change dynamically.
 
-### **Media Files**
+#### **Media Files**
 
 User-uploaded files like images, documents, and other content.
 
-### **Logging**
+#### **Logging**
 
 Process of recording application events, errors, and performance metrics.
 
-### **Error Tracking**
+#### **Error Tracking**
 
 Real-time monitoring system for application errors and exceptions.
 
-### **Sentry**
+#### **Sentry**
 
 Popular error tracking service for Django applications.
 
-### **SSL/TLS**
+#### **SSL/TLS**
 
 Security protocol that encrypts data transmitted between users and your server.
 
-### **HTTPS**
+#### **HTTPS**
 
 Secure version of HTTP using SSL/TLS encryption.
 
-### **Database Migration**
+#### **Database Migration**
 
 Process of updating database schema to match model changes.
 
-### **Backup Strategy**
+#### **Backup Strategy**
 
 Plan for regularly backing up database and media files for disaster recovery.
 
-### **Health Check**
+#### **Health Check**
 
 Endpoint or script that verifies application health and status.
 
-### **CI/CD Pipeline**
+#### **CI/CD Pipeline**
 
 Automated testing and deployment process (Continuous Integration/Continuous Deployment).
 
-### **Load Balancing**
+#### **Load Balancing**
 
 Distributing traffic across multiple server instances to handle high traffic.
 
-### **Scaling**
+#### **Scaling**
 
 Process of increasing application capacity to handle more users or traffic.
 
-### **Performance Optimization**
+#### **Performance Optimization**
 
 Techniques to improve application speed and resource usage.
 
-### **Security Headers**
+#### **Security Headers**
 
 HTTP headers that enhance browser security and protect against attacks.
 
-### **Session Security**
+#### **Session Security**
 
 Configuration options that protect user sessions from hijacking.
 
-### **Password Policies**
+#### **Password Policies**
 
 Rules and validation for user password strength and security.
+{% endtab %}
+{% endtabs %}

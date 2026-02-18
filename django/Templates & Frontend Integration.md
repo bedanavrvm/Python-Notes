@@ -1,5 +1,4 @@
-
-# 4. Templates & Frontend Integration (The Presentation Layer)
+# 4. Templates & Frontend Integration
 
 While Views handle the logic, Templates handle the presentation. Django uses the Django Template Language (DTL), which allows you to bridge the gap between static HTML and dynamic Python data.
 
@@ -17,11 +16,9 @@ Used to output data from the context dictionary passed by the view.
 <p>Published: {{ post.published_date|date:"M d, Y" }}</p>
 ```
 
-### 2. Tags `{% %}`
+### 2. Tags `{% %}`Used for logic, such as loops, conditionals, and loading external resources.
 
-Used for logic, such as loops, conditionals, and loading external resources.
-
-```html
+````html
 {% if posts %}
     {% for post in posts %}
         <article>
@@ -33,9 +30,7 @@ Used for logic, such as loops, conditionals, and loading external resources.
 {% else %}
     <p>No posts found.</p>
 {% endif %}
-```
-
-### 3. Filters `|`
+```### 3. Filters `|`
 
 Used to transform the way a variable is displayed.
 
@@ -45,7 +40,7 @@ Used to transform the way a variable is displayed.
 {{ post.title|upper }}
 {{ post.content|safe }}  <!-- Renders HTML without escaping -->
 {{ user.email|default:"No email provided" }}
-```
+````
 
 ## Template Inheritance
 
@@ -66,125 +61,90 @@ flowchart TB
 This file contains the skeleton of your site. You define "blocks" that child templates can fill in.
 
 {% tabs %}
-
 {% tab title="base.html" %}
+\`\`\`html\{% block title %\}My Site\{% endblock %\} \{% load static %\} \{% block extra\_css %\}\{% endblock %\}Home Blog \{% if user.is\_authenticated %\} \{{ user.username \}} Logout \{% else %\} Login \{% endif %\}
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Site{% endblock %}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Home</a>
-            <a href="{% url 'blog:list' %}">Blog</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'profile' %}">{{ user.username }}</a>
-                <a href="{% url 'logout' %}">Logout</a>
-            {% else %}
-                <a href="{% url 'login' %}">Login</a>
-            {% endif %}
-        </nav>
-    </header>
+```
+<main class="content">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-    <main class="content">
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message {{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% block content %}
+    {% endblock %}
+</main>
 
-        {% block content %}
-        {% endblock %}
-    </main>
+<footer>
+    <p>&copy; 2023 My Site. All rights reserved.</p>
+</footer>
 
-    <footer>
-        <p>&copy; 2023 My Site. All rights reserved.</p>
-    </footer>
-
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+{% block extra_js %}{% endblock %}
 ```
 
+\`\`\`
 {% endtab %}
 
 {% tab title="post_list.html" %}
+\`\`\`html \{% extends 'base.html' %\}
 
-```html
-{% extends 'base.html' %}
+\{% block title %\}Blog Posts - My Site\{% endblock %\}
 
-{% block title %}Blog Posts - My Site{% endblock %}
+\{% block content %\}
 
-{% block content %}
-    <div class="blog-list">
-        <h1>All Posts</h1>
+## All Posts
 
-        {% for post in posts %}
-            <article class="post">
-                <h2>
-                    <a href="{% url 'blog:detail' post.slug %}">
-                        {{ post.title }}
-                    </a>
-                </h2>
-                <p class="meta">
-                    By {{ post.author.username }} on 
-                    {{ post.published_date|date:"F j, Y" }}
-                </p>
-                <div class="excerpt">
-                    {{ post.content|truncatewords:30 }}
-                </div>
-                <a href="{% url 'blog:detail' post.slug %}" class="read-more">
-                    Read More
+```
+    {% for post in posts %}
+        <article class="post">
+            <h2>
+                <a href="{% url 'blog:detail' post.slug %}">
+                    {{ post.title }}
                 </a>
-            </article>
-        {% empty %}
-            <p>No posts found.</p>
-        {% endfor %}
+            </h2>
+            <p class="meta">
+                By {{ post.author.username }} on 
+                {{ post.published_date|date:"F j, Y" }}
+            </p>
+            <div class="excerpt">
+                {{ post.content|truncatewords:30 }}
+            </div>
+            <a href="{% url 'blog:detail' post.slug %}" class="read-more">
+                Read More
+            </a>
+        </article>
+    {% empty %}
+        <p>No posts found.</p>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
     </div>
-
-    {% if is_paginated %}
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; First</a>
-                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            {% endif %}
-
-            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-            {% endif %}
-        </div>
-    {% endif %}
-{% endblock %}
+{% endif %}
 ```
 
-{% endtab %}
+\{% endblock %\}
 
-{% endtabs %}
+````</div></div>##
 
-## Mini Walkthrough: Render a Post List Page (View Context → Template → Layout)
-
-This walkthrough shows how templates connect to views and how inheritance keeps your UI consistent.
-
-{% tabs %}
-
-{% tab title="views.py" %}
-
-```python
+This walkthrough shows how templates connect to views and how inheritance keeps your UI consistent.<div data-gb-custom-block data-tag="tabs"><div data-gb-custom-block data-tag="tab" data-title='views.py'>```python
 # blog/views.py
 from django.shortcuts import render
 from .models import Post
@@ -192,13 +152,7 @@ from .models import Post
 def post_list(request):
     posts = Post.objects.all().order_by('-published_date')
     return render(request, 'blog/post_list.html', {'posts': posts})
-```
-
-{% endtab %}
-
-{% tab title="template" %}
-
-```html
+```</div><div data-gb-custom-block data-tag="tab" data-title='template'>```html
 <!-- blog/templates/blog/post_list.html -->
 {% extends 'base.html' %}
 
@@ -218,13 +172,7 @@ def post_list(request):
     <p>No posts yet.</p>
   {% endfor %}
 {% endblock %}
-```
-
-{% endtab %}
-
-{% endtabs %}
-
-### 3. Result
+```</div></div>### 3. Result
 
 Because the template extends `base.html`, every page shares the same navigation/footer, while each page only defines its own `{% block content %}`.
 
@@ -256,9 +204,9 @@ TEMPLATES = [
         },
     },
 ]
-```
+````
 
-#### Template Tags and Filters
+**Template Tags and Filters**
 
 Create custom template tags for reusable logic:
 
@@ -284,7 +232,7 @@ def markdown(value):
     return markdown.markdown(value)
 ```
 
-```html
+````html
 <!-- Usage in templates -->
 {% load blog_tags %}
 
@@ -293,9 +241,7 @@ def markdown(value):
 {% show_latest_posts 3 %}
 
 {{ post.content|markdown }}
-```
-
-## Handling Static Files
+```## Handling Static Files
 
 Static files are assets that don't change, like CSS, JavaScript, and images. Django provides a specific way to manage these to ensure they work in both development and production.
 
@@ -314,13 +260,13 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
-```
+````
 
-### 2. Usage in Templates
+#### 2. Usage in Templates
 
 To use a static file, you must first "load" the static tag at the top of your template.
 
-```html
+````html
 {% load static %}
 
 <!DOCTYPE html>
@@ -338,9 +284,7 @@ To use a static file, you must first "load" the static tag at the top of your te
     <script src="{% static 'js/vendor/jquery.min.js' %}"></script>
 </body>
 </html>
-```
-
-### 3. Static File Organization
+```### 3. Static File Organization
 
 ```text
 static/
@@ -361,13 +305,13 @@ static/
 └── fonts/
     ├── roboto.woff2
     └── icons.woff
-```
+````
 
-## Media Files (User Uploads)
+### Media Files (User Uploads)
 
 Unlike static files (which you provide), Media files are uploaded by users (like profile pictures).
 
-### Configuration
+#### Configuration
 
 ```python
 # Media files (user uploads)
@@ -375,7 +319,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 ```
 
-### URL Configuration
+#### URL Configuration
 
 In development, you need to add a specific line to your `urls.py` to serve these files.
 
@@ -393,9 +337,9 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-### Template Usage
+#### Template Usage
 
-```html
+````html
 {% load static %}
 
 <!-- User profile picture -->
@@ -407,9 +351,7 @@ if settings.DEBUG:
         {{ attachment.file.name }}
     </a>
 {% endfor %}
-```
-
-## Forms in Templates
+```## Forms in Templates
 
 Django forms render cleanly in templates with proper error handling.
 
@@ -423,9 +365,7 @@ Django forms render cleanly in templates with proper error handling.
 
     <button type="submit">Submit</button>
 </form>
-```
-
-### Custom Form Rendering
+```### Custom Form Rendering
 
 ```html
 <form method="post">
@@ -453,9 +393,7 @@ Django forms render cleanly in templates with proper error handling.
 
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-```
-
-### Formsets
+```### Formsets
 
 ```html
 {% for form in formset %}
@@ -465,9 +403,7 @@ Django forms render cleanly in templates with proper error handling.
 {% endfor %}
 
 {{ formset.management_form }}
-```
-
-## Template Context and Variables
+```## Template Context and Variables
 
 ### Accessing Context Data
 
@@ -488,11 +424,11 @@ Django forms render cleanly in templates with proper error handling.
 <!-- Method calls (no arguments) -->
 {{ post.get_absolute_url }}
 {{ user.get_full_name }}
-```
+````
 
-### Conditional Logic
+#### Conditional Logic
 
-```html
+````html
 {% if user.is_authenticated and user.is_staff %}
     <div class="admin-panel">
         <a href="{% url 'admin:index' %}">Admin Panel</a>
@@ -506,9 +442,7 @@ Django forms render cleanly in templates with proper error handling.
         <a href="{% url 'login' %}">Login</a>
     </div>
 {% endif %}
-```
-
-### Loops and Iteration
+```### Loops and Iteration
 
 ```html
 {% for post in posts %}
@@ -532,9 +466,7 @@ Django forms render cleanly in templates with proper error handling.
         <p>Post {{ forloop.counter }} of {{ forloop.parentloop.counter }}</p>
     </article>
 {% endfor %}
-```
-
-## Security in Templates
+```## Security in Templates
 
 ### Auto-escaping
 
@@ -546,20 +478,18 @@ Django automatically escapes HTML content to prevent XSS attacks:
 
 <!-- Unsafe: Renders raw HTML (use only with trusted content) -->
 {{ trusted_content|safe }}
-```
+````
 
-### CSRF Protection
+#### CSRF Protection
 
 Always include CSRF tokens in forms:
 
-```html
+````html
 <form method="post">
     {% csrf_token %}
     <!-- form fields -->
 </form>
-```
-
-## Optional: Internationalization (i18n)
+```## Optional: Internationalization (i18n)
 
 ### Translation Tags
 
@@ -583,9 +513,7 @@ There are {{ counter }} comments.
 {% blocktrans with author=post.author %}
 By {{ author }}
 {% endblocktrans %}
-```
-
-## Optional: Performance Optimization
+```## Optional: Performance Optimization
 
 ### Template Caching
 
@@ -604,11 +532,11 @@ TEMPLATES = [
         },
     },
 ]
-```
+````
 
-### Efficient Template Design
+#### Efficient Template Design
 
-```html
+````html
 <!-- Avoid expensive operations in templates -->
 {% cache 500 sidebar %}
     {% show_latest_posts %}
@@ -619,9 +547,7 @@ TEMPLATES = [
 {% for post in category_posts %}
     {{ post.title }}
 {% endfor %}
-```
-
-## Best Practices
+```## Best Practices
 
 1. **Keep templates simple**.
    Templates should focus on rendering, not heavy logic. If you find yourself needing complex conditionals or data processing, move that logic into the view or a custom template tag.
@@ -726,3 +652,6 @@ System for displaying temporary messages to users (success, error, info messages
 ### **Form Rendering**
 
 Process of displaying Django forms in templates with proper field rendering and error display.
+````
+{% endtab %}
+{% endtabs %}
