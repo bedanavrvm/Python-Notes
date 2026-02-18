@@ -330,8 +330,25 @@ JavaScript is the engine’s language. TypeScript is a **safety layer** on top o
 
 {% endtabs %}
 
-## Summary
+## Important things to know
 
-- JavaScript is the language; Runtimes (Browser/Node) provide the body and APIs.
-- TypeScript is an optional safety layer that must be compiled into JavaScript.
-- "Strict" means runtime predictability in JS, but development safety in TS.
+This section consolidates key terms and concepts introduced in this chapter.
+
+### Core Concepts & Keywords
+
+- **JavaScript Engine**: The "brain" inside a runtime (like V8) that reads and executes code logic. It does not natively know about webpages or files.
+- **Runtime**: The "body" that wraps an engine and provides **APIs** (powers) to interact with the world (e.g., Browser for web pages, Node.js for servers).
+- **API (Application Programming Interface)**: The set of tools and objects provided by the runtime (like `fetch`, `document`, or `fs`) that let you use its powers.
+- **DOM (Document Object Model)**: A tree-like representation of your HTML that the browser provides so JavaScript can change the page.
+- **Sandboxing**: A security system that keeps your code in a "sandbox" so it cannot harm your computer or access private files.
+- **CORS (Cross-Origin Resource Sharing)**: A browser security rule that prevents websites from making requests to other sites unless explicitly permitted.
+- **ASI (Automatic Semicolon Insertion)**: A JavaScript feature where the engine tries to add semicolons for you if you leave them out.
+
+### Looking Ahead
+
+You encountered several terms that were not fully explored yet. You don’t need to master these now, but you will see them again:
+
+- **ES Modules**: A modern way of organizing code that enables "Strict Mode" automatically.
+- **Static Type System**: What TypeScript adds to JavaScript to catch bugs before they ever run.
+- **Promises**: Special JavaScript objects used to handle tasks that take time (like fetching data).
+- **Development Tooling**: Tools like **ESLint** and **Prettier** which are used in professional projects to enforce rules (like semicolons) and maintain code quality.
