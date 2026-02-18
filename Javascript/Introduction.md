@@ -8,7 +8,6 @@ JavaScript (JS) is the programming language of the web.
 Think of them like this:
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 - Runs directly in the runtime (browser/Node).
@@ -24,7 +23,6 @@ Think of them like this:
 - Many mistakes can be caught before running.
 
 {% endtab %}
-
 {% endtabs %}
 
 This chapter gives you a practical starting point:
@@ -33,10 +31,6 @@ This chapter gives you a practical starting point:
 - **Where it runs**
 - **How to run your first code**
 - **Where TypeScript fits (optional)**
-
-## What is JavaScript?
-
-JavaScript is a general-purpose language that can run in multiple environments.
 
 ## What is JavaScript?
 
@@ -137,7 +131,6 @@ This explains why some code works in the browser but not in Node, and vice-versa
 The traditional first program prints a message.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -160,13 +153,11 @@ console.log(message);
 - **Difference**: Adds type information (`: string`). TypeScript exists only during development.
 
 {% endtab %}
-
 {% endtabs %}
 
 ### Run it in the Browser
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 - Open any website.
@@ -187,13 +178,11 @@ console.log(message);
 After compilation, the browser runs only the resulting JavaScript.
 
 {% endtab %}
-
 {% endtabs %}
 
 ### Run it with Node.js
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 - Create `hello.js`: `console.log("Hello from Node.js!");`
@@ -214,14 +203,13 @@ After compilation, the browser runs only the resulting JavaScript.
 - **Result**: Node runs the emitted JavaScript; TypeScript disappears after compilation.
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Code Structure: JS vs TS Side-by-Side
 
 ### Statements
-{% tabs %}
 
+{% tabs %}
 {% tab title="JavaScript" %}
 
 ```js
@@ -242,7 +230,6 @@ count = count + 1;
 - **Runtime behavior**: Identical to JS.
 
 {% endtab %}
-
 {% endtabs %}
 
 ### Semicolons: JavaScript vs TypeScript
@@ -272,7 +259,6 @@ Same syntax in both; TypeScript does not change comment behavior.
 The word "strict" means something completely different in JS and TS.
 
 {% tabs %}
-
 {% tab title="JavaScript (Runtime)" %}
 
 Enabled with `"use strict";` (automatic in ES modules). It affects **runtime behavior**:
@@ -289,7 +275,6 @@ Enabled via a setting in `tsconfig.json`: `{"strict": true}`. It affects **compi
 - catches common mistakes (like `undefined` access) before running.
 
 {% endtab %}
-
 {% endtabs %}
 
 **The mental model**: JavaScript strict affects how the code **runs**. TypeScript strict affects how the code is **checked** during development.
@@ -312,7 +297,6 @@ JavaScript is the engine’s language. TypeScript is a **safety layer** on top o
 ## Tasks
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 - **Task 1 (Browser)**: Open DevTools and run a `console.log` message.
@@ -327,7 +311,6 @@ JavaScript is the engine’s language. TypeScript is a **safety layer** on top o
 - **Task 2 (Type Safety)**: In a TS file, declare a `number` and try to assign a `string`. Observe the compiler error.
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Important things to know
