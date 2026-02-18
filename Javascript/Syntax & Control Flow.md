@@ -1,89 +1,143 @@
 # 3. Syntax & Control Flow
 
-TypeScript uses the same runtime syntax as JavaScript, with a few additions for types.
+(JavaScript and TypeScript, Side-by-Side)
 
-## Variables: var, let, const
+TypeScript uses the same runtime syntax as JavaScript. Everything in this chapter runs the same way at runtime in both.
 
-* `var`: function-scoped, hoisted (legacy)
-* `let`: block-scoped
-* `const`: block-scoped binding (value can still be mutable)
+The difference is:
+* **JavaScript** → Runtime behavior only.
+* **TypeScript** → Adds compile-time type checking.
 
-const user = { name: "Alice" }; user.name = "Bob"; // ok: object is mutable
+We will always compare both.
 
-// Avoid var var x = 1; `</div><div data-gb-custom-block data-tag="tab" data-title='TypeScript'>`ts let count: number = 0; count += 1;
+## 1. Variables — var, let, const
 
-const user: { name: string } = { name: "Alice" }; user.name = "Bob";
+Modern development uses three variable declarations.
 
-````</div></div>###
+### `var` (Legacy)
+```js
+var x = 1;
+```
+* **Properties**: Function-scoped (not block-scoped), hoisted, can be re-declared and reassigned.
+* **The Surprising Part**:
+  ```js
+  if (true) {
+    var x = 10;
+  }
+  console.log(x); // 10 (visible outside the block)
+  ```
+* **TS Influence**: TypeScript does not change `var` behavior; it only adds type checking. 
+* **Verdict**: **Avoid `var`**.
 
-`let` and `const` are block-scoped, but they also have a *temporal dead zone* (they exist in the scope but are not usable until their declaration is evaluated).
+### `let`
+```js
+let count = 0;
+count += 1;
+```
+* **Properties**: Block-scoped, cannot be re-declared in the same scope, can be reassigned.
+{% tabs %}
+{% tab title="JavaScript" %}
+```js
+let count = 0;
+count += 1;
+```
+Runtime behavior is the core.
+{% endtab %}
+{% tab title="TypeScript" %}
+```ts
+let count: number = 0;
+count += 1;
+```
+TS adds `: number`. Runtime behavior is identical.
+{% endtab %}
+{% endtabs %}
 
-<details>
-<summary>Show TDZ behavior</summary>
+### `const`
+```js
+const user = { name: "Alice" };
+user.name = "Bob"; // Allowed!
+```
+* **CRITICAL**: `const` means the **binding** is constant, not the **value**. You cannot reassign the variable: `user = {}` would fail. But you can mutate object properties.
+{% tabs %}
+{% tab title="JavaScript" %}
+```js
+const user = { name: "Alice" };
+user.name = "Bob";
+```
+Execution allows mutation.
+{% endtab %}
+{% tab title="TypeScript" %}
+```ts
+const user: { name: string } = { name: "Alice" };
+user.name = "Bob";
+```
+TS checks the *shape* of the object.
+{% endtab %}
+{% endtabs %}
 
+## 2. Block Scope & Temporal Dead Zone (TDZ)
+
+`let` and `const` are **block-scoped**:
 ```js
 {
-  // console.log(x); // ReferenceError (TDZ)
+  let x = 1;
+}
+console.log(x); // ReferenceError
+```
+
+### The Temporal Dead Zone (TDZ)
+Even though a variable exists in a block, it cannot be accessed before it is declared.
+```js
+{
+  // console.log(x); // ReferenceError
   const x = 1;
   console.log(x);
 }
-````
-
-### `const` means “binding is constant” (not “value is immutable”)
-
-`const` prevents reassigning the variable, but it does not freeze objects.
-
-<details>
-
-<summary>Show const + mutation</summary>
-
-```js
-const settings = { theme: "dark" };
-settings.theme = "light"; // ok
-
-// settings = { theme: "dark" }; // not ok
 ```
+This period between the start of the block and the declaration is the **TDZ**. TypeScript may warn you earlier, but the runtime rules are identical.
 
-</details>
+## 3. Equality — == vs ===
 
-## Equality: == vs ===
+### `==` (Loose Equality)
+Performs **type coercion** (automatically converts types to match).
+```js
+null == undefined; // true
+"1" == 1;          // true
+```
+This leads to many bugs and surprises.
 
-* `==` does coercion (often surprising)
-* `===` is strict equality (preferred)
+### `===` (Strict Equality)
+No coercion. Values must be the same type and same value.
+```js
+null === undefined; // false
+"1" === 1;           // false
+```
+**ALWAYS use `===` unless you have a specific reason to use coercion.**
 
-null == undefined; // true null === undefined; // false
-
-````</div><div
-It can, however, help you avoid comparisons between unrelated types.
-
+### TypeScript’s Role in Equality
+In `strict` mode, TypeScript prevents you from comparing unrelated types.
 ```ts
 const n: number = 0;
 const s: string = "0";
 
-// n === s; // compile-time error in strict mode
-```</div></div>### Equality edge cases (practical)
+// n === s; // Compile-time error in TS
+```
+In JavaScript, that comparison simply returns `false` at runtime.
 
-- Prefer `===` for almost everything.
-- Know the two common exceptions:
-  - comparing to `null`/`undefined` (sometimes `x == null` is used to mean “null or undefined”)
-  - checking `NaN` (because `NaN !== NaN`)
-
-<details>
-<summary>Show NaN and Object.is</summary>
-
+### Edge Case: NaN
 ```js
-Number.isNaN(NaN); // true
 NaN === NaN; // false
+```
+To check for `NaN`, use:
+* `Number.isNaN(NaN); // true`
+* `Object.is(NaN, NaN); // true`
 
-Object.is(NaN, NaN); // true
-Object.is(0, -0); // false (=== treats them as equal)
-````
+## 4. Conditionals
 
-## Conditionals
-
+### Basic Structure
 ```js
 if (condition) {
-  // ...
+  // block
 } else if (other) {
   // ...
 } else {
@@ -91,188 +145,127 @@ if (condition) {
 }
 ```
 
-### Guard clauses (readability)
+### Guard Clauses (Reading Top-to-Bottom)
+Avoid deeply nested logic by returning early.
+**Hard to read:**
+```js
+function handle(user) {
+  if (user) {
+    if (user.isActive) {
+      return "ok";
+    }
+  }
+  return "skip";
+}
+```
+**Better (Guard Clauses):**
+```js
+function handle(user) {
+  if (!user) return "skip";
+  if (!user.isActive) return "skip";
+  return "ok";
+}
+```
 
-Reference-style code often prefers early returns over deeply nested `if` blocks.
+### TypeScript Type Narrowing
+TS uses control flow to "narrow" types. After a null check, it knows the variable is defined.
+```ts
+function handle(user?: { isActive: boolean }) {
+  if (!user) return "skip";
+  // TS now knows user is DEFINED here
+  return user.isActive ? "ok" : "skip";
+}
+```
 
-<details>
+## 5. Ternary, Optional Chaining, and Nullish Coalescing
 
-<summary>Show nested vs guard clauses</summary>
-
-\`\`\`js function handle(user) { if (user) { if (user.isActive) { return "ok"; } } return "skip"; } \`\`\`\`\`\`js function handle(user) { if (!user) return "skip"; if (!user.isActive) return "skip"; return "ok"; } \`\`\`
-
-</details>
-
-### Ternary operator
-
-Use it for simple expressions, not multi-step logic.
-
+### Ternary Operator
 ```js
 const label = isAdmin ? "Admin" : "User";
 ```
+Structure: `condition ? valueIfTrue : valueIfFalse`. Only use for simple expressions.
 
-## Optional chaining and nullish coalescing
-
-These operators help avoid `Cannot read properties of undefined` bugs.
-
-{% tabs %}
-{% tab title="JavaScript" %}
-\`\`\`js const email = user?.profile?.email; const displayName = user?.name ?? "Anonymous";
-
-````
-
-`??` uses **nullish** rules (only `null`/`undefined` count as missing).</div><div data-gb-custom-block data-tag="tab" data-title='TypeScript'>```ts
-type User = { name?: string; profile?: { email?: string } };
-
-function getEmail(u: User): string {
-  return u.profile?.email ?? "";
-}
-````
-
-TS helps ensure you handle “possibly undefined” paths.
-{% endtab %}
-{% endtabs %}
-
-\### `||` vs `??` (important)
-
-`||` treats many values as falsy (including `0` and `""`). `??` only treats `null`/`undefined` as missing.
-
-<details>
-
-<summary>Show || vs ??</summary>
-
+### Optional Chaining (`?.`)
+Prevents `Cannot read properties of undefined` crashes.
 ```js
-0 || 10; // 10 (maybe not what you want)
-0 ?? 10; // 0
-
-"" || "default"; // "default"
-"" ?? "default"; // ""
+const email = user?.profile?.email;
 ```
 
-</details>
-
-## Loops
-
-* `for` / `while`: traditional loops
-* `for...of`: values of an iterable (arrays, strings)
-* `for...in`: keys of an object (including inherited enumerable keys)
-
-<details>
-
-<summary>Show for...of vs for...in</summary>
-
-\`\`\`js const arr = \["a", "b", "c"];for (const value of arr) { console.log(value); // a b c }for (const key in arr) { console.log(key); // "0" "1" "2" } \</div>\<div data-gb-custom-block data-tag="tab" data-title='TypeScript'>ts const arr: string\[] = \["a", "b", "c"];for (const value of arr) { console.log(value); }for (const key in arr) { // key is a string console.log(key); }### Iteration methods (map/filter/reduce)Arrays have higher-level methods that are often more readable than manual loops.\<details>\<summary>Show map/filter/reduce patterns\</summary>\<div data-gb-custom-block data-tag="tabs">\<div data-gb-custom-block data-tag="tab" data-title='JavaScript'>\`\`\`jsconst nums = \[1, 2, 3, 4];const squares = nums.map((n) => n \* n);const evens = nums.filter((n) => n % 2 === 0);const sum = nums.reduce((acc, n) => acc + n, 0);\`\`\`\</div>\<div data-gb-custom-block data-tag="tab" data-title='TypeScript'>\`\`\`tsconst nums: number\[] = \[1, 2, 3, 4];const squares = nums.map((n) => n \* n);const evens = nums.filter((n) => n % 2 === 0);const sum = nums.reduce((acc, n) => acc + n, 0);TS usually infers types here, which makes these patterns safer.
-
-</details>
-
-### `forEach` pitfalls
-
-`forEach` cannot be `break`/`continue`-d, and it does not work well with `await`.
-
-<details>
-
-<summary>Show why forEach + await is a foot-gun</summary>
+### Nullish Coalescing (`??`) vs `||`
+* `||` treats **all falsy values** (`0`, `""`, `false`) as missing.
+* `??` only treats **`null`** and **`undefined`** as missing.
 
 ```js
-// This does not await each callback the way many people expect:
-[1, 2, 3].forEach(async (n) => {
-  await doWork(n);
-});
+0 || 10;   // 10
+0 ?? 10;   // 0 (Use this when 0 is a valid value!)
+```
 
-// Prefer:
+## 6. Loops and Iteration
+
+### The Trio of Loops
+* **`for`**: The traditional counter loop.
+* **`for...of`**: Iterates over **values** (best for Arrays).
+* **`for...in`**: Iterates over **keys/property names** (best for Objects).
+
+```js
+const arr = ["a", "b", "c"];
+
+for (const val of arr) { console.log(val); } // "a", "b", "c"
+for (const key in arr) { console.log(key); } // "0", "1", "2"
+```
+
+### Array Methods (Clean & Functional)
+* **`map`**: Transforms each element (`[1, 2].map(n => n * 2)` -> `[2, 4]`).
+* **`filter`**: Keeps matching elements (`[1, 2].filter(n => n > 1)` -> `[2]`).
+* **`reduce`**: Accumulates values (`[1, 2].reduce((acc, n) => acc + n, 0)` -> `3`).
+
+### The `forEach` + `await` Pitfall
+**DO NOT use `forEach` with `async/await`**. It does not wait sequentially.
+```js
+// This runs all at once, ignoring order!
+[1, 2, 3].forEach(async (n) => { await doWork(n); });
+
+// DO THIS INSTEAD:
 for (const n of [1, 2, 3]) {
   await doWork(n);
 }
 ```
 
-</details>
+## 7. Advanced Syntax
 
-## Destructuring
+### Destructuring
+Extract values quickly from objects and arrays.
+```js
+const user = { id: 1, name: "Alice" };
+const { id, name } = user; // id = 1, name = "Alice"
 
-Destructuring is a common JS/TS idiom for extracting values.
+const [x, y] = [10, 20];   // x = 10, y = 20
+```
 
-{% tabs %}
-{% tab title="JavaScript" %}
-\`\`\`js const user = { id: 1, name: "Alice" }; const { id, name } = user;
-
-const arr = \[10, 20]; const \[x, y] = arr; `</div><div data-gb-custom-block data-tag="tab" data-title='TypeScript'>`ts type User = { id: number; name: string }; const user: User = { id: 1, name: "Alice" };
-
-const { id, name } = user;
-
-````</div></div>
-
-## switch and exhaustive handling
-
-In JS, `switch` is runtime only.
-In TS, `switch` can become safer with discriminated unions.
-
-<details>
-<summary>Show discriminated unions + switch exhaustiveness</summary>
-
+### Exhaustive `switch` (TypeScript Strength)
+TS can use the `never` type to ensure you've handled every possible case in a `switch`.
 ```ts
-type Shape =
-  | { kind: "circle"; radius: number }
-  | { kind: "square"; side: number };
+type Shape = { kind: "circle" } | { kind: "square" };
 
-function area(s: Shape): number {
+function handleShape(s: Shape) {
   switch (s.kind) {
-    case "circle":
-      return Math.PI * s.radius ** 2;
-    case "square":
-      return s.side ** 2;
-    default: {
-      const _exhaustive: never = s;
+    case "circle": return "...";
+    case "square": return "...";
+    default:
+      const _exhaustive: never = s; // Error if a new shape is added but not handled!
       return _exhaustive;
-    }
   }
 }
-````
+```
 
-### Truthiness pitfalls (important)
+## 8. Truthiness Pitfalls
 
-JavaScript has truthy/falsy values:
+JavaScript's **Falsy Values**:
+* `false`, `0`, `""`, `null`, `undefined`, `NaN`.
+**Everything else is Truthy**, including `{}` and `[]`.
 
-* falsy: `false`, `0`, `""`, `null`, `undefined`, `NaN`
-* truthy: everything else
+## Final Mental Model
 
-TypeScript can help by preventing some “possibly undefined” cases.
-
-### Summary
-
-* JS and TS share the same control-flow runtime behavior.
-* Prefer `let`/`const` over `var`; know block scope and TDZ.
-* Prefer `===` over `==`; learn `NaN` and `Object.is` edge cases.
-* Use optional chaining (`?.`) and nullish coalescing (`??`) to avoid undefined access.
-* Prefer `for...of` for readable iteration and correct `await` behavior.
-
-### Important Keywords
-
-#### **Block scope**
-
-Variables are visible only within the nearest `{ ... }` block.
-
-#### **Hoisting**
-
-JS behavior where declarations are processed before execution (var/function declarations), often causing surprises.
-
-#### **Temporal Dead Zone (TDZ)**
-
-Period where `let`/`const` exist but cannot be accessed before initialization.
-
-#### **Coercion**
-
-Implicit conversion between types (often involved in `==`).
-
-#### **Truthiness**
-
-JS rule where some values count as false in conditionals (`0`, `""`, `null`, `undefined`, `NaN`).
-
-#### **Optional chaining (`?.`)**
-
-Safely access nested properties without throwing if a link is nullish.
-
-#### **Nullish coalescing (`??`)**
-
-Fallback operator that treats only `null`/`undefined` as missing.
-{% endtab %}
-{% endtabs %}
+1. **JavaScript** defines the runtime rules (how code executes).
+2. **TypeScript** adds a safety layer that catches errors *before* they run.
+3. **Control Flow** works identically in both runtimes, but TypeScript narrows types based on your checks.
