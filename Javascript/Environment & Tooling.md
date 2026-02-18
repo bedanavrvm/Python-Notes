@@ -46,26 +46,17 @@ JavaScript runs directly. TypeScript adds a mandatory build step: **Type-check â
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-
 - **File**: `index.js`
   ```js
   console.log("Hello JS");
   ```
 - **Execution**: `node index.js`
 - **Fact**: Node executes the file directly. No build step required.
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 - **File**: `src/index.ts`
   ```ts
   console.log("Hello TS");
@@ -74,13 +65,8 @@ JavaScript runs directly. TypeScript adds a mandatory build step: **Type-check â
   1. **Compile**: `npx tsc` (reads `tsconfig.json`, outputs JS to `dist/`).
   2. **Run**: `node dist/index.js`
 - **Fact**: The runtime cannot execute `.ts`. It only runs the emitted JavaScript.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 ## 3. Node Version Management
 
@@ -152,13 +138,8 @@ my_project/
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript Project" %}
-
-
 ```json
 {
   "name": "my-js-project",
@@ -168,16 +149,10 @@ my_project/
   }
 }
 ```
-
-
 - No build step; `start` runs the source directly.
-
-
 {% endtab %}
 
 {% tab title="TypeScript Project" %}
-
-
 ```json
 {
   "name": "my-ts-project",
@@ -191,16 +166,9 @@ my_project/
   }
 }
 ```
-
-
 - `build` runs the compiler; `start` runs the emitted JS.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 ## 7. Development Tools (TypeScript)
 
@@ -278,30 +246,16 @@ When debugging, source maps allow you to see your original `.ts` or source code 
 
 
 
----
-
 {% tabs %}
-
 {% tab title="General" %}
-
-
 1. **Check Node Version**: Run `node -v` in your terminal.
 2. **Examine package.json**: Open a project and identify the `scripts` and `dependencies`.
 3. **Semver Check**: Look at your version ranges. Are you using `^` or `~`?
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 1. **Clean Start**: Delete your `dist/` folder and run `npx tsc` to see it regenerate.
 2. **Typecheck vs Build**: Run `npx tsc --noEmit` and confirm no JS files were created.
 3. **tsconfig Toggle**: Set `"strict": false` in a `tsconfig.json` and see if any previously flagged errors disappear (then turn it back on!).
-
-
 {% endtab %}
-
 {% endtabs %}
-
----

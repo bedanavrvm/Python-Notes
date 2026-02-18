@@ -9,29 +9,19 @@ Think of them like this:
 
 
 
----
-
 {% tabs %}
-
-{% tab %}
-
+{% tab title="JavaScript" %}
 - Runs directly in the runtime (browser/Node).
 - No build step required.
 - Errors show up at runtime.
-
 {% endtab %}
 
-{% tab %}
-
+{% tab title="TypeScript" %}
 - You still run JavaScript in the runtime.
 - TypeScript adds compile-time checks and then emits JavaScript.
 - Many mistakes can be caught before running.
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 This chapter gives you a practical starting point:
 
@@ -140,102 +130,60 @@ The traditional first program prints a message.
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-
 ```js
 console.log("Hello, world!");
 ```
-
-
 - **Execution**: Runs directly in the runtime (Browser/Node).
 - **Difference**: Plain JavaScript logic without extra annotations.
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 ```ts
 const message: string = "Hello, world!";
 console.log(message);
 ```
-
-
 - **Execution**: After compilation, it becomes plain JavaScript.
 - **Difference**: Adds type information (`: string`). TypeScript exists only during development.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 ### Run it in the Browser
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-
 - Open any website.
 - Press **F12** (DevTools) and go to the **Console**.
 - Run: `console.log("Hello from the browser!");`
 - **Result**: It works immediately.
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 - **Browsers do not understand TypeScript.**
 - **Workflow**:
   1. Write `.ts` code.
   2. Compile it to `.js`.
   3. Load the emitted `.js` in the browser.
 
-
 After compilation, the browser runs only the resulting JavaScript.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 ### Run it with Node.js
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-
 - Create `hello.js`: `console.log("Hello from Node.js!");`
 - Run: `node hello.js`
 - **Result**: Node runs the JavaScript directly.
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 - Create `hello.ts`:
   ```ts
   const message: string = "Hello from Node.js!";
@@ -244,13 +192,8 @@ After compilation, the browser runs only the resulting JavaScript.
 - Compile: `tsc hello.ts`
 - Run the resulting JS: `node hello.js`
 - **Result**: Node runs the emitted JavaScript; TypeScript disappears after compilation.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 ## Code Structure: JS vs TS Side-by-Side
 
@@ -258,42 +201,24 @@ After compilation, the browser runs only the resulting JavaScript.
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-
 ```js
 let count = 1;
 count = count + 1;
 ```
-
-
 - No built-in type annotations.
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 ```ts
 let count: number = 1;
 count = count + 1;
 ```
-
-
 - Declares the variable type (`: number`).
 - **Runtime behavior**: Identical to JS.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 ### Semicolons: JavaScript vs TypeScript
 
@@ -323,34 +248,20 @@ The word "strict" means something completely different in JS and TS.
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-
 Enabled with `"use strict";` (automatic in ES modules). It affects **runtime behavior**:
 - Prevents accidental globals.
 - Throws errors for unsafe actions.
 - Makes the engine execution more predictable.
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 Enabled via a setting in `tsconfig.json`: `{"strict": true}`. It affects **compile-time safety**:
 - Enables stronger type checking.
 - catches common mistakes (like `undefined` access) before running.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 **The mental model**: JavaScript strict affects how the code **runs**. TypeScript strict affects how the code is **checked** during development.
 
@@ -373,32 +284,18 @@ JavaScript is the engine’s language. TypeScript is a **safety layer** on top o
 
 
 
----
-
 {% tabs %}
-
 {% tab title="JavaScript" %}
-
-
 - **Task 1 (Browser)**: Open DevTools and run a `console.log` message.
 - **Task 2 (Node.js)**: Create `hello.js` and run it using `node hello.js`.
 - **Task 3 (ASI)**: Try writing code without semicolons and see if it runs in the browser console.
-
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
-
 - **Task 1 (Workflow)**: Write a `.ts` file, compile it using `tsc`, and run the resulting `.js` file.
 - **Task 2 (Type Safety)**: In a TS file, declare a `number` and try to assign a `string`. Observe the compiler error.
-
-
 {% endtab %}
-
 {% endtabs %}
-
----
 
 ## Important things to know
 
