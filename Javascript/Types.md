@@ -7,7 +7,6 @@ JavaScript and TypeScript both work with the same runtime, but they talk about
 types in different ways.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 - Types exist at runtime.
@@ -23,7 +22,6 @@ types in different ways.
 - Many mistakes are caught before running.
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Values, variables, and dynamic typing
@@ -32,7 +30,6 @@ JavaScript is dynamically typed: the same variable can hold different types at
 different times.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -50,7 +47,6 @@ let message = "hello";
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## The 8 basic JavaScript types
@@ -72,7 +68,6 @@ This is the single most important mental model in JavaScript.
 *   **Objects** (`{...}`, `[...]`, `function`) are passed by **reference**.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 **Primitives are immutable and distinct.**
@@ -119,7 +114,6 @@ const config: Config = { apiUrl: "https://api.com" };
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Deep Dive: The "Other" Primitives
@@ -130,7 +124,6 @@ JavaScript numbers are floating point (IEEE 754). They become unsafe above
 `9,007,199,254,740,991`.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 Use the `n` suffix.
@@ -160,7 +153,6 @@ const num: number = 10;
 Use `target: es2020` or higher in `tsconfig.json` to use BigInt.
 
 {% endtab %}
-
 {% endtabs %}
 
 ### Symbol (Unique Identifiers)
@@ -169,7 +161,6 @@ Symbols are guaranteed to be unique. They are often used for "hidden" properties
 or library internals.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -198,7 +189,6 @@ const key: unique symbol = Symbol();
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Checking runtime types: `typeof` and `Array.isArray`
@@ -207,7 +197,6 @@ const key: unique symbol = Symbol();
 type.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -239,7 +228,6 @@ if (typeof value === "string") {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Type conversions (runtime)
@@ -250,7 +238,6 @@ explicitly.
 ### String conversion
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -271,7 +258,6 @@ const x = String(false);
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ### Numeric conversion
@@ -279,7 +265,6 @@ const x = String(false);
 `Number(value)` converts to a number. Unary `+value` is a shorter form.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -304,7 +289,6 @@ const sum = Number(a) + Number(b);
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ### Boolean conversion
@@ -312,7 +296,6 @@ const sum = Number(a) + Number(b);
 `Boolean(value)` converts to true/false.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -332,13 +315,11 @@ const enabled = Boolean("0");
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## any vs unknown
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 In JS everything is effectively “any” at compile time.
 
@@ -365,7 +346,6 @@ function parse(value: unknown): string {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Unions and narrowing
@@ -375,7 +355,6 @@ A union expresses “one of these types”.
 In TypeScript, you can also describe it at compile time.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -408,7 +387,6 @@ function normalizeId(id: Id): string {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Literal Types and Inference
@@ -416,7 +394,6 @@ function normalizeId(id: Id): string {
 Why does `const` sometimes have a different type than `let`?
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 Variables hold values. Access behavior doesn't change based on how they were declared, only reassignment rules apply.
@@ -442,7 +419,6 @@ const req = { url: "https://api.com", method: "GET" } as const;
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Type Aliases (`type`)
@@ -450,7 +426,6 @@ const req = { url: "https://api.com", method: "GET" } as const;
 You can give a name to any type.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 Does not exist. You just write objects and functions. JSDoc is the closest equivalent.
@@ -476,7 +451,6 @@ const pt: Point = { x: 10, y: 20 };
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Optionality: undefined vs optional properties
@@ -485,7 +459,6 @@ In JS, missing properties produce `undefined`.
 In TS, you can model this precisely.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -509,7 +482,6 @@ if (user.email) {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## `null` and `undefined`
@@ -522,7 +494,6 @@ In JavaScript:
 TypeScript can force you to handle these cases at compile time.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -547,7 +518,6 @@ function getEmail(user: User): string {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Objects and arrays
@@ -555,7 +525,6 @@ function getEmail(user: User): string {
 Objects are the “container” type in JavaScript. Arrays are also objects.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -581,7 +550,6 @@ console.log(typeof obj);
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Tuples
@@ -589,7 +557,6 @@ console.log(typeof obj);
 A tuple is an array with **fixed size** and **known types** at specific positions.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 It’s just an array. There is no runtime enforcement of "first item must be a string".
@@ -619,7 +586,6 @@ function useState(initial: number): [number, (v: number) => void] {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Narrowing values with checks
@@ -628,7 +594,6 @@ When you have “one of many possible types”, you narrow it using checks like
 `typeof`, `Array.isArray`, `instanceof`, and `"prop" in obj`.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -673,7 +638,6 @@ function printValue(value: string | number | Date) {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Practical approach: validate at the boundary
@@ -682,7 +646,6 @@ TypeScript does not validate runtime data for you. If you read JSON from a
 server, you must validate it at runtime.
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 ```js
@@ -737,7 +700,6 @@ function parseUser(value: unknown): User {
 ```
 
 {% endtab %}
-
 {% endtabs %}
 
 ## Summary
@@ -750,7 +712,6 @@ function parseUser(value: unknown): User {
 ## Tasks
 
 {% tabs %}
-
 {% tab title="JavaScript" %}
 
 - Predict the results:
@@ -774,5 +735,4 @@ console.log("2" + "3");
   `parseUser` returns `User`.
 
 {% endtab %}
-
 {% endtabs %}
