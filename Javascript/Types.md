@@ -1,66 +1,63 @@
-# Types (JavaScript & TypeScript)
+# 4. Types
 
-A value in JavaScript is always of a certain type (for example, a number or a
-string).
+A value in JavaScript is always of a certain type (for example, a number or a string).
 
-JavaScript and TypeScript both work with the same runtime, but they talk about
-types in different ways.
+JavaScript and TypeScript both work with the same runtime, but they talk about types in different ways.
 
-### JavaScript (Runtime)
+{% tabs %}
+{% tab title="JavaScript " %}
+* Types exist at runtime.
+* Variables can hold any kind of value.
+* Mistakes show up when the code runs.
+{% endtab %}
 
-- Types exist at runtime.
-- Variables can hold any kind of value.
-- Mistakes show up when the code runs.
-
-### TypeScript (Static Analysis)
-
-- The runtime is still JavaScript.
-- TypeScript adds compile-time checks, then emits JavaScript.
-- Many mistakes are caught before running.
+{% tab title="TypeScript " %}
+* The runtime is still JavaScript.
+* TypeScript adds compile-time checks, then emits JavaScript.
+* Many mistakes are caught before running.
+{% endtab %}
+{% endtabs %}
 
 ## Values, variables, and dynamic typing
 
-JavaScript is dynamically typed: the same variable can hold different types at
-different times.
+JavaScript is dynamically typed: the same variable can hold different types at different times.
 
-### JavaScript
-
+{% tabs %}
+{% tab title="JavaScript " %}
 ```js
 let message = "hello";
 message = 123456;
 ```
+{% endtab %}
 
-
-
-### TypeScript
-
+{% tab title="TypeScript " %}
 ```ts
 let message = "hello";
 // message = 123456; // compile-time error
 ```
+{% endtab %}
+{% endtabs %}
 
 ## The 8 basic JavaScript types
 
 There are 8 basic types in JavaScript.
 
-- **Primitive types**: `number`, `bigint`, `string`, `boolean`, `null`,
-  `undefined`, `symbol`
-- **Non-primitive type**: `object`
+* **Primitive types**: `number`, `bigint`, `string`, `boolean`, `null`, `undefined`, `symbol`
+* **Non-primitive type**: `object`
 
-TypeScript uses many of the same names as annotations (for example `string` and
-`number`), but those annotations do not exist at runtime.
+TypeScript uses many of the same names as annotations (for example `string` and `number`), but those annotations do not exist at runtime.
 
 ## Primitives vs. Objects (Value vs. Reference)
 
 This is the single most important mental model in JavaScript.
 
-*   **Primitives** (`string`, `number`, `boolean`, etc.) are passed by **value**.
-*   **Objects** (`{...}`, `[...]`, `function`) are passed by **reference**.
+* **Primitives** (`string`, `number`, `boolean`, etc.) are passed by **value**.
+* **Objects** (`{...}`, `[...]`, `function`) are passed by **reference**.
 
-### JavaScript (Runtime)
 
-**Primitives are immutable and distinct.**
 
+{% tabs %}
+{% tab title="JavaScript " %}
 ```js
 let a = 10;
 let b = a; // Copy the value '10'
@@ -68,14 +65,16 @@ a = 20;
 console.log(b); // 10 (untouched)
 ```
 
-**Objects share the same reference.**
+**Primitives are immutable and distinct.**
 
-```js
+```ts
 const x = { val: 10 };
 const y = x; // Copy the *address* of the object
 x.val = 20;
 console.log(y.val); // 20 (they point to the same house)
 ```
+
+**Objects share the same reference.**
 
 **const** prevents reassignment, not mutation.
 
@@ -84,9 +83,9 @@ const user = { name: "Alice" };
 user.name = "Bob"; // Allowed! You didn't change the reference, just the inside.
 // user = {}; // Error! You cannot change the reference.
 ```
+{% endtab %}
 
-### TypeScript (Static Analysis)
-
+{% tab title="TypeScript " %}
 TypeScript cannot change how memory works, but it can force immutability checks.
 
 ```ts
@@ -99,17 +98,18 @@ const config: Config = { apiUrl: "https://api.com" };
 
 // config.apiUrl = "oops"; // Error: Cannot assign to 'apiUrl' because it is a read-only property.
 ```
+{% endtab %}
+{% endtabs %}
 
 ## Deep Dive: The "Other" Primitives
 
-### BigInt (Integers larger than $2^{53}$)
+### BigInt (Integers larger than 2^<sup>53</sup>)
 
-JavaScript numbers are floating point (IEEE 754). They become unsafe above
-`9,007,199,254,740,991`.
+JavaScript numbers are floating point (IEEE 754). They become unsafe above `9,007,199,254,740,991`.
 
-#### JavaScript
-
-Use the `n` suffix.
+{% tabs %}
+{% tab title="JavaScript " %}
+* Use the `n` suffix.
 
 ```js
 const huge = 9007199254740995n; // BigInt
@@ -119,10 +119,10 @@ const num = 10;
 // console.log(huge + num); // TypeError: Cannot mix BigInt and other types
 console.log(huge + BigInt(num)); // Works
 ```
+{% endtab %}
 
-#### TypeScript
-
-TS ensures you don't mix them by accident.
+{% tab title="TypeScript " %}
+* TS ensures you don't mix them by accident.
 
 ```ts
 const huge: bigint = 9007199254740995n;
@@ -132,14 +132,15 @@ const num: number = 10;
 ```
 
 Use `target: es2020` or higher in `tsconfig.json` to use BigInt.
+{% endtab %}
+{% endtabs %}
 
 ### Symbol (Unique Identifiers)
 
-Symbols are guaranteed to be unique. They are often used for "hidden" properties
-or library internals.
+Symbols are guaranteed to be unique. They are often used for "hidden" properties or library internals.
 
-#### JavaScript
-
+{% tabs %}
+{% tab title="JavaScript " %}
 ```js
 const id1 = Symbol("id");
 const id2 = Symbol("id");
@@ -153,20 +154,20 @@ const user = {
 
 console.log(Object.keys(user)); // ["name"] (Symbol is hidden from iteration)
 ```
+{% endtab %}
 
-#### TypeScript
-
-TS supports `unique symbol` for strict checking, though rarely needed in app
-code.
+{% tab title="TypeScript " %}
+TS supports `unique symbol` for strict checking, though rarely needed in app code.
 
 ```ts
 const key: unique symbol = Symbol();
 ```
+{% endtab %}
+{% endtabs %}
 
 ## Checking runtime types: `typeof` and `Array.isArray`
 
-`typeof` is a JavaScript operator that returns a string describing the runtime
-type.
+`typeof` is a JavaScript operator that returns a string describing the runtime type.
 
 ### JavaScript
 
@@ -198,8 +199,7 @@ if (typeof value === "string") {
 
 ## Type conversions (runtime)
 
-Most of the time, operators convert values automatically. You can also convert
-explicitly.
+Most of the time, operators convert values automatically. You can also convert explicitly.
 
 ### String conversion
 
@@ -212,8 +212,7 @@ String(null); // "null"
 
 #### TypeScript
 
-Same runtime behavior. TypeScript can help you keep track of the result
-type.
+Same runtime behavior. TypeScript can help you keep track of the result type.
 
 ```ts
 const x = String(false);
@@ -236,8 +235,7 @@ Number("123z"); // NaN
 
 #### TypeScript
 
-Same runtime behavior. TypeScript helps you avoid mixing string/number by
-accident.
+Same runtime behavior. TypeScript helps you avoid mixing string/number by accident.
 
 ```ts
 const a = "2";
@@ -381,8 +379,7 @@ const pt: Point = { x: 10, y: 20 };
 
 ## Optionality: undefined vs optional properties
 
-In JS, missing properties produce `undefined`.
-In TS, you can model this precisely.
+In JS, missing properties produce `undefined`. In TS, you can model this precisely.
 
 ### JavaScript
 
@@ -408,8 +405,8 @@ if (user.email) {
 
 In JavaScript:
 
-- `undefined` usually means “missing”.
-- `null` often means “explicitly empty”.
+* `undefined` usually means “missing”.
+* `null` often means “explicitly empty”.
 
 TypeScript can force you to handle these cases at compile time.
 
@@ -492,8 +489,7 @@ function useState(initial: number): [number, (v: number) => void] {
 
 ## Narrowing values with checks
 
-When you have “one of many possible types”, you narrow it using checks like
-`typeof`, `Array.isArray`, `instanceof`, and `"prop" in obj`.
+When you have “one of many possible types”, you narrow it using checks like `typeof`, `Array.isArray`, `instanceof`, and `"prop" in obj`.
 
 ### JavaScript
 
@@ -538,8 +534,7 @@ function printValue(value: string | number | Date) {
 
 ## Practical approach: validate at the boundary
 
-TypeScript does not validate runtime data for you. If you read JSON from a
-server, you must validate it at runtime.
+TypeScript does not validate runtime data for you. If you read JSON from a server, you must validate it at runtime.
 
 ### JavaScript
 
@@ -594,21 +589,21 @@ function parseUser(value: unknown): User {
 
 ## Summary
 
-- JavaScript types are real runtime values.
-- TypeScript adds compile-time checks and then emits JavaScript.
-- Use runtime checks (`typeof`, `Array.isArray`, `instanceof`) to narrow.
-- Validate untrusted input (like JSON) at runtime.
+* JavaScript types are real runtime values.
+* TypeScript adds compile-time checks and then emits JavaScript.
+* Use runtime checks (`typeof`, `Array.isArray`, `instanceof`) to narrow.
+* Validate untrusted input (like JSON) at runtime.
 
 ## Tasks
 
 ### JavaScript
 
-- Predict the results:
-  - `typeof null`
-  - `typeof []`
-  - `Boolean("0")`
-  - `"" + 1 + 0`
-- Fix this so it prints `5` (not `"23"`):
+* Predict the results:
+  * `typeof null`
+  * `typeof []`
+  * `Boolean("0")`
+  * `"" + 1 + 0`
+* Fix this so it prints `5` (not `"23"`):
 
 ```js
 console.log("2" + "3");
@@ -616,7 +611,5 @@ console.log("2" + "3");
 
 ### TypeScript
 
-- Take the JavaScript `parseUser` and rewrite it in TypeScript using
-  `unknown`.
-- Create a `type User = { id: string; name: string }` and ensure your
-  `parseUser` returns `User`.
+* Take the JavaScript `parseUser` and rewrite it in TypeScript using `unknown`.
+* Create a `type User = { id: string; name: string }` and ensure your `parseUser` returns `User`.
