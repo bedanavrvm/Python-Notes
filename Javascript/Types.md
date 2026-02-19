@@ -8,19 +8,15 @@ types in different ways.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 - Types exist at runtime.
 - Variables can hold any kind of value.
 - Mistakes show up when the code runs.
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 - The runtime is still JavaScript.
 - TypeScript adds compile-time checks, then emits JavaScript.
 - Many mistakes are caught before running.
-
 {% endtab %}
 {% endtabs %}
 
@@ -31,21 +27,17 @@ different times.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 let message = "hello";
 message = 123456;
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 ```ts
 let message = "hello";
 // message = 123456; // compile-time error
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -69,7 +61,6 @@ This is the single most important mental model in JavaScript.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 **Primitives are immutable and distinct.**
 
 ```js
@@ -95,11 +86,9 @@ const user = { name: "Alice" };
 user.name = "Bob"; // Allowed! You didn't change the reference, just the inside.
 // user = {}; // Error! You cannot change the reference.
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 TypeScript cannot change how memory works, but it can force immutability checks.
 
 ```ts
@@ -112,7 +101,6 @@ const config: Config = { apiUrl: "https://api.com" };
 
 // config.apiUrl = "oops"; // Error: Cannot assign to 'apiUrl' because it is a read-only property.
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -125,7 +113,6 @@ JavaScript numbers are floating point (IEEE 754). They become unsafe above
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 Use the `n` suffix.
 
 ```js
@@ -136,11 +123,9 @@ const num = 10;
 // console.log(huge + num); // TypeError: Cannot mix BigInt and other types
 console.log(huge + BigInt(num)); // Works
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 TS ensures you don't mix them by accident.
 
 ```ts
@@ -151,7 +136,6 @@ const num: number = 10;
 ```
 
 Use `target: es2020` or higher in `tsconfig.json` to use BigInt.
-
 {% endtab %}
 {% endtabs %}
 
@@ -162,7 +146,6 @@ or library internals.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 const id1 = Symbol("id");
 const id2 = Symbol("id");
@@ -176,18 +159,15 @@ const user = {
 
 console.log(Object.keys(user)); // ["name"] (Symbol is hidden from iteration)
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 TS supports `unique symbol` for strict checking, though rarely needed in app
 code.
 
 ```ts
 const key: unique symbol = Symbol();
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -198,7 +178,6 @@ type.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 typeof undefined; // "undefined"
 typeof 0; // "number"
@@ -212,11 +191,9 @@ typeof alert; // "function"
 
 Array.isArray([]); // true
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 At runtime, TypeScript runs as JavaScript, so `typeof` works the same.
 
 ```ts
@@ -226,7 +203,6 @@ if (typeof value === "string") {
   console.log(value.toUpperCase());
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -239,16 +215,13 @@ explicitly.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 String(false); // "false"
 String(null); // "null"
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 Same runtime behavior. TypeScript can help you keep track of the result
 type.
 
@@ -256,7 +229,6 @@ type.
 const x = String(false);
 // x is string
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -266,7 +238,6 @@ const x = String(false);
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 Number("123"); // 123
 Number("123z"); // NaN
@@ -274,11 +245,9 @@ Number("123z"); // NaN
 +"2" + +"3"; // 5
 "2" + "3"; // "23" (string concatenation)
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 Same runtime behavior. TypeScript helps you avoid mixing string/number by
 accident.
 
@@ -287,7 +256,6 @@ const a = "2";
 const b = "3";
 const sum = Number(a) + Number(b);
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -297,23 +265,19 @@ const sum = Number(a) + Number(b);
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 Boolean(0); // false
 Boolean("0"); // true (non-empty string)
 Boolean(""); // false
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 Same runtime behavior. TypeScript helps you make boolean intent explicit.
 
 ```ts
 const enabled = Boolean("0");
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -330,7 +294,6 @@ function parse(value) {
 
 parse(123); // runtime error
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
@@ -344,7 +307,6 @@ function parse(value: unknown): string {
   throw new Error("Expected a string");
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -356,7 +318,6 @@ In TypeScript, you can also describe it at compile time.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 function normalizeId(id) {
   if (typeof id === "number") {
@@ -370,11 +331,9 @@ function normalizeId(id) {
   throw new Error("Expected id to be a string or number");
 }
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 ```ts
 type Id = string | number;
 
@@ -385,7 +344,6 @@ function normalizeId(id: Id): string {
   return id;
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -395,18 +353,15 @@ Why does `const` sometimes have a different type than `let`?
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 Variables hold values. Access behavior doesn't change based on how they were declared, only reassignment rules apply.
 
 ```js
 const method = "GET";
 let status = "pending";
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 TS infers more specific types for constants.
 
 ```ts
@@ -417,7 +372,6 @@ let status = "pending"; // Type is string (because it can change)
 const req = { url: "https://api.com", method: "GET" } as const;
 // req.method is typed as "GET", not string
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -427,7 +381,6 @@ You can give a name to any type.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 Does not exist. You just write objects and functions. JSDoc is the closest equivalent.
 
 ```js
@@ -437,11 +390,9 @@ Does not exist. You just write objects and functions. JSDoc is the closest equiv
  * @property {number} y
  */
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 ```ts
 type Point = { x: number; y: number };
 type ID = string | number;
@@ -449,7 +400,6 @@ type Callback = (data: string) => void;
 
 const pt: Point = { x: 10, y: 20 };
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -460,16 +410,13 @@ In TS, you can model this precisely.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 const user = { name: "Alice" };
 console.log(user.email); // undefined
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 ```ts
 type User = { name: string; email?: string };
 
@@ -480,7 +427,6 @@ if (user.email) {
   console.log(user.email.toLowerCase());
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -495,17 +441,14 @@ TypeScript can force you to handle these cases at compile time.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 function getEmail(user) {
   return user.email.toLowerCase();
 }
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 ```ts
 type User = { email?: string };
 
@@ -516,7 +459,6 @@ function getEmail(user: User): string {
   return user.email.toLowerCase();
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -526,7 +468,6 @@ Objects are the “container” type in JavaScript. Arrays are also objects.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 typeof {}; // "object"
 typeof []; // "object"
@@ -534,11 +475,9 @@ typeof []; // "object"
 Array.isArray([]); // true
 Array.isArray({}); // false
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 Same runtime behavior. TypeScript can also describe the shapes.
 
 ```ts
@@ -548,7 +487,6 @@ const obj: { id: string } = { id: "1" };
 console.log(Array.isArray(xs));
 console.log(typeof obj);
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -558,7 +496,6 @@ A tuple is an array with **fixed size** and **known types** at specific position
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 It’s just an array. There is no runtime enforcement of "first item must be a string".
 
 ```js
@@ -566,11 +503,9 @@ const role = ["admin", 1]; // Just (string | number)[]
 role[0] = 100; // Allowed
 role.push("oops"); // Allowed
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 TS enforces the structure.
 
 ```ts
@@ -584,7 +519,6 @@ function useState(initial: number): [number, (v: number) => void] {
   return [initial, (v) => {}];
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -595,7 +529,6 @@ When you have “one of many possible types”, you narrow it using checks like
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 function printValue(value) {
   if (typeof value === "string") {
@@ -616,11 +549,9 @@ function printValue(value) {
   console.log("Unknown value");
 }
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 ```ts
 function printValue(value: string | number | Date) {
   if (typeof value === "string") {
@@ -636,7 +567,6 @@ function printValue(value: string | number | Date) {
   console.log(value.toISOString());
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -647,7 +577,6 @@ server, you must validate it at runtime.
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 ```js
 function parseUser(value) {
   if (!value || typeof value !== "object") {
@@ -665,11 +594,9 @@ function parseUser(value) {
   return { id: value.id, name: value.name };
 }
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 ```ts
 type User = { id: string; name: string };
 
@@ -698,7 +625,6 @@ function parseUser(value: unknown): User {
   return { id, name };
 }
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -713,7 +639,6 @@ function parseUser(value: unknown): User {
 
 {% tabs %}
 {% tab title="JavaScript" %}
-
 - Predict the results:
   - `typeof null`
   - `typeof []`
@@ -724,15 +649,12 @@ function parseUser(value: unknown): User {
 ```js
 console.log("2" + "3");
 ```
-
 {% endtab %}
 
 {% tab title="TypeScript" %}
-
 - Take the JavaScript `parseUser` and rewrite it in TypeScript using
   `unknown`.
 - Create a `type User = { id: string; name: string }` and ensure your
   `parseUser` returns `User`.
-
 {% endtab %}
 {% endtabs %}
