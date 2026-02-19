@@ -8,12 +8,14 @@ types in different ways.
 
 {% tabs %}
 {% tab title="JavaScript" %}
+
 - Types exist at runtime.
 - Variables can hold any kind of value.
 - Mistakes show up when the code runs.
 {% endtab %}
 
 {% tab title="TypeScript" %}
+
 - The runtime is still JavaScript.
 - TypeScript adds compile-time checks, then emits JavaScript.
 - Many mistakes are caught before running.
@@ -639,6 +641,7 @@ function parseUser(value: unknown): User {
 
 {% tabs %}
 {% tab title="JavaScript" %}
+
 - Predict the results:
   - `typeof null`
   - `typeof []`
@@ -652,6 +655,7 @@ console.log("2" + "3");
 {% endtab %}
 
 {% tab title="TypeScript" %}
+
 - Take the JavaScript `parseUser` and rewrite it in TypeScript using
   `unknown`.
 - Create a `type User = { id: string; name: string }` and ensure your
